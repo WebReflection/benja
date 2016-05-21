@@ -109,7 +109,7 @@ fi
 # print welcome or eventually launch weston
 if [ "$SESSION_TYPE" = "remote/ssh" ]; then
   echo -e "${OS_LOGO}
-   ${SESSION_TYPE} session
+  ${SESSION_TYPE} session
  "
 else
   if [ "$WESTON_LAUNCHED" != "true" ]; then

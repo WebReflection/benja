@@ -1,11 +1,14 @@
 {
   "name": "app",
   "version": "1.0.0",
-  "description": "basic electron example",
+  "description": "basic app example",
   "main": "index.js",
   "scripts": {
     "start": "electron index.js"
   },
   "author": "Andrea Giammarchi",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "electron-prebuilt": "latest"
+  }
 }

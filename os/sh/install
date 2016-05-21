@@ -380,7 +380,7 @@ HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
 
 # basic info
 echo ''
-icho "Currently using a [*]${OS_NAME}x${WIDTH}x${HEIGHT}[/] resolution"
+icho "Configuring [*]${OS_NAME}[/] on a ${WIDTH}x${HEIGHT}[/] screen"
 echo ''
 sleep 2
 

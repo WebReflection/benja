@@ -11,42 +11,39 @@
         text-align: center;
         padding-top: 20%;
       }
-      img, strong, span {
-        display: block;
-        margin: auto;
+      h1 {
+        font-size: 1.2rem;
       }
     </style>
   </head>
   <body>
-    <img src="logo.svg" with=220 height=220>
-    <strong>benja OS</strong>
+    <h1>Benja OS</h1>
+    <img src="logo.svg" width=64 height=64>
     <script>
     function findReachableIPV4Address() {
-      var
-        ni = require('os').networkInterfaces(),
-        out = []
-      ;
-      Object.keys(ni).forEach(function (key) {
-        var ifaces = ni[key];
-        ifaces.forEach(function (iface) {
+      const ni = require('os').networkInterfaces();
+      return Object.keys(ni).reduce((out, key) => {
+        return ni[key].reduce((out, iface) => {
           if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
             out.push(iface.address);
           }
-        });
-      });
-      return out;
+          return out;
+        }, out);
+      }, []);
     }
+
     findReachableIPV4Address().forEach(function (ip) {
       document.body.appendChild(
-        document.createElement('span')
+        document.createElement('p')
       ).textContent = ip;
-      document.body.appendChild(
-        document.createElement('span')
-      ).textContent = [
-        document.documentElement.clientWidth,
-        document.documentElement.clientHeight
-      ].join('x');
     });
+
+    document.body.appendChild(
+      document.createElement('p')
+    ).textContent = [
+      document.documentElement.clientWidth,
+      document.documentElement.clientHeight
+    ].join('x');
     </script>
   </body>
 </html>

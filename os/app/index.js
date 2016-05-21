@@ -1,10 +1,19 @@
 // simple server example
-const index = require('fs').readFileSync(__dirname + '/index.html');
+const
+  fs = require('fs'),
+  index = fs.readFileSync(__dirname + '/index.html'),
+  logo = fs.readFileSync(__dirname + '/logo.svg')
+;
 require('http')
   .createServer((req, res) => {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html');
-    res.end(index);
+    if (req.url === '/logo.svg') {
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.end(logo);
+    } else {
+      res.setHeader('Content-Type', 'text/html');
+      res.end(index);
+    }
   })
   .listen(8080);
   // will respond to :80 too via iptables
@@ -34,8 +43,8 @@ app.once('ready', function () {
     fullscreen: true,
     x: 0,
     y: 0,
-    width: area.width || parseFloat(process.env.WIDTH),
-    height: area.height || parseFloat(process.env.HEIGHT)
+    width: area.width,
+    height: area.height
   });
 
   this.window
@@ -43,6 +52,6 @@ app.once('ready', function () {
       // cleanup the reference
       this.window = null;
     })
-    .loadURL('http://localhost/');
+    .loadURL('http://localhost:8080/');
  // .loadURL('https://codepen.io/bennettfeely/full/tfbCo/');
 });
