@@ -1,0 +1,11 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "basic jsgtk example",
+  "main": "index.js",
+  "scripts": {
+    "start": "jsgtk index.js"
+  },
+  "author": "Andrea Giammarchi",
+  "license": "MIT"
+}

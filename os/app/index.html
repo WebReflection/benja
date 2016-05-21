@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html {
+        font-family: sans-serif;
+        color: #eeeeec;
+        background: #393f3f;
+      }
+      body {
+        text-align: center;
+        padding-top: 20%;
+      }
+      img, strong, span {
+        display: block;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="logo.svg" with=220 height=220>
+    <strong>benja OS</strong>
+    <script>
+    function findReachableIPV4Address() {
+      var
+        ni = require('os').networkInterfaces(),
+        out = []
+      ;
+      Object.keys(ni).forEach(function (key) {
+        var ifaces = ni[key];
+        ifaces.forEach(function (iface) {
+          if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
+            out.push(iface.address);
+          }
+        });
+      });
+      return out;
+    }
+    findReachableIPV4Address().forEach(function (ip) {
+      document.body.appendChild(
+        document.createElement('span')
+      ).textContent = ip;
+      document.body.appendChild(
+        document.createElement('span')
+      ).textContent = [
+        document.documentElement.clientWidth,
+        document.documentElement.clientHeight
+      ].join('x');
+    });
+    </script>
+  </body>
+</html>

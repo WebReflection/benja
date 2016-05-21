@@ -1,0 +1,139 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+export OS_KERNEL='linux-odroid-xu'
+export OS_HEADERS='linux-odroid-xu-headers'
+export OS_ARCHIVE='ArchLinuxARM-odroid-xu-latest.tar.gz'
+export OS_MAX_RESOLUTION=1280x720
+
+# partition_sd /dev/mmblk0 3200M
+partition_sd() {
+  local DISK=$1
+  local ROOT_SIZE=$2
+  curl -LO http://os.archlinuxarm.org/os/exynos/xuboot.img
+  sudo dd if=xuboot.img of=$DISK bs=512
+  sync
+  sleep 2
+  rm xuboot.img
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    # ma-ma-ma-ma-ma-ma-ma-ma-mad-mad-ness
+    sudo sh -c "sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk $DISK
+      n # new
+      p # primary
+      1 # first
+        # start from default
+      +100M # add 100M
+      t # change type
+      c # FAT
+      n # new
+      p # primary
+      2 # second
+        # start from default
+      +$ROOT_SIZE # add 3200M
+      n # new
+      p # primary
+      3 # third
+        # start from default
+        # till the end
+      t # change type
+      3 # for the third
+      c # FAT
+      p # print (to double check manually)
+      w # write
+      q # GTFO
+    EOF">/dev/null
+  fi
+  echo 'OK'
+}
+
+# returns ordered partitions
+get_partitions() {
+  local DISK=$1
+  local POSSIBLEDISKS=$(ls ${DISK}*)
+  local BOOT=""
+  local ROOT=""
+  local WWW=""
+  local CHOICE=""
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$BOOT" = "" ]; then
+        BOOT="$CHOICE"
+      else
+        if [ "$ROOT" = "" ]; then
+          ROOT="$CHOICE"
+        else
+          WWW="$CHOICE"
+        fi
+      fi
+    fi
+  done
+
+  echo "${BOOT} ${ROOT} ${WWW}"
+}
+
+# format_sd /dev/mmblk0
+format_sd() {
+  local DISK=$1
+  local BOOT=$2
+  local ROOT=$3
+  local WWW=$4
+
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    sudo mkfs.vfat "$BOOT"
+    yes | sudo mkfs.ext4 "$ROOT"
+    sudo mkfs.vfat "$WWW"
+  fi
+
+  echo 'OK'
+
+}
+
+# install_os /dev/mmblk0 Archive.gz
+install_os() {
+  local ARCHIVE="$1"
+  local DISK=$2
+  local BOOT=$3
+  local ROOT=$4
+
+  mkdir -p boot
+  sudo mount "$BOOT" boot
+  mkdir -p root
+  sudo mount "$ROOT" root
+  sudo bsdtar -xpf "$ARCHIVE" -C root
+  sync
+  sleep 2
+  sudo cp root/boot/* boot
+  sync
+}
+
+# finalize installation
+unmount_os() {
+  local BOOT=$1
+  local ROOT=$2
+  sudo umount $BOOT $ROOT
+}

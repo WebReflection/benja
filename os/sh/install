@@ -1,0 +1,576 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+export OS_INSTALLER="0.1.0"
+export OS_VERSION="0.3.0"
+export OS_NAME="BENJA"
+export OS_WEBSITE="https://benja.io"
+export OS_REMOTE_FILES="http://webreflection.github.io/benja/os"
+export OS_USER="benja"
+export OS_LOGO=" 
+ [d]┌────────────────┐[/]
+ [d]│[/] [*][b]╔╗ ╔═╗╔╗╔ ╦╔═╗[/] [d]│[/] [l]Bootable[/]
+ [d]│[/] [*][c]╠╩╗║╣ ║║║ ║╠═╣[/] [d]│[/] [l]Electron[/]
+ [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
+ [d]└────────────────┘[/]
+  [l]${OS_WEBSITE}[/l]"
+export OS_INSTALLER_LOGO="
+  [*]installer ${OS_INSTALLER}[/]${OS_LOGO}"
+export OS_USER_DIR="/home/${OS_USER}"
+export OS_INSTALLER_SRC=$(cd $(dirname "$0"); pwd)
+export OS_APP_LAUNCHER='.launch-app'
+export OS_SDCARD=
+export OS_PLATFORM_UTILS
+
+clear
+
+. $OS_INSTALLER_SRC/utils
+
+if [ "$(uname)" = "Darwin" ]; then
+  icho "$OS_INSTALLER_LOGO"
+  echo ''
+  icho " [r][*][WARNING][/]"
+  icho "  the [*]Darwin[/] platform not supported yet"
+  echo '  please use a Linux distro ( suggested: ArchLinux )'
+  echo '  https://www.archlinux.org/'
+  echo ''
+  exit 1
+fi
+
+
+if [ "$1" = "--help" ]; then
+  icho "$OS_INSTALLER_LOGO"
+  echo ''
+  icho "  please [*]specify an SD target[/] via:"
+  echo "    ./$(basename $0) prepare /dev/mmcblk0"
+  echo ''
+  icho "  find possible targets via [*]lsblk[/] or [*]fdisk -l[/]"
+  echo ''
+  echo "  you can also specify a predefined platform via:"
+  echo "    ./$(basename $0) prepare /dev/mmcblk0 rpi2"
+  echo ''
+  icho '  [*]available platforms[/] (rpi2 is the default):'
+  echo "    beaglebone-black, rpi2, rpi3"
+  echo "    cubieboard, cubieboard-2"
+  echo "    odroid-c1, odroid-u2, odroid-u3, odroid-xu"
+  echo ''
+  exit 0
+fi
+
+# fix possible variables
+if [ "$OS_BOOTINTO" = "" ]; then
+  OS_BOOTINTO="electron"
+else
+  if [ "$OS_BOOTINTO" = "jsgtk" ]; then
+    OS_DEVEL=true
+  fi
+fi
+if [ "$OS_DEVEL" = "1" ]; then
+  OS_DEVEL=true
+fi
+
+if [ "$1" = "prepare" ]; then
+
+  if [ "$2" = "" ]; then
+    $0 --help
+    exit 1
+  fi
+
+  # find out which platform is it
+  case $3 in
+    beaglebone-black)
+      OS_PLATFORM="BeagleBone Black"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/beaglebone-black"
+      ;;
+    cubieboard)
+      OS_PLATFORM="Cubieboard"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/cubieboard"
+      ;;
+    cubieboard-1)
+      OS_PLATFORM="Cubieboard"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/cubieboard"
+      ;;
+    cubieboard-2)
+      OS_PLATFORM="Cubieboard 2"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/cubieboard-2"
+      ;;
+    rpi)
+      # TODO: test this actually works
+      OS_PLATFORM="Raspberry Pi 1"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/rpi1"
+      ;;
+    rpi1)
+      # TODO: test this actually works
+      OS_PLATFORM="Raspberry Pi 1"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/rpi1"
+      ;;
+    rpi2)
+      OS_PLATFORM="Raspberry Pi 2"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/rpi2"
+      ;;
+    rpi3)
+      OS_PLATFORM="Raspberry Pi 3"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/rpi2"
+      ;;
+    odroid-c1)
+      OS_PLATFORM="ODROID-C1"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-c1"
+      ;;
+    odroid-u2)
+      OS_PLATFORM="ODROID-U2"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-u2"
+      ;;
+    odroid-u3)
+      OS_PLATFORM="ODROID-U3"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-u2"
+      ;;
+    odroid-xu)
+      OS_PLATFORM="ODROID-XU"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-xu"
+      ;;
+    *)
+      if [ "$4" != "" ]; then
+        OS_PLATFORM="$3"
+        OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/$3"
+      else
+        OS_PLATFORM="Raspberry Pi 2"
+        OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/rpi2"
+      fi
+      ;;
+  esac
+
+  . $OS_PLATFORM_UTILS
+
+  export OS_FULL_LOGO=" 
+  [*]${OS_PLATFORM}[/]${OS_LOGO}  ${OS_VERSION}
+"
+
+  icho "${OS_FULL_LOGO}
+  using [*]${OS_ARCHIVE}[/]
+  
+  verifying [*]$2[/]"
+
+  if [ "$OS_KERNEL" = "" ] || [ "$OS_HEADERS" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
+    echo ''
+    icho " [r][*]broken configuration[/]: ${OS_PLATFORM_UTILS}"
+    echo ''
+    exit 1
+  fi
+
+  # verify sudo
+  if [ "$(user_is_authorized)" != "OK" ]; then
+    echo ''
+    icho ' [r][*]sudo privileges are needed[/] in order to prepare the SD'
+    echo ''
+    exit 1
+  fi
+
+  export OS_SDCARD="$2"
+
+  # umount sd card, exit if there are problems
+  if [ "$(umount_sd "$OS_SDCARD")" != "OK" ]; then
+    echo ''
+    icho " [r][*]invalid SD target[/]: ${OS_SDCARD}"
+    echo ''
+    exit 1
+  fi
+
+  # verify and format the SD card
+  TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
+  TMP_ROOT_SIZE="3500000"
+
+  if [ $TMP_SD_SIZE \> $TMP_ROOT_SIZE ]; then
+    TMP_ROOT_SIZE="3200M"
+  else
+    TMP_ROOT_SIZE="1900M"
+  fi
+
+  echo "  SD card total space: $TMP_SD_SIZE"
+  icho "  creating a root partition of [*]$TMP_ROOT_SIZE[/]"
+
+  echo ''
+  icho " [r][*][WARNING][/]"
+  icho "  disk [o]${OS_SDCARD}[/] will be completely [*]erased[/]"
+  echo "  and every data in it will be lost."
+  echo ''
+  read -n1 -r -p "$(icho "  prepare [*]${OS_PLATFORM}[/] and erase [*]${OS_SDCARD}[/]? [y/N]")" CHOICE
+
+  if [[ $? -ne 0 ]] || [ "$CHOICE" != "y" ]; then
+    echo ''
+    echo '  bye bye'
+    echo ''
+    exit 1
+  fi
+
+  echo ''
+  echo '  partitioning'
+  if [ "$(partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE)" != "OK" ]; then
+    echo ''
+    icho " [r][*][WARNING][/] unable to [*]partition[/] ${OS_SDCARD}"
+    echo ''
+    exit 1
+  fi
+
+  sync
+
+  export OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
+
+  echo '  formatting'
+  if [ "$(format_sd "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]})" = "" ]; then
+    echo ''
+    icho " [r][*][WARNING][/] unable to [*]format[/] ${OS_SDCARD}"
+    echo ''
+    exit 1
+  fi
+
+  sync
+
+  echo '  preparing first boot'
+
+  mkdir -p ~/${OS_NAME}-tmp-install
+
+  cp $0 ~/${OS_NAME}-tmp-install/install
+  sudo cp $OS_INSTALLER_SRC/utils ~/${OS_NAME}-tmp-install/utils
+  sudo cp "$OS_PLATFORM_UTILS" ~/${OS_NAME}-tmp-install/utils-platform
+
+  cd ~/${OS_NAME}-tmp-install
+  echo '#!/usr/bin/env bash
+pacman -Syu --needed --noconfirm dialog wpa_supplicant
+clear
+echo "
+Please choose your wifi and write its password when/if asked.
+Please ignore possible info coming up during this process.
+"
+sleep 3
+wifi-menu
+echo "
+trying to configure the wifi automatically
+"
+WLAN=$(netctl list)
+if [ "$WLAN" != "" ]; then
+  netctl enable "${WLAN:2}"
+  echo "wifi ${WLAN:2} enabled"
+else
+  echo "unable to configure the wifi"
+fi
+'>wifi
+
+  echo "${OS_PLATFORM}" >${OS_NAME}-platform
+
+  echo "[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount ${OS_SDCARD_PARTITIONS[-1]} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">${OS_NAME}-disk.service
+
+  sed -i "s/clear/export OS_DEVEL='${OS_DEVEL}';export OS_BOOTINTO='${OS_BOOTINTO}';clear/" install
+
+  if [ -f ~/Downloads/$OS_ARCHIVE ]; then
+    echo "  using $OS_ARCHIVE found in ~/Downloads"
+    TMP_ARCHIVE=~/Downloads/$OS_ARCHIVE
+  else
+    echo "  downloading $OS_ARCHIVE"
+    curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
+    TMP_ARCHIVE=./$OS_ARCHIVE
+  fi
+
+  echo '  extracting the OS (this might take a while)'
+  install_os "$TMP_ARCHIVE" "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]}
+
+  echo '  moving prepared files'
+  sudo mv ${OS_NAME}-disk.service root/etc/systemd/system/${OS_NAME}-disk.service
+  sudo mv ${OS_NAME}-platform root/root/${OS_NAME}-platform
+  sudo mv {install,utils,utils-platform,wifi} root/root/
+  sudo chmod +x root/root/install
+  sudo chmod +x root/root/wifi
+  sync
+  echo '  cleaning up'
+  sync
+  unmount_os ${OS_SDCARD_PARTITIONS[*]}
+  cd ~/
+  sync
+  sleep 1
+  sudo rm -rf ~/${OS_NAME}-tmp-install
+
+  icho "
+Please [*]remove the SD card[/] and boot it via ${OS_PLATFORM}.
+Once logged in as user [*]root[/] with password [*]root[/]
+simply write [*]./install[/] and wait for it to reboot.
+
+Please note that [*]a network connection is necessary[/]
+and the first intallation might  take a while.
+
+[*]Thanks for using ${OS_NAME}[/]
+
+"
+  exit 0
+
+  echo ''
+  echo ''
+
+fi
+
+if [ ! -f /root/${OS_NAME}-platform ]; then
+  $0 --help
+  exit 1
+fi
+
+if [ "$USER" != "root" ]; then
+  echo ' you must be root to perform this action'
+  exit 1
+fi
+
+. /root/utils-platform
+
+export OS_PLATFORM=$(cat /root/${OS_NAME}-platform)
+export OS_FULL_LOGO=" 
+  [*]${OS_PLATFORM}[/]${OS_LOGO}  ${OS_VERSION}
+"
+
+
+icho "[*]${OS_PLATFORM}[/]${OS_INSTALLER_LOGO}
+ "
+
+echo ' trying to update system clock'
+ntpdate pool.ntp.org > /dev/null 2>&1
+timedatectl set-local-rtc 1 > /dev/null 2>&1
+
+# updating system
+echo ' updating core and kernel (this might take a while)'
+pacman -Syu --needed --noconfirm ${OS_KERNEL}
+
+echo ' configuring platform'
+configure_platform ''
+
+echo ' installing dependencies (this might take a while)'
+
+# installing minimum required software
+pacman -S --needed --noconfirm \
+  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh
+
+WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
+HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
+
+# basic info
+echo ''
+icho "Currently using a [*]${OS_NAME}x${WIDTH}x${HEIGHT}[/] resolution"
+echo ''
+sleep 2
+
+# trying not to stress too much per each group of packages
+
+# fonts
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  ttf-dejavu ttf-liberation ttf-symbola ttf-droid
+
+# gstreamer
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  gst-plugins-base gst-plugins-good gst-libav
+
+# libnotify and npm
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  libnotify npm # > /dev/null 2>&1
+
+# extras
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  libva-vdpau-driver libva-mesa-driver
+
+if [[ $? -ne 0 ]] ; then
+  echo ''
+  icho " [*][r]WARNING[/] some library couldn't be installed"
+  exit 1
+fi
+
+if [ "$OS_BOOTINTO" = "electron" ]; then
+  # unfortunately required by current electron
+  # since it doesn't work on Wayland
+  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr gtk2
+
+  if [[ $? -ne 0 ]] ; then
+    echo ''
+    icho " [*][r]WARNING[/] some library couldn't be installed"
+    exit 1
+  fi
+
+  # electron is like part of the basic requirement
+  # make it already available
+  npm install -g electron-prebuilt
+
+  if [[ $? -ne 0 ]] ; then
+    echo ''
+    icho " [*][r]WARNING[/] electron couldn't be installed"
+    exit 1
+  fi
+fi
+
+# test mode only, actually not needed
+# pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbturbo
+
+# probably unnecessary extras ( in some case expected there by default )
+pacman -S --needed --noconfirm \
+  gconf nss pulseaudio pulseaudio-alsa gperf libexif
+
+if [[ $? -ne 0 ]] ; then
+  echo ''
+  icho " [*][r]WARNING[/] some library couldn't be installed"
+  exit 1
+fi
+
+if [ "$OS_DEVEL" = "true" ]; then
+  sudo pacman -S --needed --noconfirm \
+    $OS_HEADERS base-devel git diffstat chrpath wget cpio pv
+  installFromAUR "${OS_USER}" 'package-query'
+  installFromAUR "${OS_USER}" 'yaourt'
+fi
+
+if [ "$OS_BOOTINTO" = "jsgtk" ]; then
+  sudo pacman -S --needed --noconfirm \
+    adwaita-icon-theme gnome-themes-standard gjs webkit2gtk
+  yaourt -S --needed --noconfirm jsgtk
+fi
+
+if [ "$(contains '/etc/default/cpupower' "# ${OS_NAME} cpupower")" = "false" ]; then
+  echo " boosting CPU performance"
+  echo "
+# ${OS_NAME} cpupower
+governor='performance'">>/etc/default/cpupower
+  systemctl enable cpupower.service
+  systemctl start cpupower.service
+fi
+
+# create quite improbable to hack root password
+# just use sudo for root operations
+# and be sure the user password is a good one
+# by default, it's the user name itself
+ROOTPWD=$(cat /dev/urandom | head | tail | sha256sum | sed -e 's/  -//')
+echo -e "${ROOTPWD}
+${ROOTPWD}" | passwd
+ROOTPWD=""
+
+if [ -d /home/alarm ]; then
+  echo " removing alarm user"
+  userdel -r alarm
+  echo " adding ${OS_USER} user"
+  useradd -m -g users -G wheel,storage,power,video -s /bin/bash $OS_USER
+  echo -e "${OS_USER}
+${OS_USER}" | passwd $OS_USER
+fi
+
+if [ -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
+  echo " preparing ${OS_NAME} app folder"
+  mkdir -p ${OS_USER_DIR}/app
+  systemctl start ${OS_NAME}-disk.service
+  systemctl enable ${OS_NAME}-disk.service
+fi
+sleep 1
+
+# automatic login for the user
+if [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+  echo ' creating automatic login'
+  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  echo "[Service]
+ExecStart=
+ExecStart=-/usr/sbin/agetty -n -i -a ${OS_USER} %I
+" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+fi
+
+# sudo powers
+if [ "$(contains '/etc/sudoers' "# ${OS_NAME} sudoers")" = "false" ]; then
+  echo ' updating /etc/sudoers'
+  echo "
+# ${OS_NAME} sudoers
+%wheel ALL=(ALL) ALL" >>/etc/sudoers
+fi
+
+# drop initial welcome mesasge
+if [ -f /etc/motd ]; then
+  echo ' removing /etc/motd'
+  rm /etc/motd
+fi
+
+# avoid links on linux partition from fat one
+npm config set bin-links false
+
+cd $OS_USER_DIR
+curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
+icho "${OS_FULL_LOGO}">./${OS_NAME}-logo
+chown "${OS_USER}:users" ./${OS_NAME}-logo
+sudo -H -u $OS_USER bash -c "OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
+rm install-user
+rm -f ${OS_USER_DIR}/${OS_NAME}-logo
+cd -
+
+echo ' creating 80 to 8080 redirect'
+echo "[Unit]
+Description=${OS_NAME} 80 to 8080 service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+
+[Install]
+WantedBy=multi-user.target
+" >/etc/systemd/system/${OS_NAME}-80to8080.service
+  systemctl enable ${OS_NAME}-80to8080.service
+  systemctl start ${OS_NAME}-80to8080.service
+
+
+echo ' configuring hostname'
+echo "${OS_USER}.local" > /etc/hostname
+hostnamectl set-hostname "${OS_USER}.local"
+sed -i "s/localhost\$/localhost$(printf '\t')${OS_USER}.local/g" /etc/hosts
+
+# trying to avoid suspend mode
+echo 'HandleSuspendKey=ignore
+HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
+
+# most common situation so far
+configure_X11 ''
+
+# last chance to change something
+configure_after ''
+
+pacman -Sc --noconfirm
+
+echo '
+---------------------------------------------
+                                          OK
+'
+
+# drop this very same file
+rm $0
+rm utils
+rm utils-platform
+rm wifi
+rm ${OS_NAME}-platform
+
+reboot
