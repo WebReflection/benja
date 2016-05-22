@@ -1,24 +1,57 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
       html {
-        font-family: sans-serif;
-        color: #eeeeec;
-        background: #393f3f;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
       }
+
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+
       body {
+        background: #292929;
+        color: #eeeeec;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        padding-top: 20%;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
       }
+
       h1 {
+        font-size: 1.5rem;
+        color: #ffffff;
+      }
+      h2 {
+        font-weight: lighter;
         font-size: 1.2rem;
+        color: #8c8c8b;
+        margin-bottom: 0;
+      }
+      img {
+        height: 15vh;
       }
     </style>
+    <title>Benja OS</title>
   </head>
   <body>
-    <h1>Benja OS</h1>
-    <img src="logo.svg" width=64 height=64>
+    <header>
+      <img src="logo-dark.svg">
+      <h1>B.E.N.J.A.</h1>
+      <h2>Bootable Electron Node JS Application</h2>
+    </header>
+    <main></main>
     <script>
     function findReachableIPV4Address() {
       const ni = require('os').networkInterfaces();
@@ -32,13 +65,15 @@
       }, []);
     }
 
+    const main = document.querySelector('main');
+
     findReachableIPV4Address().forEach(function (ip) {
-      document.body.appendChild(
+      main.appendChild(
         document.createElement('p')
       ).textContent = ip;
     });
 
-    document.body.appendChild(
+    main.appendChild(
       document.createElement('p')
     ).textContent = [
       document.documentElement.clientWidth,

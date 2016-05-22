@@ -2,12 +2,12 @@
 const
   fs = require('fs'),
   index = fs.readFileSync(__dirname + '/index.html'),
-  logo = fs.readFileSync(__dirname + '/logo.svg')
+  logo = fs.readFileSync(__dirname + '/logo-dark.svg')
 ;
 require('http')
   .createServer((req, res) => {
     res.statusCode = 200;
-    if (req.url === '/logo.svg') {
+    if (req.url === '/logo-dark.svg') {
       res.setHeader('Content-Type', 'image/svg+xml');
       res.end(logo);
     } else {

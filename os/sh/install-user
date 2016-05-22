@@ -156,6 +156,7 @@ fi
     curl -LO "${OS_REMOTE_FILES}/jsgtk/browse"
     chmod a+x browse
   fi
-  curl -LO "${OS_REMOTE_FILES}/app/logo.svg"
+  curl -LO "${OS_REMOTE_FILES}/app/logo-dark.svg"
+  curl -LO "${OS_REMOTE_FILES}/app/logo-light.svg"
   mkdir ~/app/node_modules
 fi

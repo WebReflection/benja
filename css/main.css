@@ -1,0 +1,33 @@
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  background: #292929;
+  color: #eeeeec;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+h2 {
+  font-weight: lighter;
+  font-size: 1.2rem;
+  color: #8c8c8b;
+}
