@@ -1,0 +1,531 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+# disk checks
+if [ "$DISK" = "" ]; then
+  icho '  [*][r][WARNING][/] no DISK has been specified'
+  echo ''
+  echo '  please specify a DISK target (i.e. DISK=/dev/sdb)'
+  echo '  (use lsblk or fdisk -l to know which one could be OK)'
+  exit 1
+fi
+
+# update system time
+ntpdate pool.ntp.org
+timedatectl set-local-rtc 1
+
+# video card checks
+if [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep Intel)" != "" ]; then
+  GPU='Intel'
+  GPU_DRIVERS='xf86-video-intel libva-intel-driver'
+elif [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep NVIDIA)" != "" ]; then
+  GPU='nVidia'
+  GPU_DRIVERS='xf86-video-nouveau mesa-libgl'
+elif [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep AMD)" != "" ]; then
+  GPU='Radeon'
+  GPU_DRIVERS='xf86-video-ati libva-mesa-driver'
+fi
+
+# swap checks
+if [ "$SWAP" = "" ]; then
+  SWAP=2GiB
+fi
+
+# EDD needed in some board
+if [ "$EDD" = "NO" ] || [ "$EDD" = "0" ] || [ "$EDD" = "false" ]; then
+  EDD=off
+fi
+
+PASSWD="$(cat /dev/urandom | head | tail | sha256sum | sed -e 's/  -//')"
+USER='benja'
+UPASSWD="$USER"
+LABEL="$USER"
+
+# UEFI architecture check
+if [ "$UEFI" != "" ]; then
+  if [ "$UEFI" != "NO" ]; then
+    if [ "$UEFI" != "efi64" ]; then
+      if [ "$UEFI" != "efi32" ]; then
+        echo "valid UEFI are efi64 or efi32, not $UEFI"
+        exit 1
+      fi
+    fi
+  fi
+else
+  if [ "$(uname -m)" = "x86_64" ]; then
+    UEFI=efi64
+  else
+    UEFI=efi32
+  fi
+fi
+
+pacman -Sy --noconfirm
+pacman-db-upgrade
+pacman-key --init
+pacman-key --populate archlinux
+
+pacman -S --needed --noconfirm fbset
+if [ "$WIDTH" = "" ]; then
+  WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
+fi
+if [ "$HEIGHT" = "" ]; then
+  HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
+fi
+
+if [ "$UEFI" = "NO" ]; then
+  SYSLINUX_BOOT='/boot'
+  SYSLINUX_ROOT='/boot'
+else
+  SYSLINUX_BOOT=''
+  SYSLINUX_ROOT='/boot'
+fi
+
+echo "verifying $DISK"
+POSSIBLEDISKS=$(ls ${DISK}[0-9p]*)
+
+if [[ $? -ne 0 ]] ; then
+  POSSIBLEDISKS=$(ls ${DISK})
+  if [[ $? -ne 0 ]] ; then
+    exit 1
+  fi
+fi
+
+for CHOICE in $POSSIBLEDISKS; do
+  if [ "$CHOICE" != "$DISK" ]; then
+    if [ "$(df | grep $CHOICE)" != "" ]; then
+      echo "unmounting $CHOICE"
+      sudo umount $CHOICE
+      if [[ $? -ne 0 ]] ; then
+        icho "  [*][r][WARNING][/] unable to install in ${CHOICE}"
+        exit 1
+      fi
+    fi
+  fi
+done
+
+dd if=/dev/zero of=$DISK bs=1 count=2048
+
+sync
+sleep 2
+
+if [ "$UEFI" = "NO" ]; then
+  PARTED_START_AT="2048s"
+  sudo parted --script $DISK mklabel msdos
+else
+  PARTED_START_AT="64M"
+  sudo parted --script $DISK mklabel gpt
+  sudo parted --script --align optimal $DISK mkpart primary fat16 2048s 64M
+  sudo parted $DISK set 1 boot on
+fi
+
+if [ "$SWAP" = "0" ]; then
+  sudo parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT 100%
+else
+  sudo parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
+  sudo parted --script --align optimal $DISK mkpart primary ext4 $SWAP 100%
+fi
+
+sync
+
+POSSIBLEDISKS=$(ls ${DISK}[0-9p]*)
+if [[ $? -ne 0 ]] ; then
+  icho "  [*][r][WARNING][/] unable to install in ${POSSIBLEDISKS}"
+  exit 1
+fi
+
+TMP=
+ROOT=
+if [ "$UEFI" = "NO" ]; then
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$SWAP" = "0" ]; then
+        ROOT="$CHOICE"
+      else
+        if [ "$TMP" = "" ]; then
+          SWAP="$CHOICE"
+          TMP="$SWAP"
+        else
+          ROOT="$CHOICE"
+        fi
+      fi
+    fi
+  done
+else
+  EFI=
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$EFI" = "" ]; then
+        EFI="$CHOICE"
+      else
+        if [ "$SWAP" = "0" ]; then
+          ROOT="$CHOICE"
+        else
+          if [ "$TMP" = "" ]; then
+            SWAP="$CHOICE"
+            TMP="$SWAP"
+          else
+            ROOT="$CHOICE"
+          fi
+        fi
+      fi
+    fi
+  done
+
+  echo "EFI boot loader:  $EFI"
+fi
+
+if [ "$SWAP" != "0" ]; then
+  echo "SWAP:             $SWAP"
+fi
+echo "ROOT:             $ROOT"
+
+if [ "$SWAP" != "0" ]; then
+  sudo mkswap $SWAP
+  sudo swapon $SWAP
+fi
+
+sync
+
+if [ "$UEFI" != "NO" ]; then
+  sudo mkfs.vfat $EFI
+fi
+yes | sudo mkfs.ext4 $ROOT
+
+sync
+mkdir -p benja
+
+
+# temporary hack to test boot from SD
+# and system in the EMMC
+# needed to be done upfront:
+#   1. create a primary ext4 partition in /dev/emmcblk0
+#   2. mkfs.ext4 /dev/emmcblk0p1
+#   3. specify such partition before running this installer
+if [ "$EXP_USE_EMMC" != "" ]; then
+  mount $EXP_USE_EMMC benja
+  mkdir -p "benja$SYSLINUX_ROOT"
+  mount $ROOT "benja$SYSLINUX_ROOT"
+  SYSLINUX_BOOT=''
+else
+  sudo mount $ROOT benja
+  if [ "$UEFI" != "NO" ]; then
+    mkdir -p "benja$SYSLINUX_ROOT"
+    mount $EFI "benja$SYSLINUX_ROOT"
+  fi
+fi
+sync
+
+TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
+if [ "$UEFI" != "NO" ]; then
+  TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
+fi
+
+TOPACKSTRAP="$TOPACKSTRAP dialog wpa_supplicant iw"
+
+sudo pacstrap benja $TOPACKSTRAP
+sync
+
+if [ "$UEFI" = "NO" ]; then
+  if [ "$SAVE_FSTAB_INFO" = "1" ]; then
+    mkdir -p benja/info
+    fdisk -l > benja/info/fdisk
+    cat benja/etc/fstab > benja/info/fstab
+    genfstab -U -p benja > benja/info/genfstab
+  fi
+fi
+
+if [ "$UEFI" = "NO" ]; then
+  cat benja/etc/fstab > benja.fstab
+  genfstab -U -p benja >> benja.fstab
+  cat benja.fstab | sed -e 's/root\/benja//g' | sed -e 's/\/\/boot/\/boot/g' > etc.fstab
+  sudo mv etc.fstab benja/etc/fstab
+  rm benja.fstab
+  cat benja/etc/fstab
+  sync
+fi
+
+APPEND="APPEND root=$ROOT rw quiet splash loglevel=0 console=tty2"
+if [ "$EDD" != "" ]; then
+  APPEND="$APPEND edd=$EDD"
+fi
+
+echo "#!/usr/bin/env bash
+
+DISK='$DISK'
+USER='$USER'
+EFI='$EFI'
+ROOT='$ROOT'
+LABEL='$LABEL'
+LOCALE='$LOCALE'
+
+echo '
+en_US.UTF-8 UTF-8
+en_GB.UTF-8 UTF-8
+' >> /etc/locale.gen
+
+if [ '$LOCALE' != '' ]; then
+  echo '$LOCALE.UTF-8 UTF-8' >> /etc/locale.gen
+fi
+
+locale-gen
+locale > /etc/locale.conf
+
+if [ '$LOCALE' != '' ]; then
+  echo '
+LANG=$LOCALE.UTF-8
+LC_TIME=$LOCALE.UTF-8
+'>>/etc/locale.conf
+else
+  echo '
+LANG=en_US.UTF-8
+LC_TIME=en_US.UTF-8
+'>>/etc/locale.conf
+fi
+
+hwclock --systohc --utc
+
+if [ '$(uname -m)' = 'x86_64' ]; then
+  echo '
+[multilib]
+Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
+  sync
+fi
+
+pacman -Syu --noconfirm
+pacman-db-upgrade
+
+echo '###############
+##   root    ##
+###############'
+echo -e '$PASSWD
+$PASSWD' | passwd
+
+useradd -m -g users -G wheel,storage,power,video,lp -s /bin/bash $USER
+echo '##################
+## $USER ##
+##################'
+echo -e '$UPASSWD
+$UPASSWD' | passwd $USER
+
+echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
+echo '
+# password once asked never expires
+Defaults env_reset, timestamp_timeout=-1
+' >> /etc/sudoers
+
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+echo '[Service]
+ExecStart=
+ExecStart=-/usr/sbin/agetty -n -i -a $USER %I'>/etc/systemd/system/getty@tty1.service.d/autologin.conf
+
+sync
+
+free -h
+
+syslinux-install_update -ia
+
+if [ '$UEFI' != 'NO' ]; then
+  mkdir -p $SYSLINUX_ROOT/syslinux
+  if [ '$(uname -m)' = 'x86_64' ]; then
+    cp -r /usr/lib/syslinux/efi64/* $SYSLINUX_ROOT/syslinux
+  else
+    cp -r /usr/lib/syslinux/efi32/* $SYSLINUX_ROOT/syslinux
+  fi
+  cp -r /usr/lib/syslinux/$UEFI/syslinux.efi $SYSLINUX_ROOT/syslinux
+  echo '[Unit]
+Description=$SYSLINUX_ROOT EFI partition automatically mounted
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount $EFI $SYSLINUX_ROOT
+
+[Install]
+WantedBy=multi-user.target'>/etc/systemd/system/automount-efi.service
+  systemctl enable automount-efi
+fi
+
+pacman -Syu --needed --noconfirm \
+  weston $GPU_DRIVERS xorg-server-xwayland \
+  gstreamer-vaapi gst-libav \
+  alsa-utils xdg-utils \
+  hunspell-en \
+  file-roller \
+  bluez bluez-utils \
+  ttf-liberation ttf-symbola ttf-droid ttf-freefont
+
+echo 'TIMEOUT 10
+PROMPT 0
+DEFAULT arch
+
+SAY
+SAY ┌────────────────┐
+SAY │ ╔╗ ╔═╗╔╗╔ ╦╔═╗ │ Bootable
+SAY │ ╠╩╗║╣ ║║║ ║╠═╣ │ Electron
+SAY │ ╚═╝╚═╝╝╚╝╚╝╩ ╩ │ Node JS App
+SAY └────────────────┘
+SAY  https://benja.io
+SAY
+
+LABEL arch
+      LINUX $SYSLINUX_BOOT/vmlinuz-linux
+      INITRD $SYSLINUX_BOOT/intel-ucode.img,$SYSLINUX_BOOT/initramfs-linux.img
+      $APPEND
+
+' > $SYSLINUX_ROOT/syslinux/syslinux.cfg
+
+pacman-db-upgrade
+sync
+
+if [ '$UEFI' != 'NO' ]; then
+  if [ -d /usr/share/efitools/efi/ ]; then
+    cp /usr/share/efitools/efi/{PreLoader,HashTool}.efi /boot/syslinux/
+    cp /boot/syslinux/syslinux.efi /boot/syslinux/loader.efi
+    efibootmgr -c -d $DISK -l /syslinux/PreLoader.efi -L '$LABEL'
+  else
+    if [ -d /usr/lib/prebootloader ]; then
+      cp /usr/lib/prebootloader/{PreLoader,HashTool}.efi /boot/syslinux/
+      cp /boot/syslinux/syslinux.efi /boot/syslinux/loader.efi
+      efibootmgr -c -d $DISK -l /syslinux/PreLoader.efi -L '$LABEL'
+    else
+      efibootmgr -c -d $DISK -l /syslinux/syslinux.efi -L '$LABEL'
+    fi
+  fi
+  sync
+fi
+
+sleep 3
+
+mkinitcpio -p linux
+
+sync
+
+cd /home/$USER
+sudo -u $USER touch .hushlogin
+sudo -u $USER mkdir .config
+sudo -u $USER mkdir app
+
+echo '# Benja bootstrap
+
+# Wayland backend
+export GDK_BACKEND=wayland
+export CLUTTER_BACKEND=wayland
+export QT_QPA_PLATFORM=wayland
+export SDL_VIDEODRIVER=wayland
+export GTK_THEME=\"Adwaita:dark\"
+
+# LD and XDG
+export LD_LIBRARY_PATH=\"/usr/lib\"
+if [ \"\$XDG_RUNTIME_DIR\" = \"\" ]; then
+  export XDG_RUNTIME_DIR=/tmp
+fi
+if [ \"\$XDG_CONFIG_HOME\" = \"\" ]; then
+  export XDG_CONFIG_HOME=\"\${HOME}/.config\"
+fi
+
+# recognize SSH session from normal one
+if [ -n \"\$SSH_CLIENT\" ] || [ -n \"\$SSH_TTY\" ]; then
+  SESSION_TYPE=remote/ssh
+else
+  case $(ps -o comm= -p \$PPID) in
+    sshd|*/sshd) SESSION_TYPE=remote/ssh;;
+  esac
+fi
+
+# print welcome or eventually launch weston
+if [ \"\$SESSION_TYPE\" = \"remote/ssh\" ]; then
+  echo -e \"
+  \${SESSION_TYPE} session
+ \"
+else
+  if [ \"\$WESTON_LAUNCHED\" != \"true\" ]; then
+    export WESTON_LAUNCHED=true
+    # weston only if there is an app to run
+    if [ -f ~/app/package.json ]; then
+      # first time configuration
+      if [ ! -d ~/app/node_modules ]; then
+        mkdir ~/app/node_modules
+        cd ~/app
+        npm install --production
+        cd -
+      fi
+      weston-launch > /dev/null 2>&1
+    else
+      # if package.json has been renamed to package.jsno/jsoff
+      # it was an explicit reboot-to-shell operation
+      # make it load normally next reboot
+      if [ -f ~/app/package.jsno ]; then
+        mv ~/app/package.jsno ~/app/package.json
+      else
+        if [ -f ~/app/package.jsoff ]; then
+          mv ~/app/package.jsoff ~/app/package.json
+        fi
+      fi
+    fi
+  fi
+fi
+'>>.bashrc
+
+echo '[core]
+idle-time=0
+modules=xwayland.so
+
+[shell]
+client=/home/${USER}/.launch-app
+background-image=none
+panel-location=none
+animation=none
+close-animation=none
+startup-animation=none
+locking=false
+'>.config/weston.ini
+
+sudo -u $USER curl -L -s -o .launch-app 'https://webreflection.github.io/benja/os/sh/launcher'
+sudo -u $USER chmod a+x .launch-app
+
+cd app
+sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/index.js'
+sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/index.html'
+sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/package.json'
+sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/logo-dark.svg'
+sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/logo-light.svg'
+sudo -u $USER mkdir node_modules
+sync
+
+hostnamectl set-hostname '$LABEL'
+
+if [ '$UEFI' = 'NO' ]; then
+  if [ '$SAVE_FSTAB_INFO' = '1' ]; then
+    fdisk -l > /info/fdisk-chroot
+    genfstab -U -p / > /info/genfstab-chroot
+  fi
+fi
+
+exit
+">benja.bash
+
+sudo mv benja.bash benja/benja
+sudo chmod a+x benja/benja
+
+sudo arch-chroot benja /benja

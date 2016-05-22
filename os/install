@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+PLATFORM="$(uname -m)"
+LOGO=" 
+ [d]┌────────────────┐[/]
+ [d]│[/] [*][b]╔╗ ╔═╗╔╗╔ ╦╔═╗[/] [d]│[/] [l]Bootable[/]
+ [d]│[/] [*][c]╠╩╗║╣ ║║║ ║╠═╣[/] [d]│[/] [l]Electron[/]
+ [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
+ [d]└────────────────┘[/]
+  [l]https://benja.io[/l]"
+
+# slightly enriched echo
+# - - - - - - - - - - - - - -
+#        by Andrea Giammarchi
+# https://gist.github.com/WebReflection/02cdcb6d4ce0dfa38fac
+icho() {
+
+  # [*][g]✔[/] [*][r]x[/] [*][y]![/]
+
+  # resets
+  local reset_all=$(tput sgr0)        # [/] usable as reset for each style
+  local reset_color=$(tput setaf 9)   # [/(d|r|g|y|b|m|c|w)]
+  local reset_bgcolor=$(tput setab 9) # [/(bd|br|bg|by|bb|bm|bc|bw)]
+  local reset_underline=$(tput rmul)  # [/_]
+  local reset_stand_out=$(tput rmso)  # [/o]
+
+  # colors
+  local black=$(tput setaf 0)         # [d]dark[/d]
+  local red=$(tput setaf 1)           # [r]red[/r]
+  local green=$(tput setaf 2)         # [g]green[/g]
+  local yellow=$(tput setaf 3)        # [y]yellow[/y]
+  local blue=$(tput setaf 4)          # [b]blue[/b]
+  local magenta=$(tput setaf 5)       # [m]magenta[/m]
+  local cyan=$(tput setaf 6)          # [c]cyan[/c]
+  local white=$(tput setaf 7)         # [w]white[/w]
+
+  # background colors
+  local bgblack=$(tput setab 0)       # [bd]bg dark[/bd]
+  local bgred=$(tput setab 1)         # [br]bg red[/br]
+  local bggreen=$(tput setab 2)       # [bg]bg green[/bg]
+  local bgyellow=$(tput setab 3)      # [by]bg yellow[/by]
+  local bgblue=$(tput setab 4)        # [bb]bg blue[/bb]
+  local bgmagenta=$(tput setab 5)     # [bm]bg magenta[/bm]
+  local bgcyan=$(tput setab 6)        # [bc]bg cyan[/bc]
+  local bgwhite=$(tput setab 7)       # [bw]bg white[/bw]
+
+  # styles
+  local start_stand_out=$(tput smso)  # [o]
+  local start_under=$(tput smul)      # [_][/_]
+  local start_bold=$(tput bold)       # [*][/*]
+  local start_light=$(tput dim)       # [l]light dim[/l]
+                                      # [*][/]
+
+  # not implemented
+  # rev Start reverse video
+  # blink Start blinking text
+  # invis Start invisible text
+
+  # phrase replacement
+  local phrase=$(echo "${1}" |
+    sed -e "s/\[o\]/\\${start_stand_out}/g" | sed -e "s/\[\/o\]/\\${reset_stand_out}/g" |
+    sed -e "s/\[l\]/\\${start_light}/g" | sed -e "s/\[\/l\]/\\${reset_all}/g" |
+    sed -e "s/\[\*\]/\\${start_bold}/g" | sed -e "s/\[\/\*\]/\\${reset_all}/g" |
+    sed -e "s/\[_\]/\\${start_under}/g" | sed -e "s/\[\/_\]/\\${reset_underline}/g" |
+    sed -e "s/\[d\]/\\${black}/g" | sed -e "s/\[\/d\]/\\${reset_color}/g" |
+    sed -e "s/\[r\]/\\${red}/g" | sed -e "s/\[\/r\]/\\${reset_color}/g" |
+    sed -e "s/\[g\]/\\${green}/g" | sed -e "s/\[\/g\]/\\${reset_color}/g" |
+    sed -e "s/\[y\]/\\${yellow}/g" | sed -e "s/\[\/y\]/\\${reset_color}/g" |
+    sed -e "s/\[b\]/\\${blue}/g" | sed -e "s/\[\/b\]/\\${reset_color}/g" |
+    sed -e "s/\[m\]/\\${magenta}/g" | sed -e "s/\[\/m\]/\\${reset_color}/g" |
+    sed -e "s/\[c\]/\\${cyan}/g" | sed -e "s/\[\/c\]/\\${reset_color}/g" |
+    sed -e "s/\[w\]/\\${white}/g" | sed -e "s/\[\/w\]/\\${reset_color}/g" |
+    sed -e "s/\[bd\]/\\${bgblack}/g" | sed -e "s/\[\/bd\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[br\]/\\${bgred}/g" | sed -e "s/\[\/br\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bg\]/\\${bggreen}/g" | sed -e "s/\[\/bg\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[by\]/\\${bgyellow}/g" | sed -e "s/\[\/by\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bb\]/\\${bgblue}/g" | sed -e "s/\[\/bb\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bm\]/\\${bgmagenta}/g" | sed -e "s/\[\/bm\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bc\]/\\${bgcyan}/g" | sed -e "s/\[\/bc\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bw\]/\\${bgwhite}/g" | sed -e "s/\[\/bw\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[\/\]/\\${reset_all}/g"
+  )
+  echo -e "${phrase}${reset_all}"
+}
+
+if [ "$PLATFORM" = "x86_64" ] || [ "$PLATFORM" = "i686" ]; then
+  icho "${LOGO}
+
+  Installing on [*]${PLATFORM}[/]
+ 
+"
+  curl -LO https://webreflection.github.io/benja/os/sh/install-x86_64
+  . install-x86_64
+else
+  icho "${LOGO}
+
+  [*][r][WARNING][/] wrong installer for: [*]${PLATFORM}[/]
+  
+  Please visit the website to know more.
+ 
+"
+fi
