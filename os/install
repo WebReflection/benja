@@ -112,6 +112,8 @@ if [ "$PLATFORM" = "x86_64" ] || [ "$PLATFORM" = "i686" ]; then
  
 "
   curl -LO https://webreflection.github.io/benja/os/sh/install-x86_64
+  chmod a+x install-x86_64
+  sync
   . install-x86_64
 else
   icho "${LOGO}

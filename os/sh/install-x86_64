@@ -115,7 +115,7 @@ for CHOICE in $POSSIBLEDISKS; do
   if [ "$CHOICE" != "$DISK" ]; then
     if [ "$(df | grep $CHOICE)" != "" ]; then
       echo "unmounting $CHOICE"
-      sudo umount $CHOICE
+      umount $CHOICE
       if [[ $? -ne 0 ]] ; then
         icho "  [*][r][WARNING][/] unable to install in ${CHOICE}"
         exit 1
@@ -131,19 +131,19 @@ sleep 2
 
 if [ "$UEFI" = "NO" ]; then
   PARTED_START_AT="2048s"
-  sudo parted --script $DISK mklabel msdos
+  parted --script $DISK mklabel msdos
 else
   PARTED_START_AT="64M"
-  sudo parted --script $DISK mklabel gpt
-  sudo parted --script --align optimal $DISK mkpart primary fat16 2048s 64M
-  sudo parted $DISK set 1 boot on
+  parted --script $DISK mklabel gpt
+  parted --script --align optimal $DISK mkpart primary fat16 2048s 64M
+  parted $DISK set 1 boot on
 fi
 
 if [ "$SWAP" = "0" ]; then
-  sudo parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT 100%
+  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT 100%
 else
-  sudo parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
-  sudo parted --script --align optimal $DISK mkpart primary ext4 $SWAP 100%
+  parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
+  parted --script --align optimal $DISK mkpart primary ext4 $SWAP 100%
 fi
 
 sync
@@ -201,16 +201,16 @@ fi
 echo "ROOT:             $ROOT"
 
 if [ "$SWAP" != "0" ]; then
-  sudo mkswap $SWAP
-  sudo swapon $SWAP
+  mkswap $SWAP
+  swapon $SWAP
 fi
 
 sync
 
 if [ "$UEFI" != "NO" ]; then
-  sudo mkfs.vfat $EFI
+  mkfs.vfat $EFI
 fi
-yes | sudo mkfs.ext4 $ROOT
+yes | mkfs.ext4 $ROOT
 
 sync
 mkdir -p benja
@@ -228,7 +228,7 @@ if [ "$EXP_USE_EMMC" != "" ]; then
   mount $ROOT "benja$SYSLINUX_ROOT"
   SYSLINUX_BOOT=''
 else
-  sudo mount $ROOT benja
+  mount $ROOT benja
   if [ "$UEFI" != "NO" ]; then
     mkdir -p "benja$SYSLINUX_ROOT"
     mount $EFI "benja$SYSLINUX_ROOT"
@@ -243,7 +243,7 @@ fi
 
 TOPACKSTRAP="$TOPACKSTRAP dialog wpa_supplicant iw"
 
-sudo pacstrap benja $TOPACKSTRAP
+pacstrap benja $TOPACKSTRAP
 sync
 
 if [ "$UEFI" = "NO" ]; then
@@ -259,7 +259,7 @@ if [ "$UEFI" = "NO" ]; then
   cat benja/etc/fstab > benja.fstab
   genfstab -U -p benja >> benja.fstab
   cat benja.fstab | sed -e 's/root\/benja//g' | sed -e 's/\/\/boot/\/boot/g' > etc.fstab
-  sudo mv etc.fstab benja/etc/fstab
+  mv etc.fstab benja/etc/fstab
   rm benja.fstab
   cat benja/etc/fstab
   sync
@@ -525,7 +525,7 @@ fi
 exit
 ">benja.bash
 
-sudo mv benja.bash benja/benja
-sudo chmod a+x benja/benja
+mv benja.bash benja/benja
+chmod a+x benja/benja
 
-sudo arch-chroot benja /benja
+arch-chroot benja /benja
