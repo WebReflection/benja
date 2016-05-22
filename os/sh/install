@@ -149,6 +149,10 @@ if [ "$1" = "prepare" ]; then
       OS_PLATFORM="ODROID-XU"
       OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-xu"
       ;;
+    cubox-i)
+      OS_PLATFORM="CuBox-i"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/cubox-i"
+      ;;
     *)
       if [ "$4" != "" ]; then
         OS_PLATFORM="$3"
@@ -255,26 +259,7 @@ if [ "$1" = "prepare" ]; then
   sudo cp "$OS_PLATFORM_UTILS" ~/${OS_NAME}-tmp-install/utils-platform
 
   cd ~/${OS_NAME}-tmp-install
-  echo '#!/usr/bin/env bash
-pacman -Syu --needed --noconfirm dialog wpa_supplicant
-clear
-echo "
-Please choose your wifi and write its password when/if asked.
-Please ignore possible info coming up during this process.
-"
-sleep 3
-wifi-menu
-echo "
-trying to configure the wifi automatically
-"
-WLAN=$(netctl list)
-if [ "$WLAN" != "" ]; then
-  netctl enable "${WLAN:2}"
-  echo "wifi ${WLAN:2} enabled"
-else
-  echo "unable to configure the wifi"
-fi
-'>wifi
+  curl -L -O "${OS_REMOTE_FILES}/sh/wifi-setup"
 
   echo "${OS_PLATFORM}" >${OS_NAME}-platform
 
@@ -307,9 +292,9 @@ WantedBy=multi-user.target
   echo '  moving prepared files'
   sudo mv ${OS_NAME}-disk.service root/etc/systemd/system/${OS_NAME}-disk.service
   sudo mv ${OS_NAME}-platform root/root/${OS_NAME}-platform
-  sudo mv {install,utils,utils-platform,wifi} root/root/
-  sudo chmod +x root/root/install
-  sudo chmod +x root/root/wifi
+  sudo mv {install,utils,utils-platform,wifi-setup} root/root/
+  sudo chmod a+x root/root/install
+  sudo chmod a+x root/root/wifi-setup
   sync
   echo '  cleaning up'
   sync
@@ -373,7 +358,7 @@ echo ' installing dependencies (this might take a while)'
 
 # installing minimum required software
 pacman -S --needed --noconfirm \
-  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh
+  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
 WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
 HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
@@ -386,6 +371,9 @@ sleep 2
 
 # trying not to stress too much per each group of packages
 
+# test in case somebody would like to use native themes
+pacman -S --needed --noconfirm gnome-themes-standard
+
 # fonts
 sync && sleep 1 && pacman -S --needed --noconfirm \
   ttf-dejavu ttf-liberation ttf-symbola ttf-droid
@@ -394,9 +382,8 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 sync && sleep 1 && pacman -S --needed --noconfirm \
   gst-plugins-base gst-plugins-good gst-libav
 
-# libnotify and npm
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  libnotify npm # > /dev/null 2>&1
+# npm
+sync && sleep 1 && pacman -S --needed --noconfirm npm
 
 # extras
 sync && sleep 1 && pacman -S --needed --noconfirm \
@@ -430,9 +417,6 @@ if [ "$OS_BOOTINTO" = "electron" ]; then
   fi
 fi
 
-# test mode only, actually not needed
-# pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbturbo
-
 # probably unnecessary extras ( in some case expected there by default )
 pacman -S --needed --noconfirm \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
@@ -451,8 +435,7 @@ if [ "$OS_DEVEL" = "true" ]; then
 fi
 
 if [ "$OS_BOOTINTO" = "jsgtk" ]; then
-  sudo pacman -S --needed --noconfirm \
-    adwaita-icon-theme gnome-themes-standard gjs webkit2gtk
+  sudo pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
   yaourt -S --needed --noconfirm jsgtk
 fi
 
@@ -570,7 +553,7 @@ echo '
 rm $0
 rm utils
 rm utils-platform
-rm wifi
+rm wiwifi-setupfi
 rm ${OS_NAME}-platform
 
 reboot

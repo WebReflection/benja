@@ -26,6 +26,8 @@
 SIZE=$(xrandr | grep -o 'current\ \([0-9]\{1,\}\) x \([0-9]\{1,\}\)' | grep -o '\([0-9]\{1,\}\) x \([0-9]\{1,\}\)')
 CURRENT_WIDTH=$(echo $SIZE | sed 's/ x.*$//')
 CURRENT_HEIGHT=$(echo $SIZE | sed 's/^.*x //')
+WIDTH=$CURRENT_WIDTH
+HEIGHT=$CURRENT_HEIGHT
 
 # in case the max resolution is not defined
 if [ "$OS_MAX_RESOLUTION" = "" ]; then

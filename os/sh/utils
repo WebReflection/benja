@@ -192,6 +192,9 @@ configure_X11() {
   sed -i 's/weston-launch > \/dev\/null 2>&1/exit \& sleep 2 \&\& startx/' "$OS_USER_DIR/.bashrc"
   curl -L -s -o "$OS_USER_DIR/.xinitrc" "${OS_REMOTE_FILES}/sh/xinitrc"
   sync
+  sed -i 's/weston --width=/# weston --width=/' "$OS_USER_DIR/.xinitrc"
+  sync
+  echo './.launch-app' >> "$OS_USER_DIR/.xinitrc"
 }
 
 # before rebooting, after whole install
