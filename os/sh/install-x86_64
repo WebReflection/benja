@@ -314,6 +314,7 @@ fi
 
 pacman -Syu --noconfirm
 pacman-db-upgrade
+systemctl enable dhcpcd
 
 echo '###############
 ##   root    ##
@@ -368,6 +369,7 @@ fi
 
 pacman -Syu --needed --noconfirm \
   weston $GPU_DRIVERS xorg-server-xwayland \
+  ntp gjs \
   gstreamer-vaapi gst-libav \
   alsa-utils xdg-utils \
   hunspell-en \
@@ -521,6 +523,9 @@ if [ '$UEFI' = 'NO' ]; then
     genfstab -U -p / > /info/genfstab-chroot
   fi
 fi
+
+pacman -S --needed npm gtk2 xorg-server-xwayland nss gconf
+npm install -g electron-prebuilt
 
 exit
 ">benja.bash
