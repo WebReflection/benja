@@ -33,7 +33,10 @@ cd "${OS_INSTALLER_SRC}"
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-curl -LOs 'https://benja.io/os/sh/bash-info'
+if [ ! -f bash-info ]; then
+  curl -LOs 'https://benja.io/os/sh/bash-info'
+  sync
+fi
 . bash-info
 
 if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
@@ -44,7 +47,10 @@ if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
   exit 1
 fi
 
-curl -LOs "${OS_REMOTE_FILES}/sh/utils"
+if [ ! -f utils ]; then
+  curl -LOs "${OS_REMOTE_FILES}/sh/utils"
+  sync
+fi
 . utils
 
 clear
@@ -55,8 +61,10 @@ if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
   Installing for [*]${CURRENT_ARCH}[/]
  
 "
-  curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
-  sync
+  if [ ! -f install-x86_64 ]; then
+    curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
+    sync
+  fi
   . install-x86_64
 
   echo ''
@@ -75,4 +83,4 @@ else
 fi
 
 # cleanup
-rm -rf "${OS_INSTALLER_SRC}"
+rm -r "${OS_INSTALLER_SRC}"

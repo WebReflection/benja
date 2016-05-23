@@ -191,8 +191,6 @@ if [ "$UEFI" != "NO" ]; then
 fi
 yes | mkfs.ext4 $ROOT
 
-exit
-
 sync
 mkdir -p benja
 
