@@ -22,6 +22,18 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
+export OS_NAME="BENJA"
+export OS_WEBSITE="https://benja.io"
+export OS_REMOTE_FILES="http://webreflection.github.io/benja/os"
+export OS_USER="benja"
+export OS_USER_DIR="/home/${OS_USER}"
+export OS_APP_LAUNCHER='.launch-app'
+export OS_MAX_RESOLUTION='1920x1080' # Full HD
+export OS_BOOTINTO='electron'
+export OS_FULL_LOGO=" 
+  [*]$(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
+"
+
 # disk checks
 if [ "$DISK" = "" ]; then
   icho '  [*][r][WARNING][/] no DISK has been specified'
@@ -32,6 +44,7 @@ if [ "$DISK" = "" ]; then
 fi
 
 # update system time
+# TODO: each reboot!
 ntpdate pool.ntp.org
 timedatectl set-local-rtc 1
 
@@ -270,6 +283,8 @@ if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
 
+icho "${OS_FULL_LOGO}">"$OS_USER_DIR/${OS_NAME}-logo"
+
 echo "#!/usr/bin/env bash
 
 DISK='$DISK'
@@ -315,6 +330,7 @@ fi
 pacman -Syu --noconfirm
 pacman-db-upgrade
 systemctl enable dhcpcd
+systemctl enable ntpd.service
 
 echo '###############
 ##   root    ##
@@ -377,18 +393,9 @@ pacman -Syu --needed --noconfirm \
   bluez bluez-utils \
   ttf-liberation ttf-symbola ttf-droid ttf-freefont
 
-echo 'TIMEOUT 10
+echo 'TIMEOUT 0
 PROMPT 0
 DEFAULT arch
-
-SAY
-SAY ┌────────────────┐
-SAY │ ╔╗ ╔═╗╔╗╔ ╦╔═╗ │ Bootable
-SAY │ ╠╩╗║╣ ║║║ ║╠═╣ │ Electron
-SAY │ ╚═╝╚═╝╝╚╝╚╝╩ ╩ │ Node JS App
-SAY └────────────────┘
-SAY  https://benja.io
-SAY
 
 LABEL arch
       LINUX $SYSLINUX_BOOT/vmlinuz-linux
@@ -423,98 +430,6 @@ mkinitcpio -p linux
 
 sync
 
-cd /home/$USER
-sudo -u $USER touch .hushlogin
-sudo -u $USER mkdir .config
-sudo -u $USER mkdir app
-
-echo '# Benja bootstrap
-
-# Wayland backend
-export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=wayland
-export QT_QPA_PLATFORM=wayland
-export SDL_VIDEODRIVER=wayland
-export GTK_THEME=\"Adwaita:dark\"
-
-# LD and XDG
-export LD_LIBRARY_PATH=\"/usr/lib\"
-if [ \"\$XDG_RUNTIME_DIR\" = \"\" ]; then
-  export XDG_RUNTIME_DIR=/tmp
-fi
-if [ \"\$XDG_CONFIG_HOME\" = \"\" ]; then
-  export XDG_CONFIG_HOME=\"\${HOME}/.config\"
-fi
-
-# recognize SSH session from normal one
-if [ -n \"\$SSH_CLIENT\" ] || [ -n \"\$SSH_TTY\" ]; then
-  SESSION_TYPE=remote/ssh
-else
-  case $(ps -o comm= -p \$PPID) in
-    sshd|*/sshd) SESSION_TYPE=remote/ssh;;
-  esac
-fi
-
-# print welcome or eventually launch weston
-if [ \"\$SESSION_TYPE\" = \"remote/ssh\" ]; then
-  echo -e \"
-  \${SESSION_TYPE} session
- \"
-else
-  if [ \"\$WESTON_LAUNCHED\" != \"true\" ]; then
-    export WESTON_LAUNCHED=true
-    # weston only if there is an app to run
-    if [ -f ~/app/package.json ]; then
-      # first time configuration
-      if [ ! -d ~/app/node_modules ]; then
-        mkdir ~/app/node_modules
-        cd ~/app
-        npm install --production
-        cd -
-      fi
-      weston-launch > /dev/null 2>&1
-    else
-      # if package.json has been renamed to package.jsno/jsoff
-      # it was an explicit reboot-to-shell operation
-      # make it load normally next reboot
-      if [ -f ~/app/package.jsno ]; then
-        mv ~/app/package.jsno ~/app/package.json
-      else
-        if [ -f ~/app/package.jsoff ]; then
-          mv ~/app/package.jsoff ~/app/package.json
-        fi
-      fi
-    fi
-  fi
-fi
-'>>.bashrc
-
-echo '[core]
-idle-time=0
-modules=xwayland.so
-
-[shell]
-client=/home/${USER}/.launch-app
-background-image=none
-panel-location=none
-animation=none
-close-animation=none
-startup-animation=none
-locking=false
-'>.config/weston.ini
-
-sudo -u $USER curl -L -s -o .launch-app 'https://webreflection.github.io/benja/os/sh/launcher'
-sudo -u $USER chmod a+x .launch-app
-
-cd app
-sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/index.js'
-sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/index.html'
-sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/package.json'
-sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/logo-dark.svg'
-sudo -u $USER curl -LO 'https://webreflection.github.io/benja/os/app/logo-light.svg'
-sudo -u $USER mkdir node_modules
-sync
-
 hostnamectl set-hostname '$LABEL'
 
 if [ '$UEFI' = 'NO' ]; then
@@ -524,8 +439,67 @@ if [ '$UEFI' = 'NO' ]; then
   fi
 fi
 
-pacman -S --needed npm gtk2 xorg-server-xwayland nss gconf
+
+pacman -S --needed --noconfirm \
+  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
+
+# test in case somebody would like to use native themes
+pacman -S --needed --noconfirm gnome-themes-standard
+
+# fonts
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  ttf-dejavu ttf-liberation ttf-symbola ttf-droid
+
+# gstreamer
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  gst-plugins-base gst-plugins-good gst-libav
+
+# npm
+sync && sleep 1 && pacman -S --needed --noconfirm npm
+
+# extras
+sync && sleep 1 && pacman -S --needed --noconfirm \
+  libva-vdpau-driver libva-mesa-driver
+
+# electron
+pacman -S --needed --noconfirm xorg-server-xwayland gtk2
 npm install -g electron-prebuilt
+
+# extras
+pacman -S --needed --noconfirm \
+  gconf nss pulseaudio pulseaudio-alsa gperf libexif
+
+echo ' creating 80 to 8080 redirect'
+echo '[Unit]
+Description=${OS_NAME} 80 to 8080 service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+
+[Install]
+WantedBy=multi-user.target
+' >/etc/systemd/system/${OS_NAME}-80to8080.service
+systemctl enable ${OS_NAME}-80to8080.service
+
+echo ' configuring hostname'
+echo '${OS_USER}.local' > /etc/hostname
+hostnamectl set-hostname '${OS_USER}.local'
+sed -i \"s/localhost\\\$/localhost\$(printf '\\t')${OS_USER}.local/g\" /etc/hosts
+
+# trying to avoid suspend mode
+echo 'HandleSuspendKey=ignore
+HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
+
+cd $OS_USER_DIR
+curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
+chown "${OS_USER}:users" ./${OS_NAME}-logo
+sudo -H -u $OS_USER bash -c "OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
+rm install-user
+rm -f ${OS_USER_DIR}/${OS_NAME}-logo
+cd -
 
 exit
 ">benja.bash

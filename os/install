@@ -105,6 +105,9 @@ icho() {
   echo -e "${phrase}${reset_all}"
 }
 
+export OS_LOGO="$LOGO"
+export OS_VERSION="0.3.0"
+
 if [ "$PLATFORM" = "x86_64" ] || [ "$PLATFORM" = "i686" ]; then
   icho "${LOGO}
 
