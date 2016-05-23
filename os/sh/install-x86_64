@@ -463,6 +463,7 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
+npm install -g tiny-cdn
 npm install -g electron-prebuilt
 
 # extras

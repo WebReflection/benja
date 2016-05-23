@@ -23,11 +23,11 @@
 ##
 
 export CURRENT_PLATFORM="$(uname)"
-export OS_INSTALLER="0.1.0"
+export OS_INSTALLER="0.2.0"
 export OS_VERSION="0.3.0"
 export OS_NAME="BENJA"
 export OS_WEBSITE="https://benja.io"
-export OS_REMOTE_FILES="http://webreflection.github.io/benja/os"
+export OS_REMOTE_FILES="${OS_WEBSITE}/os"
 export OS_USER="benja"
 export OS_LOGO=" 
  [d]┌────────────────┐[/]

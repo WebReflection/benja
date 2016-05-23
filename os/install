@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 ##
 # Copyright (c) 2016 Andrea Giammarchi
@@ -22,7 +23,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-curl -LO http://webreflection.github.io/benja/os/sh/bash-info
+curl -LO https://benja.io/os/sh/bash-info
 . bash-info
 rm bash-info
 
@@ -33,7 +34,7 @@ if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
   exit 1
 fi
 
-curl -LO "${OS_REMOTE_FILES}/sh/utils"
+curl -LO "${OS_REMOTE_FILES}/os/sh/utils"
 . utils
 rm utils
 
@@ -53,7 +54,7 @@ else
 
   [*][r][WARNING][/] wrong installer for: [*]${CURRENT_PLATFORM}[/]
   
-  Please visit the website to know more.
+  Please visit ${OS_WEBSITE} to know more.
  
 "
 fi

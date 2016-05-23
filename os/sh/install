@@ -408,6 +408,7 @@ if [ "$OS_BOOTINTO" = "electron" ]; then
 
   # electron is like part of the basic requirement
   # make it already available
+  npm install -g tiny-cdn
   npm install -g electron-prebuilt
 
   if [[ $? -ne 0 ]] ; then

@@ -1,21 +1,7 @@
 // simple server example
-const
-  fs = require('fs'),
-  index = fs.readFileSync(__dirname + '/index.html'),
-  logo = fs.readFileSync(__dirname + '/logo-dark.svg')
-;
 require('http')
-  .createServer((req, res) => {
-    res.statusCode = 200;
-    if (req.url === '/logo-dark.svg') {
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.end(logo);
-    } else {
-      res.setHeader('Content-Type', 'text/html');
-      res.end(index);
-    }
-  })
-  .listen(8080);
+  .createServer(require('tiny-cdn').create({}))
+  .listen(8080, '0.0.0.0');
   // will respond to :80 too via iptables
 
 // simple app example
@@ -29,7 +15,7 @@ const
 app.commandLine.appendSwitch('--ignore-gpu-blacklist');
 
 // once the app is ready
-app.once('ready', function () {
+app.once('ready', () => {
 
   const area = electron.screen.getPrimaryDisplay().workAreaSize;
 
@@ -48,7 +34,7 @@ app.once('ready', function () {
   });
 
   this.window
-    .once('closed', function () {
+    .once('closed', () => {
       // cleanup the reference
       this.window = null;
     })

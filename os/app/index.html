@@ -55,19 +55,20 @@
     </header>
     <main></main>
     <script>
-    function findReachableIPV4Address() {
-      const ni = require('os').networkInterfaces();
-      return Object.keys(ni).reduce((out, key) => {
-        return ni[key].reduce((out, iface) => {
-          if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
-            out.push(iface.address);
-          }
-          return out;
-        }, out);
-      }, []);
-    }
-
-    const main = document.querySelector('main');
+    const
+      main = document.querySelector('main'),
+      findReachableIPV4Address = () => {
+        const ni = require('os').networkInterfaces();
+        return Object.keys(ni).reduce((out, key) => {
+          return ni[key].reduce((out, iface) => {
+            if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
+              out.push(iface.address);
+            }
+            return out;
+          }, out);
+        }, []);
+      }
+    ;
 
     findReachableIPV4Address().forEach(function (ip) {
       main.appendChild(
