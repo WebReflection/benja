@@ -28,10 +28,10 @@ cd "${OS_INSTALLER_SRC}"
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-grab 'https://benja.io/os/sh/bash-info'
+curl -LOs 'https://benja.io/os/sh/bash-info'
 . bash-info
 
-if [ "$(uname)" = "Darwin" ]; then
+if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
   echo "
   $(tput bold)WARNING$(tput sgr0) OSX/Darwin is not supported.
   "
@@ -39,18 +39,18 @@ if [ "$(uname)" = "Darwin" ]; then
   exit 1
 fi
 
-grab "${OS_REMOTE_FILES}/sh/utils"
+curl -LOs "${OS_REMOTE_FILES}/sh/utils"
 . utils
 
-clear
+# clear
 
-if [ "$CURRENT_ARCH" = "x86_64" ] || [ "$CURRENT_ARCH" = "i686" ]; then
+if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
   icho "${OS_LOGO}
 
   Installing for [*]${CURRENT_ARCH}[/]
  
 "
-  grab "${OS_REMOTE_FILES}/sh/install-x86_64"
+  curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
   sync
   . install-x86_64
 else
