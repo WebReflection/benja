@@ -55,7 +55,7 @@ fi
 
 # swap checks
 if [ "$SWAP" = "" ]; then
-  SWAP=2GiB
+  SWAP=0
 fi
 
 # EDD needed in some board
@@ -151,27 +151,28 @@ POSSIBLEDISKS=$(get_drives $DISK)
 echo 'DISKS'
 echo ${POSSIBLEDISKS[*]}
 
-exit 1
-
 if [[ $? -ne 0 ]] ; then
   icho "  [*][r][WARNING][/] unable to install in ${POSSIBLEDISKS}"
   exit 1
 fi
 
+EFI=
+ROOT=
+
 if [ "$UEFI" = "NO" ]; then
   if [ "$SWAP" != "0" ]; then
-    ROOT="${POSSIBLEDISKS[0]}"
-  else
     SWAP="${POSSIBLEDISKS[0]}"
     ROOT="${POSSIBLEDISKS[1]}"
+  else
+    ROOT="${POSSIBLEDISKS[0]}"
   fi
 else
   EFI="${POSSIBLEDISKS[0]}"
   if [ "$SWAP" != "0" ]; then
-    ROOT="${POSSIBLEDISKS[1]}"
-  else
     SWAP="${POSSIBLEDISKS[1]}"
     ROOT="${POSSIBLEDISKS[2]}"
+  else
+    ROOT="${POSSIBLEDISKS[1]}"
   fi
 fi
 
