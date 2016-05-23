@@ -28,17 +28,18 @@ export OS_FULL_LOGO="
 
 # disk checks
 if [ "$DISK" = "" ]; then
-  icho '  [*][r][WARNING][/] no DISK has been specified'
-  echo ''
-  echo '  please specify a DISK target (i.e. DISK=/dev/sdb)'
-  echo '  (use lsblk or fdisk -l to know which one could be OK)'
-  exit 1
+  if [ "$1" = "" ]; then
+    icho '  [*][r][WARNING][/] no DISK has been specified'
+    echo ''
+    echo '  please specify a DISK target:'
+    echo '    ./install /dev/mmcblk0'
+    echo '    DISK=/dev/mmcblk0 ./install'
+    echo '  (use lsblk or fdisk -l to know which one could be OK)'
+    exit 1
+  else
+    DISK="$1"
+  fi
 fi
-
-# update system time
-# TODO: each reboot!
-ntpdate pool.ntp.org
-timedatectl set-local-rtc 1
 
 # video card checks
 if [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep Intel)" != "" ]; then
@@ -85,18 +86,15 @@ else
   fi
 fi
 
+# update system time
+# TODO: each reboot!
+ntpdate pool.ntp.org
+timedatectl set-local-rtc 1
 pacman -Sy --noconfirm
 pacman-db-upgrade
 pacman-key --init
 pacman-key --populate archlinux
-
 pacman -S --needed --noconfirm fbset
-if [ "$WIDTH" = "" ]; then
-  WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
-fi
-if [ "$HEIGHT" = "" ]; then
-  HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
-fi
 
 if [ "$UEFI" = "NO" ]; then
   SYSLINUX_BOOT='/boot'
@@ -270,7 +268,7 @@ if [ "$UEFI" = "NO" ]; then
   sync
 fi
 
-APPEND="APPEND root=$ROOT rw quiet splash loglevel=0 console=tty2"
+APPEND="APPEND root=UUID=$(get_uuid $ROOT) rw quiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
@@ -368,7 +366,7 @@ Description=$SYSLINUX_ROOT EFI partition automatically mounted
 [Service]
 User=root
 Type=simple
-ExecStart=/usr/bin/mount $EFI $SYSLINUX_ROOT
+ExecStart=/usr/bin/mount --uuid $(get_uuid $EFI) $SYSLINUX_ROOT
 
 [Install]
 WantedBy=multi-user.target'>/etc/systemd/system/automount-efi.service

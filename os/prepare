@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-export OS_INSTALLER_SRC="$(pwd)/benja"
-
-mkdir -p "${OS_INSTALLER_SRC}"
-cd "${OS_INSTALLER_SRC}"
-
 ##
 # Copyright (c) 2016 Andrea Giammarchi
 # 
@@ -28,41 +23,5 @@ cd "${OS_INSTALLER_SRC}"
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-curl -LOs 'https://benja.io/os/sh/bash-info'
-. bash-info
-
-if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
-  echo "
-  $(tput bold)WARNING$(tput sgr0) OSX/Darwin is not supported.
-  "
-  rm -rf "${OS_INSTALLER_SRC}"
-  exit 1
-fi
-
-curl -LOs "${OS_REMOTE_FILES}/sh/utils"
-. utils
-
-clear
-
-if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
-  icho "${OS_LOGO}
-
-  Installing for [*]${CURRENT_ARCH}[/]
- 
-"
-  curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
-  sync
-  . install-x86_64
-else
-
-  icho "${OS_LOGO}
-
-  [*][r][WARNING][/] wrong installer for [*]${CURRENT_ARCH}[/]
-  
-  Please visit ${OS_WEBSITE} to know more.
- 
-"
-fi
-
-# cleanup
-rm -rf "${OS_INSTALLER_SRC}"
+curl -LOs 'https://benja.io/os/install'
+bash install prepare "$@"
