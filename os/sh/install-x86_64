@@ -22,14 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_NAME="BENJA"
-export OS_WEBSITE="https://benja.io"
-export OS_REMOTE_FILES="http://webreflection.github.io/benja/os"
-export OS_USER="benja"
-export OS_USER_DIR="/home/${OS_USER}"
-export OS_APP_LAUNCHER='.launch-app'
-export OS_MAX_RESOLUTION='1920x1080' # Full HD
-export OS_BOOTINTO='electron'
 export OS_FULL_LOGO=" 
   [*]$(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
 "

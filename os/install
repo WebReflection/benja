@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+export OS_INSTALLER_SRC="$(pwd)/benja"
+
+mkdir -p "${OS_INSTALLER_SRC}"
+cd "${OS_INSTALLER_SRC}"
+
 ##
 # Copyright (c) 2016 Andrea Giammarchi
 # 
@@ -23,9 +28,8 @@ set -e
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-curl -LO https://benja.io/os/sh/bash-info
+curl -LOs https://benja.io/os/sh/bash-info
 . bash-info
-rm bash-info
 
 if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
   echo "
@@ -34,11 +38,10 @@ if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
   exit 1
 fi
 
-curl -LO "${OS_REMOTE_FILES}/os/sh/utils"
+curl -LOs "${OS_REMOTE_FILES}/sh/utils"
 . utils
-rm utils
 
-clear
+# clear
 
 if [ "$CURRENT_PLATFORM" = "x86_64" ] || [ "$CURRENT_PLATFORM" = "i686" ]; then
   icho "${OS_LOGO}
@@ -46,9 +49,9 @@ if [ "$CURRENT_PLATFORM" = "x86_64" ] || [ "$CURRENT_PLATFORM" = "i686" ]; then
   Installing on [*]${CURRENT_PLATFORM}[/]
  
 "
-#  curl -LO https://webreflection.github.io/benja/os/sh/install-x86_64
-#  sync
-#  . install-x86_64
+  curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
+  sync
+  . install-x86_64
 else
   icho "${OS_LOGO}
 
@@ -58,3 +61,7 @@ else
  
 "
 fi
+
+# cleanup
+cd "${OS_INSTALLER_SRC}/../"
+rm -rf "${OS_INSTALLER_SRC}"

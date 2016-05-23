@@ -22,12 +22,25 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
+# some exported default
+if [ "$OS_BOOTINTO" = "" ]; then
+  export OS_BOOTINTO="electron"
+else
+  if [ "$OS_BOOTINTO" = "jsgtk" ]; then
+    export OS_DEVEL='true'
+  fi
+fi
+
+if [ "$OS_DEVEL" = "1" ]; then
+  export OS_DEVEL='true'
+fi
+
+# common configuration
 export CURRENT_PLATFORM="$(uname)"
 export OS_INSTALLER="0.2.0"
 export OS_VERSION="0.3.0"
 export OS_NAME="BENJA"
 export OS_WEBSITE="https://benja.io"
-export OS_REMOTE_FILES="${OS_WEBSITE}/os"
 export OS_USER="benja"
 export OS_LOGO=" 
  [d]┌────────────────┐[/]
@@ -36,11 +49,14 @@ export OS_LOGO="
  [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
  [d]└────────────────┘[/]
   [l]${OS_WEBSITE}[/l]"
+
 export OS_INSTALLER_LOGO="
   [*]installer ${OS_INSTALLER}[/]${OS_LOGO}"
-export OS_USER_DIR="/home/${OS_USER}"
-export OS_INSTALLER_SRC=$(cd $(dirname "$0"); pwd)
-export OS_APP_LAUNCHER='.launch-app'
-export OS_SDCARD=
-export OS_PLATFORM_UTILS
 
+export OS_REMOTE_FILES="${OS_WEBSITE}/os"
+export OS_USER_DIR="/home/${OS_USER}"
+export OS_APP_LAUNCHER='.launch-app'
+
+# will be defined later on
+export OS_SDCARD=
+export OS_PLATFORM_UTILS=
