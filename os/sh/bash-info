@@ -37,6 +37,7 @@ fi
 
 # common configuration
 export CURRENT_PLATFORM="$(uname)"
+export CURRENT_ARCH="$(uname -m)"
 export OS_INSTALLER="0.2.0"
 export OS_VERSION="0.3.0"
 export OS_NAME="BENJA"

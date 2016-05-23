@@ -157,6 +157,10 @@ umount_sd() {
   echo 'OK'
 }
 
+grab() {
+  curl -LOs -H 'Cache-Control: no-cache' "$1"
+}
+
 installFromAUR() {
   local user="$1"
   local name="$2"
