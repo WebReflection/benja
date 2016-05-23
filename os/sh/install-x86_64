@@ -177,9 +177,9 @@ if [ "$UEFI" != "NO" ]; then
   echo "EFI:             $EFI"
 fi
 if [ "$SWAP" != "0" ]; then
-  echo "SWAP:             $SWAP"
+  echo "SWAP:            $SWAP"
 fi
-echo "ROOT:             $ROOT"
+echo "ROOT:            $ROOT"
 
 if [ "$SWAP" != "0" ]; then
   mkswap $SWAP
