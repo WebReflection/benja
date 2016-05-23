@@ -45,6 +45,8 @@ cd ~/
 
 touch ~/.hushlogin
 mkdir -p ~/.config
+mkdir -p ~/app
+mkdir -p ~/app/node_modules
 
 # initial Weston configuration
 if [ ! -f ~/.config/weston.ini ]; then
@@ -144,7 +146,6 @@ fi
 ' >>~/.bashrc
   curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
   chmod a+x ${OS_APP_LAUNCHER}
-  mkdir -p ~/app
   cd ~/app
   if [ "$OS_BOOTINTO" = "electron" ]; then
     curl -LOs "${OS_REMOTE_FILES}/app/index.js"
@@ -158,5 +159,5 @@ fi
   fi
   curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
   curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
-  mkdir -p node_modules
+  cd -
 fi
