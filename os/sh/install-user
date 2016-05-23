@@ -143,20 +143,20 @@ else
 fi
 ' >>~/.bashrc
   source ~/.bashrc
-  curl -L -s -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
+  curl -Lso ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
   chmod a+x ${OS_APP_LAUNCHER}
   cd ~/app
   if [ "$OS_BOOTINTO" = "electron" ]; then
-    curl -LO "${OS_REMOTE_FILES}/app/index.js"
-    curl -LO "${OS_REMOTE_FILES}/app/index.html"
-    curl -LO "${OS_REMOTE_FILES}/app/package.json"
+    curl -LOs "${OS_REMOTE_FILES}/app/index.js"
+    curl -LOs "${OS_REMOTE_FILES}/app/index.html"
+    curl -LOs "${OS_REMOTE_FILES}/app/package.json"
   else
-    curl -LO "${OS_REMOTE_FILES}/jsgtk/index.js"
-    curl -LO "${OS_REMOTE_FILES}/jsgtk/package.json"
-    curl -LO "${OS_REMOTE_FILES}/jsgtk/browse"
+    curl -LOs "${OS_REMOTE_FILES}/jsgtk/index.js"
+    curl -LOs "${OS_REMOTE_FILES}/jsgtk/package.json"
+    curl -LOs "${OS_REMOTE_FILES}/jsgtk/browse"
     chmod a+x browse
   fi
-  curl -LO "${OS_REMOTE_FILES}/app/logo-dark.svg"
-  curl -LO "${OS_REMOTE_FILES}/app/logo-light.svg"
-  mkdir ~/app/node_modules
+  curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
+  curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
+  mkdir -p node_modules
 fi

@@ -59,6 +59,10 @@ if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
   sync
   . install-x86_64
 
+  echo ''
+  icho ' [*]Congratulations[/]!!!'
+  echo ''
+
 else
 
   icho "${OS_LOGO}

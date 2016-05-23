@@ -477,3 +477,15 @@ mv benja.bash benja/benja
 chmod a+x benja/benja
 
 arch-chroot benja /benja
+
+sync
+sleep 2
+
+if [ "$EXP_USE_EMMC" != "" ]; then
+  umount "benja$SYSLINUX_ROOT"
+else
+  if [ "$UEFI" != "NO" ]; then
+    umount "benja$SYSLINUX_ROOT"
+  fi
+fi
+umount benja
