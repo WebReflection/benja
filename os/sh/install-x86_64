@@ -144,8 +144,15 @@ else
 fi
 
 sync
+sleep 1
 
 POSSIBLEDISKS=$(get_drives $DISK)
+
+echo 'DISKS'
+echo ${POSSIBLEDISKS[*]}
+
+exit 1
+
 if [[ $? -ne 0 ]] ; then
   icho "  [*][r][WARNING][/] unable to install in ${POSSIBLEDISKS}"
   exit 1
