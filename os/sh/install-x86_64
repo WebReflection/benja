@@ -79,7 +79,7 @@ if [ "$UEFI" != "" ]; then
     fi
   fi
 else
-  if [ "$(uname -m)" = "x86_64" ]; then
+  if [ "$CURRENT_ARCH" = "x86_64" ]; then
     UEFI=efi64
   else
     UEFI=efi32
@@ -109,14 +109,12 @@ if [[ $? -ne 0 ]] ; then
 fi
 
 for CHOICE in $POSSIBLEDISKS; do
-  if [ "$CHOICE" != "$DISK" ]; then
-    if [ "$(df | grep $CHOICE)" != "" ]; then
-      echo "unmounting $CHOICE"
-      umount $CHOICE
-      if [[ $? -ne 0 ]] ; then
-        icho "  [*][r][WARNING][/] unable to install in ${CHOICE}"
-        exit 1
-      fi
+  if [ "$(df | grep $CHOICE)" != "" ]; then
+    echo "unmounting $CHOICE"
+    umount $CHOICE
+    if [[ $? -ne 0 ]] ; then
+      icho "  [*][r][WARNING][/] unable to install in ${CHOICE}"
+      exit 1
     fi
   fi
 done
@@ -130,9 +128,9 @@ if [ "$UEFI" = "NO" ]; then
   PARTED_START_AT="2048s"
   parted --script $DISK mklabel msdos
 else
-  PARTED_START_AT="64M"
+  PARTED_START_AT="100M"
   parted --script $DISK mklabel gpt
-  parted --script --align optimal $DISK mkpart primary fat16 2048s 64M
+  parted --script --align optimal $DISK mkpart primary fat16 2048s $PARTED_START_AT
   parted $DISK set 1 boot on
 fi
 
@@ -192,6 +190,8 @@ if [ "$UEFI" != "NO" ]; then
   mkfs.vfat $EFI
 fi
 yes | mkfs.ext4 $ROOT
+
+exit
 
 sync
 mkdir -p benja
