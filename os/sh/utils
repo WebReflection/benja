@@ -162,7 +162,7 @@ get_drives() {
   local d=
   local p=
   local l=0
-  for d in $(lsblk --output NAME | sed -e 's/[├─└─]//g'); do
+  for d in $(lsblk --output NAME $1 | sed -e 's/[├─└─]//g'); do
     if [ $l -eq 0 ]; then l=${#d}; fi
     if [ "${d:0:$l}" = "$p" ]; then
       out="${out} /dev/${d}"

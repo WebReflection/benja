@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+# update system time
+# if not possible, will fail
+ntpdate pool.ntp.org
+timedatectl set-local-rtc 1
+
 export OS_INSTALLER_SRC="$(pwd)/benja"
 
 mkdir -p "${OS_INSTALLER_SRC}"

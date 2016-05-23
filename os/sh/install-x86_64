@@ -86,10 +86,6 @@ else
   fi
 fi
 
-# update system time
-# TODO: each reboot!
-ntpdate pool.ntp.org
-timedatectl set-local-rtc 1
 pacman -Sy --noconfirm
 pacman-db-upgrade
 pacman-key --init
@@ -105,13 +101,11 @@ else
 fi
 
 echo "verifying $DISK"
-POSSIBLEDISKS=$(ls ${DISK}[0-9p]*)
+POSSIBLEDISKS=$(get_drives $DISK)
 
 if [[ $? -ne 0 ]] ; then
-  POSSIBLEDISKS=$(ls ${DISK})
-  if [[ $? -ne 0 ]] ; then
-    exit 1
-  fi
+  echo " ${DISK} is not valid"
+  exit 1
 fi
 
 for CHOICE in $POSSIBLEDISKS; do
@@ -151,51 +145,27 @@ fi
 
 sync
 
-POSSIBLEDISKS=$(ls ${DISK}[0-9p]*)
+POSSIBLEDISKS=$(get_drives $DISK)
 if [[ $? -ne 0 ]] ; then
   icho "  [*][r][WARNING][/] unable to install in ${POSSIBLEDISKS}"
   exit 1
 fi
 
-TMP=
-ROOT=
 if [ "$UEFI" = "NO" ]; then
-  for CHOICE in $POSSIBLEDISKS; do
-    if [ "$CHOICE" != "$DISK" ]; then
-      if [ "$SWAP" = "0" ]; then
-        ROOT="$CHOICE"
-      else
-        if [ "$TMP" = "" ]; then
-          SWAP="$CHOICE"
-          TMP="$SWAP"
-        else
-          ROOT="$CHOICE"
-        fi
-      fi
-    fi
-  done
+  if [ "$SWAP" != "0" ]; then
+    ROOT="${OS_SDCARD_PARTITIONS[0]}"
+  else
+    SWAP="${OS_SDCARD_PARTITIONS[0]}"
+    ROOT="${OS_SDCARD_PARTITIONS[1]}"
+  fi
 else
-  EFI=
-  for CHOICE in $POSSIBLEDISKS; do
-    if [ "$CHOICE" != "$DISK" ]; then
-      if [ "$EFI" = "" ]; then
-        EFI="$CHOICE"
-      else
-        if [ "$SWAP" = "0" ]; then
-          ROOT="$CHOICE"
-        else
-          if [ "$TMP" = "" ]; then
-            SWAP="$CHOICE"
-            TMP="$SWAP"
-          else
-            ROOT="$CHOICE"
-          fi
-        fi
-      fi
-    fi
-  done
-
-  echo "EFI boot loader:  $EFI"
+  EFI="${OS_SDCARD_PARTITIONS[0]}"
+  if [ "$SWAP" != "0" ]; then
+    ROOT="${OS_SDCARD_PARTITIONS[1]}"
+  else
+    SWAP="${OS_SDCARD_PARTITIONS[1]}"
+    ROOT="${OS_SDCARD_PARTITIONS[2]}"
+  fi
 fi
 
 if [ "$SWAP" != "0" ]; then
@@ -354,7 +324,7 @@ syslinux-install_update -ia
 
 if [ '$UEFI' != 'NO' ]; then
   mkdir -p $SYSLINUX_ROOT/syslinux
-  if [ '$(uname -m)' = 'x86_64' ]; then
+  if [ '$CURRENT_ARCH' = 'x86_64' ]; then
     cp -r /usr/lib/syslinux/efi64/* $SYSLINUX_ROOT/syslinux
   else
     cp -r /usr/lib/syslinux/efi32/* $SYSLINUX_ROOT/syslinux
@@ -487,7 +457,7 @@ HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 cd $OS_USER_DIR
 curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
 chown "${OS_USER}:users" ./${OS_NAME}-logo
-sudo -H -u $OS_USER bash -c "OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
+sudo -H -u $OS_USER bash -c \"OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user\"
 rm install-user
 rm -f ${OS_USER_DIR}/${OS_NAME}-logo
 cd -
