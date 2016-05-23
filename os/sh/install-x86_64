@@ -153,18 +153,18 @@ fi
 
 if [ "$UEFI" = "NO" ]; then
   if [ "$SWAP" != "0" ]; then
-    ROOT="${OS_SDCARD_PARTITIONS[0]}"
+    ROOT="${POSSIBLEDISKS[0]}"
   else
-    SWAP="${OS_SDCARD_PARTITIONS[0]}"
-    ROOT="${OS_SDCARD_PARTITIONS[1]}"
+    SWAP="${POSSIBLEDISKS[0]}"
+    ROOT="${POSSIBLEDISKS[1]}"
   fi
 else
-  EFI="${OS_SDCARD_PARTITIONS[0]}"
+  EFI="${POSSIBLEDISKS[0]}"
   if [ "$SWAP" != "0" ]; then
-    ROOT="${OS_SDCARD_PARTITIONS[1]}"
+    ROOT="${POSSIBLEDISKS[1]}"
   else
-    SWAP="${OS_SDCARD_PARTITIONS[1]}"
-    ROOT="${OS_SDCARD_PARTITIONS[2]}"
+    SWAP="${POSSIBLEDISKS[1]}"
+    ROOT="${POSSIBLEDISKS[2]}"
   fi
 fi
 
