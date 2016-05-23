@@ -101,7 +101,7 @@ else
 fi
 
 echo "verifying $DISK"
-POSSIBLEDISKS=$(get_drives $DISK)
+POSSIBLEDISKS=($(get_drives $DISK))
 
 if [[ $? -ne 0 ]] ; then
   echo " ${DISK} is not valid"
@@ -146,7 +146,7 @@ fi
 sync
 sleep 1
 
-POSSIBLEDISKS=$(get_drives $DISK)
+POSSIBLEDISKS=($(get_drives $DISK))
 
 echo 'DISKS'
 echo ${POSSIBLEDISKS[*]}
@@ -176,6 +176,9 @@ else
   fi
 fi
 
+if [ "$UEFI" != "NO" ]; then
+  echo "EFI:             $UEFI"
+fi
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:             $SWAP"
 fi
