@@ -22,38 +22,25 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-curl -LO http://webreflection.github.io/benja/os/sh/bash-info
-. bash-info
-rm bash-info
+export CURRENT_PLATFORM="$(uname)"
+export OS_INSTALLER="0.1.0"
+export OS_VERSION="0.3.0"
+export OS_NAME="BENJA"
+export OS_WEBSITE="https://benja.io"
+export OS_REMOTE_FILES="http://webreflection.github.io/benja/os"
+export OS_USER="benja"
+export OS_LOGO=" 
+ [d]┌────────────────┐[/]
+ [d]│[/] [*][b]╔╗ ╔═╗╔╗╔ ╦╔═╗[/] [d]│[/] [l]Bootable[/]
+ [d]│[/] [*][c]╠╩╗║╣ ║║║ ║╠═╣[/] [d]│[/] [l]Electron[/]
+ [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
+ [d]└────────────────┘[/]
+  [l]${OS_WEBSITE}[/l]"
+export OS_INSTALLER_LOGO="
+  [*]installer ${OS_INSTALLER}[/]${OS_LOGO}"
+export OS_USER_DIR="/home/${OS_USER}"
+export OS_INSTALLER_SRC=$(cd $(dirname "$0"); pwd)
+export OS_APP_LAUNCHER='.launch-app'
+export OS_SDCARD=
+export OS_PLATFORM_UTILS
 
-if [ "${CURRENT_PLATFORM}" = "Darwin" ]; then
-  echo "
-  $(tput bold)WARNING$(tput sgr0) OSX/Darwin is not supported.
-  "
-  exit 1
-fi
-
-curl -LO "${OS_REMOTE_FILES}/sh/utils"
-. utils
-rm utils
-
-clear
-
-if [ "$CURRENT_PLATFORM" = "x86_64" ] || [ "$CURRENT_PLATFORM" = "i686" ]; then
-  icho "${OS_LOGO}
-
-  Installing on [*]${CURRENT_PLATFORM}[/]
- 
-"
-#  curl -LO https://webreflection.github.io/benja/os/sh/install-x86_64
-#  sync
-#  . install-x86_64
-else
-  icho "${OS_LOGO}
-
-  [*][r][WARNING][/] wrong installer for: [*]${CURRENT_PLATFORM}[/]
-  
-  Please visit the website to know more.
- 
-"
-fi
