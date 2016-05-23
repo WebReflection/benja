@@ -142,9 +142,9 @@ else
   fi
 fi
 ' >>~/.bashrc
-  source ~/.bashrc
-  curl -Los ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
+  curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
   chmod a+x ${OS_APP_LAUNCHER}
+  mkdir -p ~/app
   cd ~/app
   if [ "$OS_BOOTINTO" = "electron" ]; then
     curl -LOs "${OS_REMOTE_FILES}/app/index.js"

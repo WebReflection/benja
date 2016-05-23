@@ -244,12 +244,15 @@ if [ "$UEFI" = "NO" ]; then
   sync
 fi
 
-APPEND="APPEND root=UUID=$(get_uuid $ROOT) rw quiet splash loglevel=0 console=tty2"
+icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
+
+EFI_UUID="$(get_uuid $EFI)"
+ROOT_UUID="$(get_uuid $ROOT)"
+
+APPEND="APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
-
-icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
 echo "#!/usr/bin/env bash
 
@@ -259,6 +262,8 @@ EFI='$EFI'
 ROOT='$ROOT'
 LABEL='$LABEL'
 LOCALE='$LOCALE'
+EFI_UUID='$EFI_UUID'
+ROOT_UUID='$ROOT_UUID'
 
 echo '
 en_US.UTF-8 UTF-8
@@ -342,7 +347,7 @@ Description=$SYSLINUX_ROOT EFI partition automatically mounted
 [Service]
 User=root
 Type=simple
-ExecStart=/usr/bin/mount --uuid $(get_uuid $EFI) $SYSLINUX_ROOT
+ExecStart=/usr/bin/mount --uuid $EFI_UUID $SYSLINUX_ROOT
 
 [Install]
 WantedBy=multi-user.target'>/etc/systemd/system/automount-efi.service
