@@ -53,6 +53,7 @@ if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
   curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
   sync
   . install-x86_64
+
 else
 
   icho "${OS_LOGO}
