@@ -174,7 +174,7 @@ else
 fi
 
 if [ "$UEFI" != "NO" ]; then
-  echo "EFI:             $UEFI"
+  echo "EFI:             $EFI"
 fi
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:             $SWAP"
@@ -251,7 +251,7 @@ if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
 
-icho "${OS_FULL_LOGO}">"$OS_USER_DIR/${OS_NAME}-logo"
+icho "${OS_FULL_LOGO}">"benja${OS_USER_DIR}/${OS_NAME}-logo"
 
 echo "#!/usr/bin/env bash
 
