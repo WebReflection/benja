@@ -460,8 +460,13 @@ sed -i \"s/localhost\\\$/localhost\$(printf '\\t')${OS_USER}.local/g\" /etc/host
 echo 'HandleSuspendKey=ignore
 HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 
+# making first wifi-setup straight forward
+curl -LO "${OS_REMOTE_FILES}/sh/wifi-setup"
+chmod a+x wifi-setup
+mv wifi-setup /usr/bin
+
 cd $OS_USER_DIR
-curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
+curl -LO "${OS_REMOTE_FILES}/sh/install-user"
 chown "${OS_USER}:users" /${OS_NAME}-logo
 sudo -H -u $OS_USER bash -c \"OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user\"
 rm install-user
