@@ -63,5 +63,5 @@ else
 "
 fi
 
-# cleanup
+# cleanup ... maybe
 rm -rf "${OS_INSTALLER_SRC}"
