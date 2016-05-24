@@ -272,8 +272,6 @@ get_uuid() {
   done
 }
 
-localectl set-locale LANG=en_US.UTF-8
-
 DISK='$DISK'
 USER='$USER'
 EFI='$EFI'
@@ -305,9 +303,6 @@ if [ '$LOCALE' != '' ]; then
   echo '$LOCALE.UTF-8 UTF-8' >> /etc/locale.gen
 fi
 
-locale-gen
-locale > /etc/locale.conf
-
 if [ '$LOCALE' != '' ]; then
   echo '
 LANG=$LOCALE.UTF-8
@@ -321,6 +316,10 @@ LC_TIME=en_US.UTF-8
 fi
 
 hwclock --systohc --utc
+
+localectl set-locale LANG=\$LANG
+locale-gen
+locale > /etc/locale.conf
 
 if [ '$(uname -m)' = 'x86_64' ]; then
   echo '
