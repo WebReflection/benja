@@ -141,16 +141,14 @@ umount_sd() {
   fi
 
   for CHOICE in $POSSIBLEDISKS; do
-    if [ "$CHOICE" != "$DISK" ]; then
-      if [ "$(df | grep $CHOICE)" != "" ]; then
-        if [ "$(uname)" = "Darwin" ]; then
-          sudo diskutil umount $CHOICE
-        else
-          sudo umount $CHOICE
-        fi
-        if [[ $? -ne 0 ]] ; then
-          exit 1
-        fi
+    if [ "$(df | grep $CHOICE)" != "" ]; then
+      if [ "$(uname)" = "Darwin" ]; then
+        sudo diskutil umount $CHOICE
+      else
+        sudo umount $CHOICE
+      fi
+      if [[ $? -ne 0 ]] ; then
+        exit 1
       fi
     fi
   done
