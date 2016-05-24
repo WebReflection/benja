@@ -203,6 +203,9 @@ sync
 mkfs.vfat $APP
 sleep 3
 
+# print out info
+echo "GPU:             ${GPU}"
+
 if [ "$UEFI" != "NO" ]; then
   EFI_UUID="$(get_fatid $EFI)"
   echo "EFI:             ${EFI} ${EFI_UUID}"
@@ -217,10 +220,9 @@ echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 APP_UUID="$(get_fatid $APP)"
 echo "APP:             ${APP} ${APP_UUID}"
 
-echo "GPU:             ${GPU}"
 echo ''
 
-sleep 3
+sleep 5
 
 if [ "$UEFI" != "NO" ]; then
   if [ "$EFI_UUID" = "" ]; then
