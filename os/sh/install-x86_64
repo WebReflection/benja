@@ -213,6 +213,7 @@ mkdir -p benja
 #   1. create a primary ext4 partition in /dev/emmcblk0
 #   2. mkfs.ext4 /dev/emmcblk0p1
 #   3. specify such partition before running this installer
+mount -a
 if [ "$EXP_USE_EMMC" != "" ]; then
   mount $EXP_USE_EMMC benja
   mkdir -p "benja$SYSLINUX_ROOT"
@@ -227,6 +228,9 @@ else
 fi
 sync
 
+echo "${EFI}: $(get_uuid $EFI)"
+echo "${ROOT}: $(get_uuid $ROOT)"
+
 TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
 if [ "$UEFI" != "NO" ]; then
   TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
@@ -237,18 +241,7 @@ TOPACKSTRAP="$TOPACKSTRAP dialog wpa_supplicant iw"
 pacstrap benja $TOPACKSTRAP
 sync
 
-if [ "$UEFI" = "NO" ]; then
-  if [ "$SAVE_FSTAB_INFO" = "1" ]; then
-    mkdir -p benja/info
-    fdisk -l > benja/info/fdisk
-    cat benja/etc/fstab > benja/info/fstab
-    genfstab -U -p benja > benja/info/genfstab
-  fi
-fi
-
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
-
-LSBLK_BEFORE="$(lsblk --output NAME,UUID)"
 
 echo "#!/usr/bin/env bash
 
