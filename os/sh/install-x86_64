@@ -256,6 +256,8 @@ fi
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
+LSBLK_BEFORE="$(lsblk --output NAME,UUID)"
+
 echo "#!/usr/bin/env bash
 
 get_uuid() {
@@ -287,7 +289,10 @@ echo ''
 echo '$ROOT_UUID'
 echo \"\$(get_uuid '$ROOT')\"
 echo ''
-sleep 2
+echo '$LSBLK_BEFORE'
+echo \"\$(lsblk --output NAME,UUID)\"
+sleep 10
+exit
 
 # APPEND=\"APPEND root=UUID=\$(get_uuid '$ROOT') rw quiet splash loglevel=0 console=tty2\"
 APPEND=\"APPEND root=UUID=\$(get_uuid '$ROOT') rw\"
@@ -396,16 +401,16 @@ pacman -Syu --needed --noconfirm \
   bluez bluez-utils \
   ttf-liberation ttf-symbola ttf-droid ttf-freefont
 
-echo 'TIMEOUT 0
+echo \"TIMEOUT 0
 PROMPT 0
 DEFAULT arch
 
 LABEL arch
       LINUX $SYSLINUX_BOOT/vmlinuz-linux
       INITRD $SYSLINUX_BOOT/intel-ucode.img,$SYSLINUX_BOOT/initramfs-linux.img
-      $APPEND
+      \$APPEND
 
-' > $SYSLINUX_ROOT/syslinux/syslinux.cfg
+\"> $SYSLINUX_ROOT/syslinux/syslinux.cfg
 
 pacman-db-upgrade
 sync
