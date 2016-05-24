@@ -513,7 +513,9 @@ chmod a+x benja/benja
 
 arch-chroot benja /benja
 
+echo ' user configured'
 sync
+sleep 5
 
 if [ "$EXP_USE_EMMC" != "" ]; then
   umount "benja$SYSLINUX_ROOT"
