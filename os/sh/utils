@@ -210,8 +210,8 @@ get_fatid() {
   local p=
   local d=
   for d in $(blkid -o value "$1"); do
-    if [ "$p" = "msdos" ]; then
-      echo "$d"
+    if [ "$d" = "vfat" ]; then
+      echo "$p"
       break
     fi
     p="$d"
