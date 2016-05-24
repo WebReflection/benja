@@ -130,6 +130,8 @@ dd if=/dev/zero of=$DISK bs=1 count=2048
 sync
 sleep 2
 
+ROOT_SIZE=3200M
+
 if [ "$UEFI" = "NO" ]; then
   PARTED_START_AT="2048s"
   parted --script $DISK mklabel msdos
@@ -141,11 +143,12 @@ else
 fi
 
 if [ "$SWAP" = "0" ]; then
-  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT 100%
+  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT $ROOT_SIZE
 else
   parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
-  parted --script --align optimal $DISK mkpart primary ext4 $SWAP 100%
+  parted --script --align optimal $DISK mkpart primary ext4 $SWAP $ROOT_SIZE
 fi
+parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
 
 sync
 sleep 1
@@ -159,21 +162,26 @@ fi
 
 EFI=
 ROOT=
+APP=
 
 if [ "$UEFI" = "NO" ]; then
   if [ "$SWAP" != "0" ]; then
     SWAP="${POSSIBLEDISKS[0]}"
     ROOT="${POSSIBLEDISKS[1]}"
+    APP="${POSSIBLEDISKS[2]}"
   else
     ROOT="${POSSIBLEDISKS[0]}"
+    APP="${POSSIBLEDISKS[1]}"
   fi
 else
   EFI="${POSSIBLEDISKS[0]}"
   if [ "$SWAP" != "0" ]; then
     SWAP="${POSSIBLEDISKS[1]}"
     ROOT="${POSSIBLEDISKS[2]}"
+    APP="${POSSIBLEDISKS[3]}"
   else
     ROOT="${POSSIBLEDISKS[1]}"
+    APP="${POSSIBLEDISKS[2]}"
   fi
 fi
 
@@ -191,17 +199,23 @@ yes | mkfs.ext4 $ROOT
 sync
 ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
 tune2fs -U $ROOT_UUID $ROOT
+sync
+mkfs.vfat $APP
 sleep 3
 
 if [ "$UEFI" != "NO" ]; then
   EFI_UUID="$(get_fatid $EFI)"
   echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
+
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
 
 echo "ROOT:            ${ROOT} ${ROOT_UUID}"
+
+APP_UUID="$(get_fatid $APP)"
+echo "APP:             ${APP} ${APP_UUID}"
 
 echo "GPU:             ${GPU}"
 echo ''
@@ -336,7 +350,7 @@ if [ '$UEFI' != 'NO' ]; then
     cp -r /usr/lib/syslinux/efi32/* $SYSLINUX_ROOT/syslinux
   fi
   cp -r /usr/lib/syslinux/$UEFI/syslinux.efi $SYSLINUX_ROOT/syslinux
-  echo \"[Unit]
+  echo '[Unit]
 Description=$SYSLINUX_ROOT EFI partition automatically mounted
 
 [Service]
@@ -345,9 +359,22 @@ Type=simple
 ExecStart=/usr/bin/mount --uuid $EFI_UUID $SYSLINUX_ROOT
 
 [Install]
-WantedBy=multi-user.target\">/etc/systemd/system/automount-efi.service
+WantedBy=multi-user.target'>/etc/systemd/system/automount-efi.service
   systemctl enable automount-efi
 fi
+
+echo '[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+'>/etc/systemd/system/${OS_NAME}-disk.service
+systemctl enable ${OS_NAME}-disk
 
 pacman -Syu --needed --noconfirm \
   weston $GPU_DRIVERS xorg-server-xwayland \
