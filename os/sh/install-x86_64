@@ -243,23 +243,11 @@ sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
-echo "#!/usr/bin/env bash
-
-get_uuid() {
-  local t=0
-  local c=\"$(echo \"\$1\" | sed -e 's/^\/dev\///')\"
-  for d in $(lsblk --output NAME,UUID \"\$1\"); do
-    if [ \"\$c\" = \"\$d\" ]; then
-      t=1
-    else
-      if [ \"\$t\" = \"1\" ]; then
-        echo \"\$d\"
-        break
-      fi
-    fi
-  done
-}
-
+echo '#!/usr/bin/env bash
+' > benja.bash
+cat utils >> benja.bash
+echo "
+# actual-setup
 mount -a
 genfstab -U / >> /etc/fstab
 cat /etc/fstab
@@ -273,14 +261,17 @@ LOCALE='$LOCALE'
 
 # TODO REMOVE THIS
 echo '$EFI_UUID'
-echo \"\$(get_uuid '$EFI')\"
-echo ''
 echo '$ROOT_UUID'
-echo \"\$(get_uuid '$ROOT')\"
 echo ''
 echo '$LSBLK_BEFORE'
+echo ''
 echo \"\$(lsblk --output NAME,UUID)\"
+echo ''
 echo \"\$(lsblk -f)\"
+echo ''
+echo \"\$(get_uuid '$EFI')\"
+echo \"\$(get_uuid '$ROOT')\"
+
 sleep 10
 exit
 
@@ -506,7 +497,7 @@ rm -f $OS_USER_DIR/${OS_NAME}-logo
 cd -
 
 exit
-">benja.bash
+">>benja.bash
 
 mv benja.bash benja/benja
 chmod a+x benja/benja
