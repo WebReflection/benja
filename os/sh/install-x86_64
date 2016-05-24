@@ -183,7 +183,7 @@ if [ "$SWAP" != "0" ]; then
 fi
 echo "GPU:             ${GPU}"
 
-exit 1
+sleep 2
 
 if [ "$SWAP" != "0" ]; then
   mkswap $SWAP
