@@ -195,7 +195,10 @@ ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
 tune2fs -U $ROOT_UUID $ROOT
 
 if [ "$UEFI" != "NO" ]; then
-  EFI_UUID="$(get_uuid $EFI)"
+  EFI_UUID="$(cat /proc/sys/kernel/random/uuid)"
+  EFI_UUID="${EFI_UUID:0:8}"
+  EFI_UUID="${EFI_UUID:0:4}-${EFI_UUID:4}"
+  EFI_UUID="$(echo $EFI_UUID| awk '{print toupper($0)}')"
   tune2fs -U $EFI_UUID $EFI
   echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
