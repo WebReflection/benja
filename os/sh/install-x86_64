@@ -250,8 +250,6 @@ else
     mount $EFI "benja$SYSLINUX_ROOT"
   fi
 fi
-mkdir -p "benja${OS_USER_DIR}/app"
-mount $APP "benja${OS_USER_DIR}/app"
 sync
 
 TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
@@ -335,6 +333,9 @@ ExecStart=
 ExecStart=-/usr/sbin/agetty -n -i -a $USER %I'>/etc/systemd/system/getty@tty1.service.d/autologin.conf
 
 sync
+
+mkdir -p '${OS_USER_DIR}/app'
+mount $APP '${OS_USER_DIR}/app'
 
 free -h
 
