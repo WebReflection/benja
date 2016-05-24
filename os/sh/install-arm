@@ -189,11 +189,16 @@ if [ "$USER" != "root" ]; then
   exit 1
 fi
 
-. /root/bash-info
-. /root/utils
-. /root/utils-platform
+if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ]; then
+  echo ' something is wrong here.'
+  echo ' please visit https://benja.io/ to know how to install'
+fi
 
-export OS_PLATFORM=$(cat /root/${OS_NAME}-platform)
+. bash-info
+. utils
+. utils-platform
+
+export OS_PLATFORM=$(cat ${OS_NAME}-platform)
 export OS_FULL_LOGO=" 
   [*]${OS_PLATFORM}[/]${OS_LOGO}  ${OS_VERSION}
 "
