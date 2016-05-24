@@ -128,18 +128,10 @@ user_is_authorized() {
 
 umount_sd() {
 
-  echo 1
   local CHOICE=
   local DISK="${1}"
   local POSSIBLEDISKS=($(get_drives $DISK))
 
-  echo 2
-  if [[ $? -ne 0 ]] || [ "$POSSIBLEDISKS" = "" ]; then
-      exit 1
-  fi
-
-  echo 3
-  
   for CHOICE in $POSSIBLEDISKS; do
     if [ "$CHOICE" != "$DISK" ]; then
       if [ "$(df | grep $CHOICE)" != "" ]; then
