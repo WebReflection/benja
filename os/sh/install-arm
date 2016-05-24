@@ -22,18 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-# fix possible variables
-if [ "$OS_BOOTINTO" = "" ]; then
-  OS_BOOTINTO="electron"
-else
-  if [ "$OS_BOOTINTO" = "jsgtk" ]; then
-    OS_DEVEL=true
-  fi
-fi
-if [ "$OS_DEVEL" = "1" ]; then
-  OS_DEVEL=true
-fi
-
 if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   if [ ! -f utils-platform ]; then
@@ -128,6 +116,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   mkdir -p ~/${OS_NAME}-tmp-install
 
+  sudo cp bash-info ~/${OS_NAME}-tmp-install/bash-info
   sudo cp install-arm ~/${OS_NAME}-tmp-install/install
   sudo cp utils ~/${OS_NAME}-tmp-install/utils
   sudo cp utils-platform ~/${OS_NAME}-tmp-install/utils-platform
@@ -166,7 +155,7 @@ WantedBy=multi-user.target
   echo '  moving prepared files'
   sudo mv ${OS_NAME}-disk.service root/etc/systemd/system/${OS_NAME}-disk.service
   sudo mv ${OS_NAME}-platform root/root/${OS_NAME}-platform
-  sudo mv {install,utils,utils-platform,wifi-setup} root/root/
+  sudo mv {install,bash-info,utils,utils-platform,wifi-setup} root/root/
   sudo chmod a+x root/root/install
   sudo chmod a+x root/root/wifi-setup
   sync
@@ -195,16 +184,13 @@ and the first intallation might  take a while.
 
 fi
 
-if [ ! -f /root/${OS_NAME}-platform ]; then
-  $0 --help
-  exit 1
-fi
-
 if [ "$USER" != "root" ]; then
   echo ' you must be root to perform this action'
   exit 1
 fi
 
+. /root/bash-info
+. /root/utils
 . /root/utils-platform
 
 export OS_PLATFORM=$(cat /root/${OS_NAME}-platform)
