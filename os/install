@@ -6,7 +6,7 @@ set -e
 ntpdate pool.ntp.org
 timedatectl set-local-rtc 1
 
-export OS_INSTALLER_SRC="$(pwd)/benja"
+export OS_INSTALLER_SRC="$(pwd)/benja-installer"
 
 mkdir -p "${OS_INSTALLER_SRC}"
 cd "${OS_INSTALLER_SRC}"
