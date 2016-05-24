@@ -31,12 +31,12 @@ fi
 
 export OS_PLATFORM_UTILS=
 export OS_PLATFORM=
-export DISK=
+export OS_SDCARD=
 
 for tmp in $@; do
   if [ "${tmp:0:1}" = "/" ]; then
     if [ "$(lsblk $tmp)" != "" ]; then
-      DISK="$tmp"
+      OS_SDCARD="$tmp"
     else
       echo "
   $(tput bold)WARNING$(tput sgr0) invalid target $(tput bold)${tmp}$(tput sgr0)
@@ -113,7 +113,7 @@ done
 #   2. DISK ONLY: install x86_64
 #   3. DISK AND PLATFORM: prepare via install-arm
 
-if [ "${DISK}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
+if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
   echo "
  $(tput bold)BENJA Installer$(tput sgr0)
  a disk target and optionally an ARM platform is needed:

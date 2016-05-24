@@ -58,3 +58,7 @@ export OS_INSTALLER_LOGO="
 export OS_REMOTE_FILES="${OS_WEBSITE}/os"
 export OS_USER_DIR="/home/${OS_USER}"
 export OS_APP_LAUNCHER='.launch-app'
+
+# will be defined later on
+export OS_SDCARD=
+export OS_PLATFORM_UTILS=

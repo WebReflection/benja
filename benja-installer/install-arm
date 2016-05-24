@@ -50,7 +50,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   icho "${OS_FULL_LOGO}
   using [*]${OS_ARCHIVE}[/]
   
-  verifying [*]${OS_SDCARD}[/]"
+  verifying [*]$DISK[/]"
 
   if [ "$OS_KERNEL" = "" ] || [ "$OS_HEADERS" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
     echo ''
@@ -66,6 +66,8 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
     echo ''
     exit 1
   fi
+
+  export OS_SDCARD="$DISK"
 
   # umount sd card, exit if there are problems
   if [ "$(umount_sd "$OS_SDCARD")" != "OK" ]; then
