@@ -191,12 +191,14 @@ yes | mkfs.ext4 $ROOT
 sync
 sleep 3
 
+ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+tune2fs -U $ROOT_UUID $ROOT
+
 if [ "$UEFI" != "NO" ]; then
   EFI_UUID="$(get_uuid $EFI)"
-  echo "EFI:             ${EFI}"
+  echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
-ROOT_UUID="$(get_uuid $ROOT)"
-echo "ROOT:            ${ROOT}"
+echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
