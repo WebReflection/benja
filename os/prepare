@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 ##
 # Copyright (c) 2016 Andrea Giammarchi
