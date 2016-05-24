@@ -133,7 +133,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   sudo cp utils-platform ~/${OS_NAME}-tmp-install/utils-platform
 
   cd ~/${OS_NAME}-tmp-install
-  curl -L -O "${OS_REMOTE_FILES}/sh/wifi-setup"
+  curl -LOs "${OS_REMOTE_FILES}/sh/wifi-setup"
 
   echo "${OS_PLATFORM}" >${OS_NAME}-platform
 
