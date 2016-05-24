@@ -132,6 +132,10 @@ umount_sd() {
   local DISK="${1}"
   local POSSIBLEDISKS=($(get_drives $DISK))
 
+  if [[ $? -ne 0 ]] ; then
+    exit 1
+  fi
+
   for CHOICE in $POSSIBLEDISKS; do
     if [ "$CHOICE" != "$DISK" ]; then
       if [ "$(df | grep $CHOICE)" != "" ]; then
