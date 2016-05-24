@@ -37,7 +37,6 @@ fi
 if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   if [ ! -f utils-platform ]; then
-    echo "grabbing ${OS_REMOTE_FILES}/sh/utils/${OS_PLATFORM_UTILS}"
     curl -Ls -o utils-platform "${OS_REMOTE_FILES}/sh/utils/${OS_PLATFORM_UTILS}"
     sync
   fi
