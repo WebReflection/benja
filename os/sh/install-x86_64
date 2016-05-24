@@ -173,12 +173,17 @@ else
 fi
 
 if [ "$UEFI" != "NO" ]; then
-  echo "EFI:             $EFI"
+  EFI_UUID="$(get_uuid $EFI)"
+  echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
+ROOT_UUID="$(get_uuid $ROOT)"
+echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
-echo "ROOT:            $ROOT"
+echo "GPU:             ${GPU}"
+
+exit 1
 
 if [ "$SWAP" != "0" ]; then
   mkswap $SWAP
@@ -246,9 +251,6 @@ if [ "$UEFI" = "NO" ]; then
 fi
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
-
-EFI_UUID="$(get_uuid $EFI)"
-ROOT_UUID="$(get_uuid $ROOT)"
 
 APPEND="APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
