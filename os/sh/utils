@@ -204,6 +204,17 @@ get_uuid() {
   done
 }
 
+clean_efibootmgr() {
+  local which="$1"
+  local prev=
+  for entry in $(efibootmgr); do
+    if [ "$entry" = "$which" ]; then
+      efibootmgr -b "${prev:4:-1}" -B
+    fi
+    prev="$entry"
+  done
+}
+
 installFromAUR() {
   local user="$1"
   local name="$2"
