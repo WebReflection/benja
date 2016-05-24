@@ -210,9 +210,7 @@ if [ "$ROOT_UUID" = "" ]; then
   exit 1
 fi
 
-sync
 mkdir -p benja
-
 
 # temporary hack to test boot from SD
 # and system in the EMMC
@@ -247,6 +245,12 @@ sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
+# rw quiet splash loglevel=0 console=tty2
+APPEND="APPEND root=UUID=$ROOT_UUID rw"
+if [ "$EDD" != "" ]; then
+  APPEND="$APPEND edd=$EDD"
+fi
+
 echo "#!/usr/bin/env bash
 
 DISK='$DISK'
@@ -255,12 +259,6 @@ EFI='$EFI'
 ROOT='$ROOT'
 LABEL='$LABEL'
 LOCALE='$LOCALE'
-
-# APPEND=\"APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2\"
-APPEND=\"APPEND root=UUID=$ROOT_UUID rw\"
-if [ "$EDD" != "" ]; then
-  APPEND=\"\$APPEND edd=$EDD\"
-fi
 
 echo '
 en_US.UTF-8 UTF-8
@@ -370,7 +368,7 @@ DEFAULT arch
 LABEL arch
       LINUX $SYSLINUX_BOOT/vmlinuz-linux
       INITRD $SYSLINUX_BOOT/intel-ucode.img,$SYSLINUX_BOOT/initramfs-linux.img
-      \$APPEND
+      $APPEND
 
 \"> $SYSLINUX_ROOT/syslinux/syslinux.cfg
 
