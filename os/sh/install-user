@@ -152,6 +152,7 @@ fi
     curl -LOs "${OS_REMOTE_FILES}/app/index.js"
     curl -LOs "${OS_REMOTE_FILES}/app/index.html"
     curl -LOs "${OS_REMOTE_FILES}/app/package.json"
+    npm install --production
   else
     curl -LOs "${OS_REMOTE_FILES}/jsgtk/index.js"
     curl -LOs "${OS_REMOTE_FILES}/jsgtk/package.json"
