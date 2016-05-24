@@ -128,9 +128,9 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   mkdir -p ~/${OS_NAME}-tmp-install
 
-  cp "$OS_INSTALLER_SRC/install-arm" ~/${OS_NAME}-tmp-install/install
-  sudo cp "$OS_INSTALLER_SRC/utils" ~/${OS_NAME}-tmp-install/utils
-  sudo cp "$OS_INSTALLER_SRC/utils-platform" ~/${OS_NAME}-tmp-install/utils-platform
+  sudo cp install-arm ~/${OS_NAME}-tmp-install/install
+  sudo cp utils ~/${OS_NAME}-tmp-install/utils
+  sudo cp utils-platform ~/${OS_NAME}-tmp-install/utils-platform
 
   cd ~/${OS_NAME}-tmp-install
   curl -L -O "${OS_REMOTE_FILES}/sh/wifi-setup"
@@ -189,10 +189,9 @@ and the first intallation might  take a while.
 [*]Thanks for using ${OS_NAME}[/]
 
 "
-  exit 0
 
-  echo ''
-  echo ''
+  rm -r "${OS_INSTALLER_SRC}"
+  exit 0
 
 fi
 
