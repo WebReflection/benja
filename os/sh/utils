@@ -130,23 +130,15 @@ umount_sd() {
 
   local CHOICE=
   local DISK="${1}"
-  local POSSIBLEDISKS=($(get_drives $DISK))
+  local POSSIBLEDISKS="$(get_drives $DISK)"
 
-  if [[ $? -ne 0 ]] ; then
-    exit 1
-  fi
-
-  if [ "${POSSIBLEDISKS}" = "" ]; then
+  if [ "$POSSIBLEDISKS" = "" ]; then
     POSSIBLEDISKS="$DISK"
   fi
 
   for CHOICE in $POSSIBLEDISKS; do
     if [ "$(df | grep $CHOICE)" != "" ]; then
-      if [ "$(uname)" = "Darwin" ]; then
-        sudo diskutil umount $CHOICE
-      else
-        sudo umount $CHOICE
-      fi
+      sudo umount $CHOICE
       if [[ $? -ne 0 ]] ; then
         exit 1
       fi
