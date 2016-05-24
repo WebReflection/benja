@@ -185,7 +185,8 @@ fi
 sync
 
 if [ "$UEFI" != "NO" ]; then
-  mkfs.vfat $EFI
+  EFI_UUID="$(get_uuid $EFI)"
+  mkfs.vfat $EFI -i $EFI_UUID
 fi
 yes | mkfs.ext4 $ROOT
 sync
@@ -195,7 +196,6 @@ ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
 tune2fs -U $ROOT_UUID $ROOT
 
 if [ "$UEFI" != "NO" ]; then
-  EFI_UUID="$(get_uuid $EFI)"
   echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
 echo "ROOT:            ${ROOT} ${ROOT_UUID}"
@@ -207,6 +207,12 @@ echo ''
 
 sleep 3
 
+if [ "$UEFI" != "NO" ]; then
+  if [ "$EFI_UUID" = "" ]; then
+    icho "  [*][r][WARNING][/] unable to retrieve UUID for ${EFI}"
+    exit 1
+  fi
+fi
 if [ "$ROOT_UUID" = "" ]; then
   icho "  [*][r][WARNING][/] unable to retrieve UUID for ${ROOT}"
   exit 1
