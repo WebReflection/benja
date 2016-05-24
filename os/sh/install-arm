@@ -67,6 +67,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   fi
 
   # umount sd card, exit if there are problems
+  umount_sd "$OS_SDCARD"
   if [ "$(umount_sd "$OS_SDCARD")" != "OK" ]; then
     echo ''
     icho " [r][*]invalid SD target[/]: ${OS_SDCARD}"
