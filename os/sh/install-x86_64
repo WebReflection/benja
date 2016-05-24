@@ -361,7 +361,7 @@ pacman -Syu --needed --noconfirm \
   bluez bluez-utils \
   ttf-liberation ttf-symbola ttf-droid ttf-freefont
 
-echo \"TIMEOUT 0
+echo 'TIMEOUT 0
 PROMPT 0
 DEFAULT arch
 
@@ -370,7 +370,7 @@ LABEL arch
       INITRD $SYSLINUX_BOOT/intel-ucode.img,$SYSLINUX_BOOT/initramfs-linux.img
       $APPEND
 
-\"> $SYSLINUX_ROOT/syslinux/syslinux.cfg
+'> $SYSLINUX_ROOT/syslinux/syslinux.cfg
 
 pacman-db-upgrade
 sync
