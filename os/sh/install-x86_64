@@ -23,10 +23,6 @@ set -e
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_FULL_LOGO=" 
-  [*]$(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
-"
-
 localectl set-locale LANG=$LANG
 export LC_TIME=$LANG
 
@@ -56,6 +52,10 @@ elif [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep AMD)" != "" ]; then
   GPU='Radeon'
   GPU_DRIVERS='xf86-video-ati libva-mesa-driver'
 fi
+
+export OS_FULL_LOGO=" 
+  [*]${GPU} on $(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
+"
 
 # swap checks
 if [ "$SWAP" = "" ]; then
