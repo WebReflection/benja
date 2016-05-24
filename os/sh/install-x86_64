@@ -254,7 +254,7 @@ sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
-APPEND="APPEND root=UUID=$ROOT_UUID rw rw quiet splash loglevel=0 console=tty2"
+APPEND="APPEND root=UUID=$ROOT_UUID rw rw q uiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
@@ -297,9 +297,6 @@ fi
 
 pacman -Syu --noconfirm
 pacman-db-upgrade
-systemctl enable dhcpcd
-systemctl enable ntpd.service
-systemctl enable sshd
 
 echo '###############
 ##   root    ##
@@ -474,6 +471,10 @@ sleep 1
 rm install-user
 rm -f $OS_USER_DIR/${OS_NAME}-logo
 cd -
+
+systemctl enable dhcpcd
+systemctl enable ntpd.service
+systemctl enable sshd
 
 exit
 ">>benja.bash
