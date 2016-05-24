@@ -95,7 +95,7 @@ if [ "$UEFI" = "NO" ]; then
 else
   SYSLINUX_BOOT=''
   SYSLINUX_ROOT='/boot'
-  clean_efibootmgr "$OS_NAME"
+  clean_efibootmgr "$LABEL"
   efibootmgr
 fi
 
