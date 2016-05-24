@@ -253,13 +253,6 @@ fi
 
 echo "#!/usr/bin/env bash
 
-DISK='$DISK'
-USER='$USER'
-EFI='$EFI'
-ROOT='$ROOT'
-LABEL='$LABEL'
-LOCALE='$LOCALE'
-
 echo '
 en_US.UTF-8 UTF-8
 en_GB.UTF-8 UTF-8
@@ -405,7 +398,6 @@ if [ '$UEFI' = 'NO' ]; then
   fi
 fi
 
-
 pacman -S --needed --noconfirm \
   sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
@@ -484,7 +476,6 @@ chmod a+x benja/benja
 arch-chroot benja /benja
 
 sync
-sleep 2
 
 if [ "$EXP_USE_EMMC" != "" ]; then
   umount "benja$SYSLINUX_ROOT"
