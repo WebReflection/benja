@@ -254,8 +254,7 @@ sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
-# rw quiet splash loglevel=0 console=tty2
-APPEND="APPEND root=UUID=$ROOT_UUID rw"
+APPEND="APPEND root=UUID=$ROOT_UUID rw rw quiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
