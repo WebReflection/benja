@@ -89,12 +89,6 @@ else
   fi
 fi
 
-pacman -Sy --noconfirm
-pacman-db-upgrade
-pacman-key --init
-pacman-key --populate archlinux
-pacman -S --needed --noconfirm fbset
-
 if [ "$UEFI" = "NO" ]; then
   SYSLINUX_BOOT='/boot'
   SYSLINUX_ROOT='/boot'
@@ -102,7 +96,14 @@ else
   SYSLINUX_BOOT=''
   SYSLINUX_ROOT='/boot'
   clean_efibootmgr "$OS_NAME"
+  efibootmgr
 fi
+
+pacman -Sy --noconfirm
+pacman-db-upgrade
+pacman-key --init
+pacman-key --populate archlinux
+pacman -S --needed --noconfirm fbset
 
 echo "verifying $DISK"
 POSSIBLEDISKS=($(get_drives $DISK))
@@ -177,10 +178,10 @@ fi
 
 if [ "$UEFI" != "NO" ]; then
   EFI_UUID="$(get_uuid $EFI)"
-  echo "EFI:             ${EFI} ${EFI_UUID}"
+  echo "EFI:             ${EFI}"
 fi
 ROOT_UUID="$(get_uuid $ROOT)"
-echo "ROOT:            ${ROOT} ${ROOT_UUID}"
+echo "ROOT:            ${ROOT}"
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
@@ -459,16 +460,13 @@ sync && sleep 1 && pacman -S --needed --noconfirm npm
 
 # extras
 sync && sleep 1 && pacman -S --needed --noconfirm \
-  libva-vdpau-driver libva-mesa-driver
+  libva-vdpau-driver libva-mesa-driver \
+  gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
 npm install -g tiny-cdn
 npm install -g electron-prebuilt
-
-# extras
-pacman -S --needed --noconfirm \
-  gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
 echo ' creating 80 to 8080 redirect'
 echo '[Unit]
