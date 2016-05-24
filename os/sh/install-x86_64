@@ -457,6 +457,9 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
 npm install -g electron-prebuilt
 
+# avoid links on linux partition from fat one
+npm config set bin-links false
+
 echo ' creating 80 to 8080 redirect'
 echo '[Unit]
 Description=${OS_NAME} 80 to 8080 service
