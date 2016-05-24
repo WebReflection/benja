@@ -277,6 +277,8 @@ get_uuid() {
   done
 }
 
+mount -a
+
 DISK='$DISK'
 USER='$USER'
 EFI='$EFI'
