@@ -137,6 +137,10 @@ if [ "$1" = "prepare" ]; then
       OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-c1"
       ;;
+    odroid-c2)
+      OS_PLATFORM="ODROID-C2"
+      OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-c2"
+      ;;
     odroid-u2)
       OS_PLATFORM="ODROID-U2"
       OS_PLATFORM_UTILS="$OS_INSTALLER_SRC/utils-platform/odroid-u2"
