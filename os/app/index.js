@@ -39,6 +39,10 @@ app.once('ready', () => {
       this.window = null;
     })
     .loadURL('http://localhost:8080/');
+    // test CSS
  // .loadURL('https://codepen.io/bennettfeely/full/tfbCo/');
+    // test WebGL
+ // .loadURL('http://get.webgl.org/');
+    // stress WebGL
  // .loadURL('http://webglsamples.org/aquarium/aquarium.html');
 });
