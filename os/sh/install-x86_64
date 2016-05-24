@@ -189,6 +189,8 @@ if [ "$UEFI" != "NO" ]; then
 fi
 yes | mkfs.ext4 $ROOT
 sync
+ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+tune2fs -U $ROOT_UUID $ROOT
 sleep 3
 
 if [ "$UEFI" != "NO" ]; then
@@ -199,8 +201,6 @@ if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
 
-ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
-tune2fs -U $ROOT_UUID $ROOT
 echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 
 echo "GPU:             ${GPU}"
