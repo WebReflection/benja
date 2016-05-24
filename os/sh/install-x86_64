@@ -237,13 +237,7 @@ fi
 
 mkdir -p benja
 
-# temporary hack to test boot from SD
-# and system in the EMMC
-# needed to be done upfront:
-#   1. create a primary ext4 partition in /dev/emmcblk0
-#   2. mkfs.ext4 /dev/emmcblk0p1
-#   3. specify such partition before running this installer
-mount -a
+# preparing chroot env
 if [ "$EXP_USE_EMMC" != "" ]; then
   mount $EXP_USE_EMMC benja
   mkdir -p "benja$SYSLINUX_ROOT"
@@ -256,6 +250,8 @@ else
     mount $EFI "benja$SYSLINUX_ROOT"
   fi
 fi
+mkdir -p "benja${OS_USER_DIR}/app"
+mount $APP "benja${OS_USER_DIR}/app"
 sync
 
 TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
@@ -378,8 +374,6 @@ WantedBy=multi-user.target
 '>/etc/systemd/system/${OS_NAME}-disk.service
 
 echo ' preparing ${OS_NAME} app folder'
-mkdir -p ${OS_USER_DIR}/app
-systemctl start ${OS_NAME}-disk.service
 systemctl enable ${OS_NAME}-disk.service
 
 pacman -Syu --needed --noconfirm \
