@@ -177,6 +177,20 @@ else
   fi
 fi
 
+if [ "$SWAP" != "0" ]; then
+  mkswap $SWAP
+  swapon $SWAP
+fi
+
+sync
+
+if [ "$UEFI" != "NO" ]; then
+  mkfs.vfat $EFI
+fi
+yes | mkfs.ext4 $ROOT
+sync
+sleep 3
+
 if [ "$UEFI" != "NO" ]; then
   EFI_UUID="$(get_uuid $EFI)"
   echo "EFI:             ${EFI}"
@@ -189,19 +203,12 @@ fi
 echo "GPU:             ${GPU}"
 echo ''
 
-sleep 2
+sleep 3
 
-if [ "$SWAP" != "0" ]; then
-  mkswap $SWAP
-  swapon $SWAP
+if [ "$ROOT_UUID" = "" ]; then
+  icho "  [*][r][WARNING][/] unable to retrieve UUID for ${ROOT}"
+  exit 1
 fi
-
-sync
-
-if [ "$UEFI" != "NO" ]; then
-  mkfs.vfat $EFI
-fi
-yes | mkfs.ext4 $ROOT
 
 sync
 mkdir -p benja
@@ -228,9 +235,6 @@ else
 fi
 sync
 
-echo "${EFI}: $(get_uuid $EFI)"
-echo "${ROOT}: $(get_uuid $ROOT)"
-
 TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
 if [ "$UEFI" != "NO" ]; then
   TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
@@ -243,14 +247,7 @@ sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
-echo '#!/usr/bin/env bash
-' > benja.bash
-cat utils >> benja.bash
-echo "
-# actual-setup
-mount -a
-genfstab -U / >> /etc/fstab
-cat /etc/fstab
+echo "#!/usr/bin/env bash
 
 DISK='$DISK'
 USER='$USER'
@@ -259,24 +256,8 @@ ROOT='$ROOT'
 LABEL='$LABEL'
 LOCALE='$LOCALE'
 
-# TODO REMOVE THIS
-echo '$EFI_UUID'
-echo '$ROOT_UUID'
-echo ''
-echo '$LSBLK_BEFORE'
-echo ''
-echo \"\$(lsblk --output NAME,UUID)\"
-echo ''
-echo \"\$(lsblk -f)\"
-echo ''
-echo \"\$(get_uuid '$EFI')\"
-echo \"\$(get_uuid '$ROOT')\"
-
-sleep 10
-exit
-
-# APPEND=\"APPEND root=UUID=\$(get_uuid '$ROOT') rw quiet splash loglevel=0 console=tty2\"
-APPEND=\"APPEND root=UUID=\$(get_uuid '$ROOT') rw\"
+# APPEND=\"APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2\"
+APPEND=\"APPEND root=UUID=$ROOT_UUID rw\"
 if [ "$EDD" != "" ]; then
   APPEND=\"\$APPEND edd=$EDD\"
 fi
@@ -365,7 +346,7 @@ Description=$SYSLINUX_ROOT EFI partition automatically mounted
 [Service]
 User=root
 Type=simple
-ExecStart=/usr/bin/mount --uuid \$(get_uuid '$EFI') $SYSLINUX_ROOT
+ExecStart=/usr/bin/mount --uuid $EFI_UUID $SYSLINUX_ROOT
 
 [Install]
 WantedBy=multi-user.target\">/etc/systemd/system/automount-efi.service
