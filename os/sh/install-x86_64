@@ -191,21 +191,18 @@ yes | mkfs.ext4 $ROOT
 sync
 sleep 3
 
-ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
-tune2fs -U $ROOT_UUID $ROOT
-
 if [ "$UEFI" != "NO" ]; then
-  EFI_UUID="$(cat /proc/sys/kernel/random/uuid)"
-  EFI_UUID="${EFI_UUID:0:8}"
-  EFI_UUID="${EFI_UUID:0:4}-${EFI_UUID:4}"
-  EFI_UUID="$(echo $EFI_UUID| awk '{print toupper($0)}')"
-  tune2fs -U $EFI_UUID $EFI
+  EFI_UUID="$(get_fatid $EFI)"
   echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
-echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
+
+ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+tune2fs -U $ROOT_UUID $ROOT
+echo "ROOT:            ${ROOT} ${ROOT_UUID}"
+
 echo "GPU:             ${GPU}"
 echo ''
 

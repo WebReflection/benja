@@ -177,6 +177,7 @@ get_drives() {
 get_fstype() {
   local t=0
   local c="$(echo "$1" | sed -e 's/^\/dev\///')"
+  local d=
   for d in $(lsblk --output NAME,FSTYPE "$1"); do
     if [ "$c" = "$d" ]; then
       t=1
@@ -192,6 +193,7 @@ get_fstype() {
 get_uuid() {
   local t=0
   local c="$(echo "$1" | sed -e 's/^\/dev\///')"
+  local d=
   for d in $(lsblk --output NAME,UUID "$1"); do
     if [ "$c" = "$d" ]; then
       t=1
@@ -201,6 +203,18 @@ get_uuid() {
         break
       fi
     fi
+  done
+}
+
+get_fatid() {
+  local p=
+  local d=
+  for d in $(blkid -o value "$1"); do
+    if [ "$p" = "msdos" ]; then
+      echo "$d"
+      break
+    fi
+    p="$d"
   done
 }
 
