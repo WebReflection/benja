@@ -111,5 +111,5 @@ unmount_os() {
 # install and configure the platform
 configure_platform() {
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/boot.ini
-  pacman -S --needed --noconfirm xf86-video-odroid-c2 weston aml-libs-c2
+  pacman -S --needed --noconfirm odroid-c2-libgl-fb weston xf86-video-fbdev
 }

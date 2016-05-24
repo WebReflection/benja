@@ -48,6 +48,9 @@ touch ~/.hushlogin
 mkdir -p ~/.config
 mkdir -p ~/app/node_modules
 
+# avoid bin-links
+npm config set bin-links false
+
 # initial Weston configuration
 if [ ! -f ~/.config/weston.ini ]; then
   echo ' creating ~/.config/weston.ini'
