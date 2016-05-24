@@ -269,6 +269,7 @@ get_uuid() {
 
 mount -a
 genfstab -U / >> /etc/fstab
+cat /etc/fstab
 
 DISK='$DISK'
 USER='$USER'
@@ -286,6 +287,7 @@ echo \"\$(get_uuid '$ROOT')\"
 echo ''
 echo '$LSBLK_BEFORE'
 echo \"\$(lsblk --output NAME,UUID)\"
+echo \"\$(lsblk -f)\"
 sleep 10
 exit
 
