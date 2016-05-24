@@ -374,7 +374,11 @@ ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER}
 [Install]
 WantedBy=multi-user.target
 '>/etc/systemd/system/${OS_NAME}-disk.service
-systemctl enable ${OS_NAME}-disk
+
+echo ' preparing ${OS_NAME} app folder'
+mkdir -p ${OS_USER_DIR}/app
+systemctl start ${OS_NAME}-disk.service
+systemctl enable ${OS_NAME}-disk.service
 
 pacman -Syu --needed --noconfirm \
   weston $GPU_DRIVERS xorg-server-xwayland \

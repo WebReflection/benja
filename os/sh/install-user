@@ -46,7 +46,6 @@ cd ~/
 
 touch ~/.hushlogin
 mkdir -p ~/.config
-mkdir -p ~/app
 mkdir -p ~/app/node_modules
 
 # initial Weston configuration
