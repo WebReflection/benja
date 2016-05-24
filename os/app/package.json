@@ -8,8 +8,10 @@
   },
   "author": "Andrea Giammarchi",
   "license": "MIT",
-  "devDependencies": {
-    "electron-prebuilt": "latest",
+  "dependencies": {
     "tiny-cdn": "latest"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "latest"
   }
 }
