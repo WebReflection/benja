@@ -27,7 +27,8 @@ export OS_FULL_LOGO="
   [*]$(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
 "
 
-localectl set-locale LANG=en_US.UTF-8
+localectl set-locale LANG=$LANG
+export LC_TIME=$LANG
 
 # disk checks
 if [ "$DISK" = "" ]; then
@@ -186,6 +187,7 @@ if [ "$SWAP" != "0" ]; then
   echo "SWAP:            $SWAP"
 fi
 echo "GPU:             ${GPU}"
+echo ''
 
 sleep 2
 
@@ -316,8 +318,8 @@ LC_TIME=$LOCALE.UTF-8
 '>>/etc/locale.conf
 else
   echo '
-LANG=en_US.UTF-8
-LC_TIME=en_US.UTF-8
+LANG=$LANG
+LC_TIME=$LANG
 '>>/etc/locale.conf
 fi
 

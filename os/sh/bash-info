@@ -36,6 +36,7 @@ if [ "$OS_DEVEL" = "1" ]; then
 fi
 
 # common configuration
+export LANG=en_US.UTF-8
 export CURRENT_PLATFORM="$(uname)"
 export CURRENT_ARCH="$(uname -m)"
 export OS_INSTALLER="0.2.0"
