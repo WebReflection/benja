@@ -411,10 +411,6 @@ if [ "$OS_BOOTINTO" = "electron" ]; then
     exit 1
   fi
 
-  # electron is like part of the basic requirement
-  # make it already available
-  npm install -g --arch=arm electron-prebuilt
-
   if [[ $? -ne 0 ]] ; then
     echo ''
     icho " [*][r]WARNING[/] electron couldn't be installed"
@@ -502,6 +498,10 @@ if [ -f /etc/motd ]; then
   echo ' removing /etc/motd'
   rm /etc/motd
 fi
+
+# electron is like part of the basic requirement
+# make it already available
+npm install -g --arch=arm electron-prebuilt
 
 # avoid links on linux partition from fat one
 npm config set bin-links false
