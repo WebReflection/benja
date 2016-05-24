@@ -246,16 +246,6 @@ if [ "$UEFI" = "NO" ]; then
   fi
 fi
 
-if [ "$UEFI" = "NO" ]; then
-  cat benja/etc/fstab > benja.fstab
-  genfstab -U -p benja >> benja.fstab
-  cat benja.fstab | sed -e 's/root\/benja//g' | sed -e 's/\/\/boot/\/boot/g' > etc.fstab
-  mv etc.fstab benja/etc/fstab
-  rm benja.fstab
-  cat benja/etc/fstab
-  sync
-fi
-
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
 
 LSBLK_BEFORE="$(lsblk --output NAME,UUID)"
@@ -278,6 +268,7 @@ get_uuid() {
 }
 
 mount -a
+genfstab -U / >> /etc/fstab
 
 DISK='$DISK'
 USER='$USER'
