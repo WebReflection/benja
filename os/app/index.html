@@ -47,25 +47,8 @@
       }
 
       img {
-        padding: 0;
-        border: 0;
-        margin: 0;
         width: 15vh;
         height: 15vh;
-        -webkit-transform: translateZ(0);
-      }
-
-      @keyframes pulse {
-        from {opacity: 0;}
-        to {opacity: 1;}
-      }
-
-      img.pulse {
-        margin-left: -15vh;
-        animation-name: pulse;
-        animation-duration: 2s;
-        animation-direction: alternate;
-        animation-iteration-count: infinite;
       }
 
     </style>
@@ -73,7 +56,7 @@
   </head>
   <body>
     <header>
-      <img src="logo-dark.svg"><img class="pulse" src="logo-light.svg">
+      <img src="logo-dark.svg">
       <h1>B.E.N.J.A.</h1>
       <h2>Bootable Electron Node JS Application</h2>
     </header>
