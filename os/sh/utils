@@ -181,6 +181,24 @@ get_fstype() {
   done
 }
 
+
+# get_partid 'vfat' /dev/sdb1
+# get_partid 'swap' /dev/sdb2
+get_partid() {
+  local kind="$1"
+  local part="$2"
+  local p=
+  local d=
+  for d in $(blkid -o value "$part"); do
+    if [ "$d" = "$kind" ]; then
+      echo "$p"
+      break
+    fi
+    p="$d"
+  done
+}
+
+# TOBEREMOVED
 get_uuid() {
   local t=0
   local c="$(echo "$1" | sed -e 's/^\/dev\///')"
@@ -197,6 +215,7 @@ get_uuid() {
   done
 }
 
+# TOBEREMOVED
 get_fatid() {
   local p=
   local d=

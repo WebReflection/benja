@@ -206,7 +206,7 @@ sleep 3
 echo "GPU:             ${GPU}"
 
 if [ "$UEFI" != "NO" ]; then
-  EFI_UUID="$(get_fatid $EFI)"
+  EFI_UUID="$(get_partid 'vfat' $EFI)"
   echo "EFI:             ${EFI} ${EFI_UUID}"
 fi
 
@@ -216,7 +216,7 @@ fi
 
 echo "ROOT:            ${ROOT} ${ROOT_UUID}"
 
-APP_UUID="$(get_fatid $APP)"
+APP_UUID="$(get_partid 'vfat' $APP)"
 echo "APP:             ${APP} ${APP_UUID}"
 
 echo ''
@@ -454,9 +454,6 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
 npm install -g electron-prebuilt
-
-# avoid links on linux partition from fat one
-npm config set bin-links false
 
 echo ' creating 80 to 8080 redirect'
 echo '[Unit]

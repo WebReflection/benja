@@ -149,6 +149,9 @@ fi
   echo ' installing launcher'
   curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
   chmod a+x ${OS_APP_LAUNCHER}
+  echo ' downloading rmate'
+  curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
+  chmod a+x rmate
   cd ~/app
   if [ "$OS_BOOTINTO" = "electron" ]; then
     echo ' installing electron app'
@@ -166,5 +169,6 @@ fi
   echo ' downloading logo'
   curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
   curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
+  touch reload
   cd -
 fi

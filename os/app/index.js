@@ -45,4 +45,10 @@ app.once('ready', () => {
  // .loadURL('http://get.webgl.org/');
     // stress WebGL
  // .loadURL('http://webglsamples.org/aquarium/aquarium.html');
+
+
+  // for debugging purpose, it might be handy to be able
+  // to reload the window simply via `touch ~/app/reload`
+  require('fs').watch('reload', () => this.window.reload());
+
 });
