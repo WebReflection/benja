@@ -127,7 +127,7 @@ if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
   for tmp in $(lsblk --output NAME); do
     if [ "${tmp:0:1}" != "├" ] && [ "${tmp:0:1}" != "└" ] && [ "$tmp" != "NAME" ]; then
       if [ "${first}" = "0" ]; then
-        echo "   /dev/${tmp}  (first is usually the current system)"
+        echo "   /dev/${tmp}"
       else
         echo "   $(tput bold)/dev/${tmp}$(tput sgr0)"
       fi
@@ -138,7 +138,7 @@ if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
   
    beaglebone-black cubox-i
    cubieboard cubieboard-1 cubieboard-2
-   rpi rpi1 rpi2 rpi3
+   rpi2 rpi3
    odroid-c1 odroid-c2
    odroid-u2 odroid-u3 odroid-xu
  "
@@ -150,6 +150,12 @@ else
   cd "${OS_INSTALLER_SRC}"
 
   if [ ! -f bash-info ]; then
+    curl -LOs 'https://benja.io/os/sh/bash-info'
+    sync
+  fi
+  if [ ! -f bash-info ]; then
+    ntpdate pool.ntp.org
+    timedatectl set-local-rtc 1
     curl -LOs 'https://benja.io/os/sh/bash-info'
     sync
   fi
