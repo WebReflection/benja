@@ -211,6 +211,7 @@ if [ "$UEFI" != "NO" ]; then
 fi
 
 if [ "$SWAP" != "0" ]; then
+  SWAP_UUID="$(get_partid 'swap' $SWAP)"
   echo "SWAP:            $SWAP"
 fi
 
@@ -262,6 +263,25 @@ pacstrap benja $TOPACKSTRAP
 sync
 
 icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
+
+# create fstab for reliable boot sequence
+echo "
+# root
+UUID=$ROOT_UUID	/         	ext4      	rw,relatime,discard,data=ordered	0 1
+" > benja.fstab
+if [ "$UEFI" != "NO" ]; then
+echo "
+# boot
+UUID=$EFI_UUID      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro	0 2
+" >> benja.fstab
+fi
+if [ "$SWAP" != "0" ]; then
+echo "
+# swap
+UUID=$SWAP_UUID      	none     	swap      	defaults	0 0
+" >> benja.fstab
+fi
+mv benja.fstab benja/etc/fstab
 
 APPEND="APPEND root=UUID=$ROOT_UUID rw rw q uiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
@@ -345,17 +365,6 @@ if [ '$UEFI' != 'NO' ]; then
     cp -r /usr/lib/syslinux/efi32/* $SYSLINUX_ROOT/syslinux
   fi
   cp -r /usr/lib/syslinux/$UEFI/syslinux.efi $SYSLINUX_ROOT/syslinux
-  echo '[Unit]
-Description=$SYSLINUX_ROOT EFI partition automatically mounted
-
-[Service]
-User=root
-Type=simple
-ExecStart=/usr/bin/mount --uuid $EFI_UUID $SYSLINUX_ROOT
-
-[Install]
-WantedBy=multi-user.target'>/etc/systemd/system/automount-efi.service
-  systemctl enable automount-efi
 fi
 
 echo '[Unit]
