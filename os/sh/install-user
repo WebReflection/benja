@@ -63,8 +63,8 @@ modules=xwayland.so"
 
 [shell]
 client=/home/${OS_USER}/${OS_APP_LAUNCHER}
-background-image=none
-panel-location=none
+# background-image=none
+# panel-location=none
 animation=none
 close-animation=none
 startup-animation=none
