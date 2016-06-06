@@ -490,6 +490,12 @@ curl -LOs "${OS_REMOTE_FILES}/sh/wifi-setup"
 chmod a+x wifi-setup
 mv wifi-setup /usr/bin
 
+# adding rmate
+echo ' downloading rmate'
+curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
+chmod a+x rmate
+mv rmate /usr/bin/rmate
+
 echo ' configuring user'
 cd $OS_USER_DIR
 curl -LOs "${OS_REMOTE_FILES}/sh/install-user"

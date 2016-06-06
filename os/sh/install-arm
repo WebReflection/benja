@@ -362,6 +362,11 @@ fi
 # make it already available
 npm install -g electron-prebuilt
 
+echo ' downloading rmate'
+curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
+chmod a+x rmate
+mv rmate /usr/bin/rmate
+
 cd $OS_USER_DIR
 curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
 icho "${OS_FULL_LOGO}">./${OS_NAME}-logo
