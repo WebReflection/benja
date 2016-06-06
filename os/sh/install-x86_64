@@ -455,18 +455,6 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
-if [ '$OS_DEVEL' = 'true' ]; then
-  sudo pacman -S --needed --noconfirm \
-    linux-headers base-devel git diffstat chrpath wget cpio pv
-  installFromAUR '${OS_USER}' 'package-query'
-  installFromAUR '${OS_USER}' 'yaourt'
-fi
-
-if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
-  sudo pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
-  yaourt -S --needed --noconfirm jsgtk
-fi
-
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
 npm install -g electron-prebuilt
@@ -517,6 +505,18 @@ cd -
 systemctl enable dhcpcd
 systemctl enable ntpd.service
 systemctl enable sshd
+
+if [ '$OS_DEVEL' = 'true' ]; then
+  pacman -S --needed --noconfirm \
+    linux-headers base-devel git diffstat chrpath wget cpio pv
+  installFromAUR '${OS_USER}' 'package-query'
+  installFromAUR '${OS_USER}' 'yaourt'
+fi
+
+if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
+  pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
+  yaourt -S --needed --noconfirm jsgtk
+fi
 
 rm /utils
 rm /benja
