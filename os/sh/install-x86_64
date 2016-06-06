@@ -96,7 +96,6 @@ else
   SYSLINUX_BOOT=''
   SYSLINUX_ROOT='/boot'
   clean_efibootmgr "$LABEL"
-  efibootmgr
 fi
 
 pacman -Sy --noconfirm
@@ -240,17 +239,18 @@ mkdir -p benja
 # preparing chroot env
 if [ "$EXP_USE_EMMC" != "" ]; then
   mount $EXP_USE_EMMC benja
-  mkdir -p "benja$SYSLINUX_ROOT"
-  mount $ROOT "benja$SYSLINUX_ROOT"
+  mkdir -p "benja${SYSLINUX_ROOT}"
+  mount $ROOT "benja${SYSLINUX_ROOT}"
   SYSLINUX_BOOT=''
 else
   mount $ROOT benja
   if [ "$UEFI" != "NO" ]; then
-    mkdir -p "benja$SYSLINUX_ROOT"
-    mount $EFI "benja$SYSLINUX_ROOT"
+    mkdir -p "benja${SYSLINUX_ROOT}"
+    mount $EFI "benja${SYSLINUX_ROOT}"
   fi
 fi
 sync
+sleep 1
 
 TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
 if [ "$UEFI" != "NO" ]; then
@@ -283,12 +283,14 @@ UUID=$SWAP_UUID      	none     	swap      	defaults	0 0
 fi
 mv benja.fstab benja/etc/fstab
 
-APPEND="APPEND root=UUID=$ROOT_UUID rw rw q uiet splash loglevel=0 console=tty2"
+APPEND="APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2"
 if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
 
 echo "#!/usr/bin/env bash
+
+. /utils
 
 echo '
 en_US.UTF-8 UTF-8
@@ -431,13 +433,6 @@ mkinitcpio -p linux
 
 sync
 
-if [ '$UEFI' = 'NO' ]; then
-  if [ '$SAVE_FSTAB_INFO' = '1' ]; then
-    fdisk -l > /info/fdisk-chroot
-    genfstab -U -p / > /info/genfstab-chroot
-  fi
-fi
-
 pacman -S --needed --noconfirm \
   sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
@@ -459,6 +454,18 @@ sync && sleep 1 && pacman -S --needed --noconfirm npm
 sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
+
+if [ '$OS_DEVEL' = 'true' ]; then
+  sudo pacman -S --needed --noconfirm \
+    linux-headers base-devel git diffstat chrpath wget cpio pv
+  installFromAUR '${OS_USER}' 'package-query'
+  installFromAUR '${OS_USER}' 'yaourt'
+fi
+
+if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
+  sudo pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
+  yaourt -S --needed --noconfirm jsgtk
+fi
 
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2
@@ -511,11 +518,18 @@ systemctl enable dhcpcd
 systemctl enable ntpd.service
 systemctl enable sshd
 
+rm /utils
+rm /benja
+
+sync
+umount $APP
+
 exit
 ">>benja.bash
 
 mv benja.bash benja/benja
 chmod a+x benja/benja
+cp utils benja/utils
 
 arch-chroot benja /benja
 
@@ -523,11 +537,8 @@ echo ' user configured'
 sync
 sleep 5
 
-if [ "$EXP_USE_EMMC" != "" ]; then
-  umount "benja$SYSLINUX_ROOT"
-else
-  if [ "$UEFI" != "NO" ]; then
-    umount "benja$SYSLINUX_ROOT"
-  fi
+if [ "$UEFI" != "NO" ]; then
+  umount $EFI
 fi
-umount benja
+
+umount $ROOT

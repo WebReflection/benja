@@ -22,25 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-# utilities
-contains() {
-  local s=$1
-  local b=''
-  local a=''
-  if [ -f $s ]; then
-    b=$(cat $s)
-    a=$(cat $s | sed -e "s/${2}//")
-  else
-    b="${s}"
-    a=$(echo "${s}" | sed -e "s/${2}//")
-  fi
-  if [ "$b" = "$a" ]; then
-    echo "false"
-  else
-    echo "true"
-  fi
-}
-
 cd ~/
 
 touch ~/.hushlogin
@@ -73,17 +54,16 @@ locking=false
 fi
 
 # OS Bootstrap
-if [ "$(contains ~/.bashrc "# ${OS_NAME} bootstrap")" = "false" ]; then
-  echo ' updating ~/.bashrc'
-  OS_LOGO=$(cat ${OS_NAME}-logo)
-  echo "# ${OS_NAME} bootstrap
+echo ' updating ~/.bashrc'
+OS_LOGO=$(cat ${OS_NAME}-logo)
+echo "# ${OS_NAME} bootstrap
 
 # maximum Xorg resolution
 export OS_MAX_RESOLUTION=${OS_MAX_RESOLUTION}
 
 # logo
 OS_LOGO=\"${OS_LOGO}"\" >>~/.bashrc
-  echo '
+echo '
 
 # Wayland backend
 export GDK_BACKEND=wayland
@@ -146,29 +126,28 @@ else
   fi
 fi
 ' >>~/.bashrc
-  echo ' installing launcher'
-  curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
-  chmod a+x ${OS_APP_LAUNCHER}
-  echo ' downloading rmate'
-  curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
-  chmod a+x rmate
-  cd ~/app
-  if [ "$OS_BOOTINTO" = "electron" ]; then
-    echo ' installing electron app'
-    curl -LOs "${OS_REMOTE_FILES}/app/index.js"
-    curl -LOs "${OS_REMOTE_FILES}/app/index.html"
-    curl -LOs "${OS_REMOTE_FILES}/app/package.json"
-    npm install --production
-  else
-    echo ' installing jsgtk app'
-    curl -LOs "${OS_REMOTE_FILES}/jsgtk/index.js"
-    curl -LOs "${OS_REMOTE_FILES}/jsgtk/package.json"
-    curl -LOs "${OS_REMOTE_FILES}/jsgtk/browse"
-    chmod a+x browse
-  fi
-  echo ' downloading logo'
-  curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
-  curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
-  touch reload
-  cd -
+echo ' installing launcher'
+curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
+chmod a+x ${OS_APP_LAUNCHER}
+echo ' downloading rmate'
+curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
+chmod a+x rmate
+cd ~/app
+if [ "$OS_BOOTINTO" = "electron" ]; then
+  echo ' installing electron app'
+  curl -LOs "${OS_REMOTE_FILES}/app/index.js"
+  curl -LOs "${OS_REMOTE_FILES}/app/index.html"
+  curl -LOs "${OS_REMOTE_FILES}/app/package.json"
+  npm install --production
+else
+  echo ' installing jsgtk app'
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/index.js"
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/package.json"
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/browse"
+  chmod a+x browse
 fi
+echo ' downloading logo'
+curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
+curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
+touch reload
+cd -

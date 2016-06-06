@@ -188,8 +188,6 @@ else
         sync
       fi
 
-      timedatectl set-local-rtc 1
-
       . install-x86_64
 
       echo ''

@@ -31,7 +31,7 @@ else
   fi
 fi
 
-if [ "$OS_DEVEL" = "1" ]; then
+if [ "$OS_DEVEL" = "" ] || [ "$OS_DEVEL" = "1" ]; then
   export OS_DEVEL='true'
 fi
 
