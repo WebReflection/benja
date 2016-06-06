@@ -456,8 +456,9 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
 # electron
-pacman -S --needed --noconfirm xorg-server-xwayland gtk2
+pacman -S --needed --noconfirm xorg-server-xwayland gtk2 libxss
 npm install -g electron-prebuilt
+# npm install -g serialport
 
 echo ' creating 80 to 8080 redirect'
 echo '[Unit]

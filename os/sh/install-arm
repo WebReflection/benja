@@ -262,7 +262,7 @@ fi
 if [ "$OS_BOOTINTO" = "electron" ]; then
   # unfortunately required by current electron
   # since it doesn't work on Wayland
-  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr gtk2
+  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr gtk2 libxss
 
   if [[ $? -ne 0 ]] ; then
     echo ''
@@ -360,7 +360,7 @@ fi
 
 # electron is like part of the basic requirement
 # make it already available
-npm install -g --arch=arm electron-prebuilt
+npm install -g electron-prebuilt
 
 cd $OS_USER_DIR
 curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
