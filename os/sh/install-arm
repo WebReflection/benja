@@ -269,7 +269,7 @@ if [[ $? -ne 0 ]] ; then
 fi
 
 sync
-npm install -g node-gyp node-pre-gyp benja
+npm install -g node-gyp node-pre-gyp
 
 if [ "$OS_BOOTINTO" = "electron" ]; then
   # unfortunately required by current electron

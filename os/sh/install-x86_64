@@ -459,7 +459,7 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 pacman -S --neede --noconfirm adwaita-icon-theme
 
 sync
-npm install -g node-gyp node-pre-gyp benja
+npm install -g node-gyp node-pre-gyp
 
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland xorg-xhost gtk2 libxss
