@@ -222,14 +222,10 @@ configure_platform ''
 echo ' installing dependencies (this might take a while)'
 
 # installing minimum required software
-pacman -S --needed --noconfirm \
-  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
+pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
 # all the (commonly) necessary to build via node-gyp
-sync && pacman -S --needed --noconfirm \
-  $OS_HEADERS base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
-
-npm install -g node-gyp node-pre-gyp
+pacman -S --needed --noconfirm $OS_HEADERS base-devel git python2 nodejs npm
 
 WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
 HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
@@ -268,6 +264,9 @@ if [[ $? -ne 0 ]] ; then
   icho " [*][r]WARNING[/] some library couldn't be installed"
   exit 1
 fi
+
+sync
+npm install -g node-gyp node-pre-gyp
 
 if [ "$OS_BOOTINTO" = "electron" ]; then
   # unfortunately required by current electron

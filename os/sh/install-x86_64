@@ -435,14 +435,10 @@ mkinitcpio -p linux
 
 sync
 
-pacman -S --needed --noconfirm \
-  sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
+pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
 # all the (commonly) necessary to build via node-gyp
-sync && pacman -S --needed --noconfirm \
-  $OS_HEADERS base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
-
-npm install -g node-gyp node-pre-gyp
+pacman -S --needed --noconfirm $OS_HEADERS base-devel git python2 nodejs npm
 
 # test in case somebody would like to use native themes
 pacman -S --needed --noconfirm gnome-themes-standard
@@ -459,6 +455,9 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
+
+sync
+npm install -g node-gyp node-pre-gyp
 
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2 libxss
