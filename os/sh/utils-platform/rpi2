@@ -133,9 +133,9 @@ configurePI() {
     echo 'hdmi_mode=4' >>/boot/config.txt
     echo 'hdmi_group=1' >>/boot/config.txt
     echo '' >>/boot/config.txt
-    echo '# if those black borders disturb you' >>/boot/config.txt
-    echo '# feel free to uncomment next line' >>/boot/config.txt
-    echo '# disable_overscan=1' >>/boot/config.txt
+    echo '# if the absence of black borders disturb you' >>/boot/config.txt
+    echo '# feel free to comment the following line' >>/boot/config.txt
+    echo 'disable_overscan=1' >>/boot/config.txt
   fi
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
