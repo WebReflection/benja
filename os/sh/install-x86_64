@@ -455,11 +455,14 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
+# provide some theme by default
+pacman -S --neede --noconfirm adwaita-icon-theme
+
 sync
 npm install -g node-gyp node-pre-gyp
 
 # electron
-pacman -S --needed --noconfirm xorg-server-xwayland gtk2 libxss
+pacman -S --needed --noconfirm xorg-server-xwayland xorg-xhost gtk2 libxss
 npm install -g electron-prebuilt
 
 echo ' creating 80 to 8080 redirect'
@@ -516,7 +519,7 @@ systemctl enable ntpd.service
 systemctl enable sshd
 
 if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
-  pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
+  pacman -S --needed --noconfirm gjs webkit2gtk
   yaourt -S --needed --noconfirm jsgtk
 fi
 

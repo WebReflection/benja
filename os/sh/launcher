@@ -23,4 +23,5 @@
 ##
 
 cd ~/app
-npm start
+xhost +local:
+sudo npm start

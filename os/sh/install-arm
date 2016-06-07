@@ -257,6 +257,9 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 pacman -S --needed --noconfirm \
   gconf nss pulseaudio pulseaudio-alsa gperf libexif
 
+# provide some theme by default
+pacman -S --neede --noconfirm adwaita-icon-theme
+
 # TODO: install yaourt
 
 if [[ $? -ne 0 ]] ; then
@@ -271,7 +274,7 @@ npm install -g node-gyp node-pre-gyp
 if [ "$OS_BOOTINTO" = "electron" ]; then
   # unfortunately required by current electron
   # since it doesn't work on Wayland
-  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr gtk2 libxss
+  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr xorg-xhost gtk2 libxss
 
   if [[ $? -ne 0 ]] ; then
     echo ''
@@ -288,7 +291,7 @@ if [ "$OS_BOOTINTO" = "electron" ]; then
   npm install -g electron-prebuilt
 
 elif [ "$OS_BOOTINTO" = "jsgtk" ]; then
-  pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
+  pacman -S --needed --noconfirm gjs webkit2gtk
   yaourt -S --needed --noconfirm jsgtk
 fi
 
