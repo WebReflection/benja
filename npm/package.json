@@ -1,0 +1,26 @@
+{
+  "name": "benja",
+  "version": "0.0.2",
+  "description": "Bootable Electron Node JS Application",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/WebReflection/benja.git"
+  },
+  "keywords": [
+    "kiosk",
+    "electron",
+    "archlinux",
+    "node",
+    "JS",
+    "linux",
+    "nodejs",
+    "IoT"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WebReflection/benja/issues"
+  },
+  "homepage": "https://github.com/WebReflection/benja#readme"
+}
