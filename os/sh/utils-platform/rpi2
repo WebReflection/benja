@@ -20,8 +20,8 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_KERNEL='linux-raspberry'
-export OS_HEADERS='linux-raspberry-headers'
+export OS_KERNEL='linux-raspberrypi'
+export OS_HEADERS='linux-raspberrypi-headers'
 export OS_ARCHIVE='ArchLinuxARM-rpi-2-latest.tar.gz'
 
 # partition_sd /dev/mmblk0 3200M
