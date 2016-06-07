@@ -23,4 +23,6 @@
 ##
 
 xhost +local:
-sudo npm start --prefix ~/app/
+cd ~/app
+sudo npm start
+

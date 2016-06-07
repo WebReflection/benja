@@ -5,10 +5,12 @@ var globalPaths = require('module').globalPaths;
 var target = '/home/benja/app/node_modules';
 if (globalPaths.indexOf(target) < 0) {
   try {
-    fs.statSync(target);
-  } catch(e) {
-    globalPaths.unshift(target);
+    if (fs.statSync(target)) {
+      globalPaths.unshift(target);
+    }
+  } catch(meh) {
+    // not a B.E.N.J.A. ¯\_(ツ)_/¯
   }
 }
 
-this.require = require;
+this.require = global.require;
