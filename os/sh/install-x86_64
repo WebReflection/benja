@@ -435,10 +435,13 @@ mkinitcpio -p linux
 
 sync
 
+# installing minimum required software
 pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
 # all the (commonly) necessary to build via node-gyp
-pacman -S --needed --noconfirm $OS_HEADERS base-devel git python2 nodejs npm
+pacman -S --needed --noconfirm $OS_HEADERS
+pacman -S --needed --noconfirm base-devel git python2 nodejs npm
+pacman -S --needed --noconfirm diffstat chrpath wget cpio pv
 
 # test in case somebody would like to use native themes
 pacman -S --needed --noconfirm gnome-themes-standard
