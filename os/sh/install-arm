@@ -138,7 +138,7 @@ ExecStart=/usr/bin/mount ${OS_SDCARD_PARTITIONS[-1]} ${OS_USER_DIR}/app -o uid=$
 WantedBy=multi-user.target
 ">${OS_NAME}-disk.service
 
-  sed -i "s/clear/export OS_DEVEL='${OS_DEVEL}';export OS_BOOTINTO='${OS_BOOTINTO}';clear/" install
+  sed -i "s/clear/export OS_BOOTINTO='${OS_BOOTINTO}';clear/" install
 
   if [ -f ~/Downloads/$OS_ARCHIVE ]; then
     echo "  using $OS_ARCHIVE found in ~/Downloads"
@@ -192,11 +192,12 @@ fi
 if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ]; then
   echo ' something is wrong here.'
   echo ' please visit https://benja.io/ to know how to install'
+  exit 1
 fi
 
-. bash-info
-. utils
-. utils-platform
+. ./bash-info
+. ./utils
+. ./utils-platform
 
 export OS_PLATFORM=$(cat ${OS_NAME}-platform)
 export OS_FULL_LOGO=" 
@@ -224,6 +225,12 @@ echo ' installing dependencies (this might take a while)'
 pacman -S --needed --noconfirm \
   sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
+# all the (commonly) necessary to build via node-gyp
+sync && pacman -S --needed --noconfirm \
+  $OS_HEADERS base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
+
+npm install -g node-gyp node-pre-gyp
+
 WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
 HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
 
@@ -246,12 +253,15 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 sync && sleep 1 && pacman -S --needed --noconfirm \
   gst-plugins-base gst-plugins-good gst-libav
 
-# npm
-sync && sleep 1 && pacman -S --needed --noconfirm npm
-
 # extras
 sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver
+
+# probably unnecessary extras ( in some case expected there by default )
+pacman -S --needed --noconfirm \
+  gconf nss pulseaudio pulseaudio-alsa gperf libexif
+
+# TODO: install yaourt
 
 if [[ $? -ne 0 ]] ; then
   echo ''
@@ -275,27 +285,11 @@ if [ "$OS_BOOTINTO" = "electron" ]; then
     icho " [*][r]WARNING[/] electron couldn't be installed"
     exit 1
   fi
-fi
 
-# probably unnecessary extras ( in some case expected there by default )
-pacman -S --needed --noconfirm \
-  gconf nss pulseaudio pulseaudio-alsa gperf libexif
+  npm install -g electron-prebuilt
 
-if [[ $? -ne 0 ]] ; then
-  echo ''
-  icho " [*][r]WARNING[/] some library couldn't be installed"
-  exit 1
-fi
-
-if [ "$OS_DEVEL" = "true" ]; then
-  sudo pacman -S --needed --noconfirm \
-    $OS_HEADERS base-devel git diffstat chrpath wget cpio pv
-  installFromAUR "${OS_USER}" 'package-query'
-  installFromAUR "${OS_USER}" 'yaourt'
-fi
-
-if [ "$OS_BOOTINTO" = "jsgtk" ]; then
-  sudo pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
+elif [ "$OS_BOOTINTO" = "jsgtk" ]; then
+  pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk
   yaourt -S --needed --noconfirm jsgtk
 fi
 
@@ -348,8 +342,10 @@ fi
 if [ "$(contains '/etc/sudoers' "# ${OS_NAME} sudoers")" = "false" ]; then
   echo ' updating /etc/sudoers'
   echo "
-# ${OS_NAME} sudoers
-%wheel ALL=(ALL) ALL" >>/etc/sudoers
+# ${OS_NAME} sudoers + rules
+%wheel ALL=(ALL) ALL
+${OS_USER} ALL=NOPASSWD: /usr/bin/npm
+" >>/etc/sudoers
 fi
 
 # drop initial welcome mesasge
@@ -357,10 +353,6 @@ if [ -f /etc/motd ]; then
   echo ' removing /etc/motd'
   rm /etc/motd
 fi
-
-# electron is like part of the basic requirement
-# make it already available
-npm install -g electron-prebuilt
 
 echo ' downloading rmate'
 curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
@@ -389,10 +381,10 @@ ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT
 [Install]
 WantedBy=multi-user.target
 " >/etc/systemd/system/${OS_NAME}-80to8080.service
-  systemctl enable ${OS_NAME}-80to8080.service
-  systemctl start ${OS_NAME}-80to8080.service
+systemctl enable ${OS_NAME}-80to8080.service
+systemctl start ${OS_NAME}-80to8080.service
 
-
+# simple hostname configuration
 echo ' configuring hostname'
 echo "${OS_USER}.local" > /etc/hostname
 hostnamectl set-hostname "${OS_USER}.local"

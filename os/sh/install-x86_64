@@ -288,6 +288,8 @@ if [ "$EDD" != "" ]; then
   APPEND="$APPEND edd=$EDD"
 fi
 
+OS_HEADERS='linux-headers'
+
 echo "#!/usr/bin/env bash
 
 . /utils
@@ -436,6 +438,12 @@ sync
 pacman -S --needed --noconfirm \
   sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
+# all the (commonly) necessary to build via node-gyp
+sync && pacman -S --needed --noconfirm \
+  $OS_HEADERS base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
+
+npm install -g node-gyp node-pre-gyp
+
 # test in case somebody would like to use native themes
 pacman -S --needed --noconfirm gnome-themes-standard
 
@@ -447,9 +455,6 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 sync && sleep 1 && pacman -S --needed --noconfirm \
   gst-plugins-base gst-plugins-good gst-libav
 
-# npm
-sync && sleep 1 && pacman -S --needed --noconfirm npm
-
 # extras
 sync && sleep 1 && pacman -S --needed --noconfirm \
   libva-vdpau-driver libva-mesa-driver \
@@ -458,7 +463,6 @@ sync && sleep 1 && pacman -S --needed --noconfirm \
 # electron
 pacman -S --needed --noconfirm xorg-server-xwayland gtk2 libxss
 npm install -g electron-prebuilt
-# npm install -g serialport
 
 echo ' creating 80 to 8080 redirect'
 echo '[Unit]
@@ -512,13 +516,6 @@ cd -
 systemctl enable dhcpcd
 systemctl enable ntpd.service
 systemctl enable sshd
-
-if [ '$OS_DEVEL' = 'true' ]; then
-  pacman -S --needed --noconfirm \
-    linux-headers base-devel git diffstat chrpath wget cpio pv
-  installFromAUR '${OS_USER}' 'package-query'
-  installFromAUR '${OS_USER}' 'yaourt'
-fi
 
 if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
   pacman -S --needed --noconfirm adwaita-icon-theme gjs webkit2gtk

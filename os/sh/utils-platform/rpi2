@@ -145,3 +145,9 @@ configurePI() {
 configure_X11() {
   echo 'X11 not needed'
 }
+
+# once everything is already installed
+configure_after() {
+  pacman -S --needed wiringpi i2c-tools lm_sensors
+  echo 'i2c-dev' >> /etc/modules-load.d/raspberrypi.conf
+}

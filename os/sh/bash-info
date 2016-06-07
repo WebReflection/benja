@@ -25,14 +25,6 @@
 # some exported default
 if [ "$OS_BOOTINTO" = "" ]; then
   export OS_BOOTINTO="electron"
-else
-  if [ "$OS_BOOTINTO" = "jsgtk" ]; then
-    export OS_DEVEL='true'
-  fi
-fi
-
-if [ "$OS_DEVEL" = "" ] || [ "$OS_DEVEL" = "1" ]; then
-  export OS_DEVEL='true'
 fi
 
 # common configuration
