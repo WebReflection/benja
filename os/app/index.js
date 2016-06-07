@@ -49,6 +49,8 @@ app.once('ready', () => {
 
   // for debugging purpose, it might be handy to be able
   // to reload the window simply via `touch ~/app/reload`
-  require('fs').watch('reload', () => this.window.reload());
+  require('fs').watch('reload', () =>
+    require('child_process').execSync('killall weston-launch && logout')
+  );
 
 });

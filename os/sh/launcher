@@ -22,6 +22,5 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-cd ~/app
 xhost +local:
-sudo npm start
+sudo npm start --prefix ~/app/
