@@ -2,6 +2,9 @@ html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  font-family: sans-serif;
+  font-size: 1em;
+  line-height: 1.5em;
 }
 
 *, *:before, *:after {
@@ -12,23 +15,88 @@ body {
   background: #292929;
   color: #eeeeec;
   font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100vh;
   padding: 0;
   margin: 0;
+  text-align: center;
 }
 
-h1 {
-  font-size: 1.5rem;
-  color: #ffffff;
-}
-
-h2 {
+a, a:visited {
   font-weight: lighter;
-  font-size: 1.2rem;
-  color: #8c8c8b;
+  color: silver;
+}
+
+header {
+  max-width: 560px;
+  margin: auto;
+  padding: 12px 0;
+}
+
+header img {
+  float: left;
+  max-width: 100px;
+}
+
+header h1 {
+  font-size: 1.3em;
+  padding-top: 24px;
+}
+header h2 {
+  color: silver;
+  font-size: 1.1em;
+}
+
+header:after {
+  display: block;
+  content: '';
+  clear: left;
+}
+
+main {
+  margin: auto;
+  max-width: 920px;
+}
+
+iframe {
+  max-width: 100%;
+  margin: auto;
+}
+
+ul.inline, ul.inline > li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+ul.inline {
+  text-align: left;
+  margin: auto;
+  display: inline-block;
+}
+ul.inline:after {
+  display: block;
+  content: '';
+  clear: left;
+}
+
+ul.inline > li {
+  display: inline-block;
+  float: left;
+  max-width: 33%;
+  padding: 8px;
+}
+
+ul.inline img {
+  margin: auto;
+  width: 100%;
+}
+
+ul.inline a {
+  text-decoration: none;
+}
+
+@media (max-width: 639px) {
+  ul.inline > li {
+    float: none;
+    min-width: 100%;
+    padding: 32px;
+  }
 }
