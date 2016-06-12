@@ -98,8 +98,8 @@ else
   clean_efibootmgr "$LABEL"
 fi
 
-pacman -Syu --needed --noconfirm fbset
 pacman-db-upgrade
+pacman -Syu --needed --noconfirm fbset
 pacman-key --init
 pacman-key --populate archlinux
 
