@@ -128,7 +128,7 @@ dd if=/dev/zero of=$DISK bs=1 count=2048
 sync
 sleep 2
 
-ROOT_SIZE=3200M
+ROOT_SIZE=3500M
 
 if [ "$UEFI" = "NO" ]; then
   PARTED_START_AT="2048s"
