@@ -67,7 +67,7 @@ if [ "$EDD" = "NO" ] || [ "$EDD" = "0" ] || [ "$EDD" = "false" ]; then
 fi
 
 PASSWD="$(cat /dev/urandom | head | tail | sha256sum | sed -e 's/  -//')"
-USER='benja'
+USER="$OS_USER"
 UPASSWD="$USER"
 LABEL="$USER"
 
@@ -342,11 +342,11 @@ echo '##################
 echo -e '$UPASSWD
 $UPASSWD' | passwd $USER
 
-echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
 echo '
-# password once asked never expires
-Defaults env_reset, timestamp_timeout=-1
-' >> /etc/sudoers
+# ${OS_NAME} sudoers + rules
+%wheel ALL=(ALL) ALL
+${OS_USER} ALL=NOPASSWD: /usr/bin/npm
+' >>/etc/sudoers
 
 mkdir -p /etc/systemd/system/getty@tty1.service.d
 echo '[Service]
