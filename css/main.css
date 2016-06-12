@@ -21,34 +21,68 @@ body {
 }
 
 a, a:visited {
-  font-weight: lighter;
   color: silver;
 }
 
-header {
-  max-width: 560px;
-  margin: auto;
-  padding: 12px 0;
+.menu > li:first-child {
+  padding-left: 48px;
+  background: transparent url(/img/benja-dark.png) left no-repeat;
+  background-size: 32px;
 }
 
-header img {
-  float: left;
-  max-width: 100px;
+.menu > li:first-child span {
+  color: darkgrey;
 }
 
-header h1 {
-  font-size: 1.3em;
-  padding-top: 24px;
-}
-header h2 {
-  color: silver;
-  font-size: 1.1em;
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #111111;
+  background-color: rgba(16,16,16, .8);
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
 }
 
-header:after {
-  display: block;
-  content: '';
-  clear: left;
+/* there is a position fixed in this page,
+   be sure anchors works as expected */
+body, #about {
+  padding-top: 52px;
+}
+
+.menu > li {
+  display: inline-block;
+  padding: 0 16px;
+  margin: 0;
+  border-bottom: 4px solid rgba(16,16,16, .8);
+}
+
+.menu > li:first-child {
+  position: fixed;
+  left: 16px;
+  padding-top: 4px;
+  border-bottom: 0;
+}
+
+.menu > li.active {
+  border-bottom: 4px solid #369;
+}
+
+.menu > li * {
+  line-height: 48px;
+}
+
+.menu > li a {
+  padding: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.menu > li a, .menu > li a:hover, .menu > li a:active, .menu > li a:focus {
+  outline: 0;
 }
 
 main {
@@ -93,10 +127,52 @@ ul.inline a {
   text-decoration: none;
 }
 
+#about {
+  text-align: left;
+}
+
 @media (max-width: 639px) {
+  .menu > li {
+    width: auto;
+  }
+  .menu > li:first-child span {
+    display: none;
+  }
+  .menu > li:first-child strong:after {
+    content: '.';
+  }
   ul.inline > li {
     float: none;
     min-width: 100%;
     padding: 32px;
   }
 }
+
+
+/*
+header {
+  max-width: 560px;
+  margin: auto;
+  padding: 12px 0;
+}
+
+header img {
+  float: left;
+  max-width: 100px;
+}
+
+header h1 {
+  font-size: 1.3em;
+  padding-top: 24px;
+}
+header h2 {
+  color: silver;
+  font-size: 1.1em;
+}
+
+header:after {
+  display: block;
+  content: '';
+  clear: left;
+}
+*/

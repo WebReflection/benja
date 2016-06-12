@@ -6,17 +6,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" type="text/css" href="css/main.css" media="screen">
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script defer src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.4.1/ie8.js"></script>
     <![endif]-->
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/dom4/1.8.3/dom4.js"></script>
+    <script defer src="js/main.js"></script>
     <title>Benja OS</title>
   </head>
-  <body>
+  <body id="home">
+    <ul class="menu">
+      <li>
+        <strong>B</strong><span>ootable</span>
+        <strong>E</strong><span>lectron</span>
+        <strong>N</strong><span>ode</span>
+        <strong>J</strong><span>S</span>
+        <strong>A</strong><span>pplication</span>
+      </li>
+      <li class="active"><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
     <header>
-      <div>
-        <img src="os/app/logo-dark.svg" alt="logo">
-        <h1>B.E.N.J.A.</h1>
-        <h2>Bootable Electron Node JS Application</h2>
-      </div><br>
     </header>
     <main>
       <iframe width="560" height="315" src="https://www.youtube.com/embed/AsVvoy2K8d8" allowfullscreen></iframe>
@@ -24,20 +33,22 @@
         <li>
           <a href="https://www.archlinux.org/"><img src="img/archlinux.png" alt="ArchLinux"></a>
           <p>
-            A simple, lightweight, and always up-to-date Linux distribution.
-            Its <a href="https://archlinuxarm.org/">ARM</a> counterpart
-            has been working on hacker boards long time before Ubuntu snappy.
-            Mature, stable, and most important simple,
-            ArchLinux can bootstrap most hacker-friendly boards out there in few seconds.
+            Open Source centric and community driven, <a href="https://www.archlinux.org/">Arch Linux</a> is one of the most
+            popular and well documented Linux distributions out there.
+            <br>
+            Simple, lightweight, and always up-to-date,
+            its <a href="https://archlinuxarm.org/">ARM</a> counterpart
+            has been working on hacker-friendly boards long time before others and
+            it can bootstrap in just a few seconds.
           </p>
         </li>
         <li>
           <a href="https://nodejs.org/"><img src="img/nodejs.png" alt="NodeJS"></a>
           <p>
             Based on <a href="https://developers.google.com/v8/">Chrome's V8 JavaScript engine</a>,
-            NodeJS is the powerful JavaScript runtime used by developers of any level
-            as Web server backed as well as Sys administartor tools.
-            Thanks to its <a href="https://www.npmjs.com/">npm</a> modules such <a href="https://www.npmjs.com/package/serialport">serialport</a>
+            NodeJS is the powerful JavaScript runtime used by backend developers as wenn as system administrators.
+            <br>
+            Thanks to <a href="https://www.npmjs.com/">npm</a> modules such <a href="https://www.npmjs.com/package/serialport">serialport</a>
             or <a href="https://www.npmjs.com/package/johnny-five">johnny-five</a>,
             NodeJS can be used to drive Arduino, Raspberry Pi, and many other <abbr title="Internet of Things">IoT</abbr> oriented boards.
           </p>
@@ -45,11 +56,15 @@
         <li>
           <a href="http://electron.atom.io/"><img src="img/electron.png" alt="Electron"></a>
           <p>
-            Formerly known as Atom Shell, Electron is an <a href="https://github.com/electron/electron">open source project maintained by GitHub</a> and an active community of contributors.
-            It uses Chromium and NodeJS, meaning you can build any kind of app using npm modules, HTML and CSS pages, and JavaScript driven.
+            Electron is an <a href="https://github.com/electron/electron">open source project maintained by GitHub</a> with an active community of contributors.
+            <br>
+            It uses Chromium and NodeJS, providing the ability to build any kind of app using the HTML, CSS and JavaScript Web stack.
+            <br>
+            B.E.N.J.A. uses it to create a restrictions-free Web full of potentials.
           </p>
         </li>
       </ul>
+      <div id="about"></div>
     </main>
   </body>
 </html>
