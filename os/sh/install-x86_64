@@ -437,7 +437,7 @@ sync
 pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
 
 # all the (commonly) necessary to build via node-gyp
-pacman -S --needed --noconfirm base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
+pacman -S --needed --noconfirm base-devel linux-headers git python2 nodejs npm diffstat chrpath wget cpio pv
 
 # test in case somebody would like to use native themes
 pacman -S --needed --noconfirm gnome-themes-standard
