@@ -98,11 +98,10 @@ else
   clean_efibootmgr "$LABEL"
 fi
 
-pacman -Sy --noconfirm
+pacman -Syu --needed --noconfirm fbset
 pacman-db-upgrade
 pacman-key --init
 pacman-key --populate archlinux
-pacman -S --needed --noconfirm fbset
 
 echo "verifying $DISK"
 POSSIBLEDISKS=($(get_drives $DISK))
