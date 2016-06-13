@@ -19,7 +19,7 @@ if [ "$X11" != "NO" ]
   if [ "$RUNNING_IN_XTERM" != "true" ]; then
     chmod a+x "$0"
     sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
-    echo "xterm -e "RUNNING_IN_XTERM='true' bash $0" > ~/.xinitrc
+    echo "xterm -e \"RUNNING_IN_XTERM='true' bash $0\"" > ~/.xinitrc
     startx
     exit 0
   else
