@@ -120,7 +120,6 @@ if [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
   KERNEL=="fb*", MODE="0660", GROUP="video"
   KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > ~/.sunxi-mali/50-mali.rules
   sudo mv ~/.sunxi-mali/50-mali.rules /etc/udev/rules.d/50-mali.rules
-
 fi
 
 if [ ! -d ~/.sunxi-mali/libcedrus ]; then
@@ -158,8 +157,6 @@ if [ ! -d ~/.sunxi-mali/libvdpau-sunxi ]; then
   subalign=2
   subfont=/usr/share/fonts/TTF/DejaVuSans.ttf
   subcp=cp1250' > ~/.mplayer/config
-
 fi
 
-cd ~/.sunxi-mali/sunxi-mali/test
-cc -Wall -o test test.c -lEGL -lGLESv2 -lX11
+sudo reboot
