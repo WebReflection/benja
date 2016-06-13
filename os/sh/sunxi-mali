@@ -15,11 +15,17 @@ if [ ! -f /etc/default/cpupower ]; then
   bash cpupower
 fi
 
-if [ "$X11" != "NO" ] && [ "$RUNNING_IN_XTERM" != "true" ]; then
-  chmod a+x "$0"
-  sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
-  echo "RUNNING_IN_XTERM='true' xterm -e $0" > ~/.xinitrc
-  startx
+if [ "$X11" != "NO" ]
+  if [ "$RUNNING_IN_XTERM" != "true" ]; then
+    chmod a+x "$0"
+    sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
+    echo "xterm -e "RUNNING_IN_XTERM='true' bash $0" > ~/.xinitrc
+    startx
+    exit 0
+  else
+    echo 'Executing from X11'
+    sleep 2
+  fi
 fi
 
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
@@ -73,22 +79,23 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   git clone --recursive https://github.com/linux-sunxi/sunxi-mali.git
   cd ~/.sunxi-mali/sunxi-mali
   sudo mkdir -p /usr/lib/mali
-  chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
-  chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
-  curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
-  curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
+  # curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
+  # curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
   export ABI=armhf
   if [ "$X11" != "NO" ]; then
     export EGL_TYPE=X11
+    chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
   else
     export EGL_TYPE=framebuffer
+    chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
   fi
   make config
-  sudo make -C include install
-  sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
-  if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
-    sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
-  fi
+  sudo make install
+  # sudo make -C include install
+  # sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
+  # if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
+  #  sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+  # fi
 fi
 
 if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
