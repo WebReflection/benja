@@ -159,4 +159,7 @@ if [ ! -d ~/.sunxi-mali/libvdpau-sunxi ]; then
   subcp=cp1250' > ~/.mplayer/config
 fi
 
+if [ -f /boot/script.bin ]; then
+  sudo umount /boot
+fi
 sudo reboot
