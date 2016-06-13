@@ -10,6 +10,11 @@ if [ ! -f /boot/script.bin ]; then
   exit 1
 fi
 
+if [ ! -f /etc/default/cpupower ]; then
+  curl -LO benja.io/os/sh/cpupower
+  bash cpupower
+fi
+
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
 mkdir -p ~/.sunxi-mali
@@ -63,8 +68,8 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   sudo mkdir -p /usr/lib/mali
   chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
   chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
-  make config ABI=armhf EGL_TYPE=framebuffer
-  sudo make install ABI=armhf EGL_TYPE=framebuffer
+  make config ABI=armhf # EGL_TYPE=framebuffer
+  sudo make install ABI=armhf # EGL_TYPE=framebuffer
 #  curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
 #  curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
 #  sudo make -C include install
