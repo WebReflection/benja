@@ -242,8 +242,10 @@ sleep 2
 pacman -S --needed --noconfirm gnome-themes-standard
 
 # fonts
+# sync && sleep 1 && pacman -S --needed --noconfirm ttf-dejavu ttf-liberation ttf-symbola ttf-droid
+
 sync && sleep 1 && pacman -S --needed --noconfirm \
-  ttf-dejavu ttf-liberation ttf-symbola ttf-droid
+  noto-fonts noto-fonts-emoji
 
 # gstreamer
 sync && sleep 1 && pacman -S --needed --noconfirm \
