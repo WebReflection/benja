@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ ! -f /etc/default/cpupower ]; then
+if [ ! -f /etc/default/cpupower ] || [ "$(cat /etc/default/cpupower | grep 'governor=\"performance\"')" = "" ]; then
   sudo pacman -S --needed --noconfirm cpupower
   sync
   sudo sh -c "echo '
