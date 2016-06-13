@@ -25,99 +25,123 @@ fi
 
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 mkdir -p ~/.sunxi-mali
+
 cd ~/.sunxi-mali
-git clone https://github.com/robclark/libdri2.git
-git clone https://github.com/linux-sunxi/libump.git
-git clone --recursive https://github.com/linux-sunxi/sunxi-mali.git
-git clone https://github.com/ssvb/xf86-video-fbturbo.git
-git clone https://github.com/linux-sunxi/libcedrus.git
-git clone https://github.com/linux-sunxi/libvdpau-sunxi.git
 
-cd ~/.sunxi-mali/libdri2
-./autogen.sh --prefix=/usr
-sudo make install
-
-cd ~/.sunxi-mali/libump
-autoreconf -vi
-./configure --prefix=/usr
-make
-sudo make install
-
-cd ~/.sunxi-mali/sunxi-mali
-sudo mkdir -p /usr/lib/mali
-make config ABI=armhf VERSION=r3p0 EGL_TYPE=framebuffer
-curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
-curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
-sudo make -C include install
-sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
-if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
-  sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+if [ ! -d ~/.sunxi-mali/libdri2 ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/robclark/libdri2.git
+  cd ~/.sunxi-mali/libdri2
+  ./autogen.sh --prefix=/usr
+  sudo make install
 fi
 
-cd ~/.sunxi-mali/xf86-video-fbturbo
-autoreconf -vi
-./configure --prefix=/usr
-make
-sudo make install
-echo 'Section "Screen"
-        Identifier      "Allwinner Screen"
-        Device          "Allwinner FBDEV"
-        Monitor         "Allwinner Monitor"
-EndSection
+if [ ! -d ~/.sunxi-mali/libump ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libump.git
+  cd ~/.sunxi-mali/libump
+  autoreconf -vi
+  ./configure --prefix=/usr
+  make
+  sudo make install
+fi
 
-Section "Device"
-        Identifier      "Allwinner FBDEV"
-        Driver          "fbturbo"
-        Option          "fbdev" "/dev/fb0"
-        Option          "SwapbuffersWait" "true"
-        Option          "AccelMethod" "G2D"
-EndSection
+if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
+  cd ~/.sunxi-mali
+  git clone --recursive https://github.com/linux-sunxi/sunxi-mali.git
+  cd ~/.sunxi-mali/sunxi-mali
+  sudo mkdir -p /usr/lib/mali
+  make config ABI=armhf VERSION=r3p0 EGL_TYPE=framebuffer
+  curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
+  curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
+  sudo make -C include install
+  sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
+  if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
+    sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+  fi
+fi
 
-Section "Monitor"
-        Identifier      "Allwinner Monitor"
-        Option          "DPMS" "false"
-EndSection' > /etc/X11/xorg.conf.d/99-fbturbo.conf
+if [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/ssvb/xf86-video-fbturbo.git
+  cd ~/.sunxi-mali/xf86-video-fbturbo
+  autoreconf -vi
+  ./configure --prefix=/usr
+  make
+  sudo make install
+  echo 'Section "Screen"
+          Identifier      "Allwinner Screen"
+          Device          "Allwinner FBDEV"
+          Monitor         "Allwinner Monitor"
+  EndSection
 
-sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
-for fb in $(ls /dev/fb*); do
-  sudo chmod 666 $fb
-done
+  Section "Device"
+          Identifier      "Allwinner FBDEV"
+          Driver          "fbturbo"
+          Option          "fbdev" "/dev/fb0"
+          Option          "SwapbuffersWait" "true"
+          Option          "AccelMethod" "G2D"
+  EndSection
 
-echo 'KERNEL=="mali", MODE="0660", GROUP="video"
-KERNEL=="ump", MODE="0660", GROUP="video"
-KERNEL=="disp", MODE="0660", GROUP="video"
-KERNEL=="g2d", MODE="0660", GROUP="video"
-KERNEL=="fb*", MODE="0660", GROUP="video"
-KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > /etc/udev/rules.d/50-mali.rules
+  Section "Monitor"
+          Identifier      "Allwinner Monitor"
+          Option          "DPMS" "false"
+  EndSection' > /etc/X11/xorg.conf.d/99-fbturbo.conf
 
-sudo pacman -S --needed --noconfirm libvdpau-va-gl
-cd ~/.sunxi-mali/libvdpau-sunxi
-make
-sudo make install
-sudo sh -c 'echo "export VDPAU_DRIVER=sunxi" >> /etc/profile'
-mkdir -p ~/.mplayer/
-echo 'vo=vdpau
-vc=ffmpeg12vdpau,ffh264vdpau
-fullscreen=yes
-quiet=yes
-ao=pulse
-framedrop=yes
-cache=8192
-lavdopts=threads=2
-ass=no
-ass-font-scale=1.4
-ass-color=FFFFFF00
-ass-border-color=00000000
-ass-use-margins=yes
-ass-bottom-margin=50
-spualign=2
-subalign=2
-subfont=/usr/share/fonts/TTF/DejaVuSans.ttf
-subcp=cp1250' > ~/.mplayer/config
+  sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
+  for fb in $(ls /dev/fb*); do
+    sudo chmod 666 $fb
+  done
 
-sudo bin2fex /boot/script.bin ~/.sunxi-mali/script.fex
-sudo sed -i 's/fb([0-9]*)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
-sudo fex2bin ~/.sunxi-mali/script.fex /boot/script.bin
+  echo 'KERNEL=="mali", MODE="0660", GROUP="video"
+  KERNEL=="ump", MODE="0660", GROUP="video"
+  KERNEL=="disp", MODE="0660", GROUP="video"
+  KERNEL=="g2d", MODE="0660", GROUP="video"
+  KERNEL=="fb*", MODE="0660", GROUP="video"
+  KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > /etc/udev/rules.d/50-mali.rules
 
-cd ~/.sunxi-mali/sunxi-mali/test
-cc -Wall -o test test.c -lEGL -lGLESv2 -lX11
+fi
+
+if [ ! -d ~/.sunxi-mali/libcedrus ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libcedrus.git
+  cd ~/.sunxi-mali/libcedrus
+  make
+  sudo make install
+fi
+
+if [ ! -d ~/.sunxi-mali/libvdpau-sunxi ]; then
+  sudo pacman -S --needed --noconfirm libvdpau-va-gl
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libvdpau-sunxi.git
+  cd ~/.sunxi-mali/libvdpau-sunxi
+  make
+  sudo make install
+  sudo sh -c 'echo "export VDPAU_DRIVER=sunxi" >> /etc/profile'
+  mkdir -p ~/.mplayer/
+  echo 'vo=vdpau
+  vc=ffmpeg12vdpau,ffh264vdpau
+  fullscreen=yes
+  quiet=yes
+  ao=pulse
+  framedrop=yes
+  cache=8192
+  lavdopts=threads=2
+  ass=no
+  ass-font-scale=1.4
+  ass-color=FFFFFF00
+  ass-border-color=00000000
+  ass-use-margins=yes
+  ass-bottom-margin=50
+  spualign=2
+  subalign=2
+  subfont=/usr/share/fonts/TTF/DejaVuSans.ttf
+  subcp=cp1250' > ~/.mplayer/config
+
+  sudo bin2fex /boot/script.bin ~/.sunxi-mali/script.fex
+  sudo sed -i 's/fb([0-9]*)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
+  sudo fex2bin ~/.sunxi-mali/script.fex /boot/script.bin
+
+  cd ~/.sunxi-mali/sunxi-mali/test
+  cc -Wall -o test test.c -lEGL -lGLESv2 -lX11
+fi
