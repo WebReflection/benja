@@ -10,19 +10,6 @@ if [ ! -f /boot/script.bin ]; then
   exit 1
 fi
 
-if [ ! -f /etc/default/cpupower ]; then
-  sudo pacman -S --needed --noconfirm cpupower
-  sync
-  sudo sh -c "echo 'governor=\"performance\"'>>/etc/default/cpupower"
-  sudo systemctl enable cpupower.service
-  sudo systemctl start cpupower.service
-fi
-
-if [[ $? -ne 0 ]] ; then
-  echo 'Unable to setup governor'
-  exit 1
-fi
-
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
 mkdir -p ~/.sunxi-mali

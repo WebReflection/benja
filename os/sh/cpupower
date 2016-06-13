@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ ! -f /etc/default/cpupower ]; then
+  sudo pacman -S --needed --noconfirm cpupower
+  sync
+  sudo sh -c "echo '
+governor=\"performance\"
+'>>/etc/default/cpupower"
+  sudo systemctl enable cpupower.service
+  sudo systemctl start cpupower.service
+fi
+
+if [[ $? -ne 0 ]] ; then
+  echo 'Unable to setup governor'
+  exit 1
+fi
