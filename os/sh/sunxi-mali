@@ -13,10 +13,10 @@ fi
 sudo usermod -aG video $USER
 
 if [ ! -f /usr/lib/modules-load.d/modules.conf ]; then
-  echo 'ump
+  sudo sh -c 'echo "ump
 mali
 drm
-mali_drm' >/usr/lib/modules-load.d/modules.conf
+mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe ump
   sudo modprobe mali
   sudo modprobe drm
