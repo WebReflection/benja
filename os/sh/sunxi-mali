@@ -99,7 +99,8 @@ if [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
   Section "Monitor"
           Identifier      "Allwinner Monitor"
           Option          "DPMS" "false"
-  EndSection' > ~/.sunxi-mali/99-fbturbo.conf
+  EndSection
+  ' > ~/.sunxi-mali/99-fbturbo.conf
   sudo mv ~/.sunxi-mali/99-fbturbo.conf /etc/X11/xorg.conf.d/99-fbturbo.conf
 
   sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
