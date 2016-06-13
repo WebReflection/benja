@@ -10,12 +10,10 @@ if [ ! -f /boot/script.bin ]; then
   exit 1
 fi
 
-if [ ! -f /etc/default/cpupower ]; then
-  curl -LO benja.io/os/sh/cpupower
-  bash cpupower
-fi
-
 sudo pacman -Sy --noconfirm
+
+curl -LO benja.io/os/sh/cpupower
+bash cpupower
 
 if [ "$X11" != "NO" ]; then
   if [ "$RUNNING_IN_XTERM" != "true" ]; then
@@ -82,15 +80,17 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   cd ~/.sunxi-mali/sunxi-mali
   sudo mkdir -p /usr/lib/mali
   if [ "$X11" != "NO" ]; then
-    curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
-    curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
+    # curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
+    # curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
     chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
     make config ABI=armhf EGL_TYPE=x11
-    sudo make -C include install ABI=armhf EGL_TYPE=x11
-    sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install ABI=armhf EGL_TYPE=x11
-    if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
-      sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
-    fi
+    sudo make install ABI=armhf EGL_TYPE=x11
+    # make config ABI=armhf EGL_TYPE=x11
+    # sudo make -C include install ABI=armhf EGL_TYPE=x11
+    # sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install ABI=armhf EGL_TYPE=x11
+    # if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
+    #   sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+    # fi
   else
     chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
     make config ABI=armhf EGL_TYPE=framebuffer
