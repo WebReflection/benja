@@ -12,6 +12,9 @@ fi
 
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
+mkdir -p ~/.sunxi-mali
+cd ~/.sunxi-mali
+
 sudo bin2fex /boot/script.bin ~/.sunxi-mali/script.fex
 sudo sed -i 's/fb\([0-9]*\)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
 sync
@@ -34,10 +37,6 @@ mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe drm
   sudo modprobe mali_drm
 fi
-
-mkdir -p ~/.sunxi-mali
-
-cd ~/.sunxi-mali
 
 if [ ! -d ~/.sunxi-mali/libdri2 ]; then
   cd ~/.sunxi-mali
