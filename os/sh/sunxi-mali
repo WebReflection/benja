@@ -13,7 +13,8 @@ fi
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
 sudo bin2fex /boot/script.bin ~/.sunxi-mali/script.fex
-sudo sed -i 's/fb([0-9]*)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
+sudo sed -i 's/fb\([0-9]*\)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
+sync
 sudo fex2bin ~/.sunxi-mali/script.fex /boot/script.bin
 
 if [[ $? -ne 0 ]] ; then
