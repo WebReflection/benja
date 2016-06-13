@@ -10,8 +10,6 @@ if [ ! -f /boot/script.bin ]; then
   exit 1
 fi
 
-sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
-
 if [ ! -f /etc/default/cpupower ]; then
   sudo pacman -S --needed --noconfirm cpupower
   sync
@@ -24,6 +22,8 @@ if [[ $? -ne 0 ]] ; then
   echo 'Unable to setup governor'
   exit 1
 fi
+
+sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
 mkdir -p ~/.sunxi-mali
 cd ~/.sunxi-mali
