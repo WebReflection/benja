@@ -64,7 +64,7 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
   chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
   make config ABI=armhf EGL_TYPE=framebuffer
-  sudo make install
+  sudo make install ABI=armhf EGL_TYPE=framebuffer
 #  curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
 #  curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
 #  sudo make -C include install
