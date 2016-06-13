@@ -79,23 +79,21 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   git clone --recursive https://github.com/linux-sunxi/sunxi-mali.git
   cd ~/.sunxi-mali/sunxi-mali
   sudo mkdir -p /usr/lib/mali
-  # curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
-  # curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
-  export ABI=armhf
   if [ "$X11" != "NO" ]; then
-    export EGL_TYPE=X11
+    curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
+    curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
     chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
+    make config ABI=armhf EGL_TYPE=x11
+    sudo make -C include install ABI=armhf EGL_TYPE=x11
+    sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install ABI=armhf EGL_TYPE=x11
+    if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
+      sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+    fi
   else
-    export EGL_TYPE=framebuffer
     chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
+    make config ABI=armhf EGL_TYPE=framebuffer
+    sudo make install ABI=armhf EGL_TYPE=framebuffer
   fi
-  make config
-  sudo make install
-  # sudo make -C include install
-  # sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
-  # if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
-  #  sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
-  # fi
 fi
 
 if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
