@@ -15,6 +15,13 @@ if [ ! -f /etc/default/cpupower ]; then
   bash cpupower
 fi
 
+if [ "$X11" != "NO" ] && [ "$RUNNING_IN_XTERM" != "true" ]; then
+  chmod a+x "$0"
+  sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
+  echo "RUNNING_IN_XTERM='true' xterm -e $0" > ~/.xinitrc
+  startx
+fi
+
 sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
 
 mkdir -p ~/.sunxi-mali
@@ -43,7 +50,7 @@ mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe mali_drm
 fi
 
-if [ ! -d ~/.sunxi-mali/libdri2 ]; then
+if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
   cd ~/.sunxi-mali
   git clone https://github.com/robclark/libdri2.git
   cd ~/.sunxi-mali/libdri2
@@ -70,15 +77,21 @@ if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
   chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
   curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
   curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
-  make config ABI=armhf # EGL_TYPE=framebuffer
-  sudo make -C include install ABI=armhf # EGL_TYPE=framebuffer
+  export ABI=armhf
+  if [ "$X11" != "NO" ]; then
+    export EGL_TYPE=X11
+  else
+    export EGL_TYPE=framebuffer
+  fi
+  make config
+  sudo make -C include install
   sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install
   if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
     sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
   fi
 fi
 
-if [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
+if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
   cd ~/.sunxi-mali
   git clone https://github.com/ssvb/xf86-video-fbturbo.git
   cd ~/.sunxi-mali/xf86-video-fbturbo
@@ -156,6 +169,10 @@ if [ ! -d ~/.sunxi-mali/libvdpau-sunxi ]; then
   subalign=2
   subfont=/usr/share/fonts/TTF/DejaVuSans.ttf
   subcp=cp1250' > ~/.mplayer/config
+fi
+
+if [ "$X11" != "NO" ] && [ "$RUNNING_IN_XTERM" = "true" ]; then
+  rm ~/.xinitrc
 fi
 
 if [ -f /boot/script.bin ]; then
