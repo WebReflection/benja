@@ -15,7 +15,7 @@ if [ ! -f /etc/default/cpupower ]; then
   bash cpupower
 fi
 
-if [ "$X11" != "NO" ]
+if [ "$X11" != "NO" ]; then
   if [ "$RUNNING_IN_XTERM" != "true" ]; then
     chmod a+x "$0"
     sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
