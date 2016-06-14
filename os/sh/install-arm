@@ -332,6 +332,9 @@ if [ -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
 fi
 sleep 1
 
+curl -LOs "${OS_REMOTE_FILES}/sh/weston.service"
+mv weston.service /etc/systemd/system
+
 # automatic login for the user
 if [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
   echo ' creating automatic login'
