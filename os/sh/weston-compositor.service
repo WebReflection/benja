@@ -1,0 +1,18 @@
+[Unit]
+Description=Weston Compositor
+Conflicts=getty@tty1.service
+After=getty@tty1.service rc-local.service systemd-user-sessions.service
+
+[Service]
+User=benja
+Environment='XDG_RUNTIME_DIR=/tmp'
+ExecStart=/usr/bin/weston-launch
+Restart=always
+IgnoreSIGPIPE=no
+StandardOutput=syslog
+StandardError=inherit
+StandardInput=tty
+TTYPath=/dev/tty1
+
+[Install]
+Alias=display-manager.service

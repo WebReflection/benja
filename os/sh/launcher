@@ -22,7 +22,60 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
+# grants access to the local screen (needed by some Xorg configuration)
 xhost +local:
-cd ~/app
-sudo npm start
 
+# if there is a package json
+if [ -f ~/app/package.json ]; then
+  cd ~/app
+  # in case there is no module folder yet
+  if [ ! -d node_modules ]; then
+    # create it and install possible dependencies
+    mkdir node_modules
+    npm install --production
+  fi
+  # launch the app via npm
+  sudo npm start
+  # NOTE: npm is unfortunately very slow in some case.
+  #       It adds ~2 extra seconds to the bootstrap time.
+else
+  # if there is no package, we assume it's a terminal session.
+  # if package.json has been renamed to package.jsno/jsoff
+  # it was an explicit reboot-to-shell operation
+  # make it load normally next reboot
+  if [ -f ~/app/package.jsno ]; then
+    mv ~/app/package.jsno ~/app/package.json
+  elif [ -f ~/app/package.jsoff ]; then
+    mv ~/app/package.jsoff ~/app/package.json
+  fi
+  # We are already a Weston session. Let's use its terminal.
+  weston-terminal --fullscreen
+fi
+
+
+
+
+    if [ -f ~/app/package.json ]; then
+      # first time configuration
+      if [ ! -d ~/app/node_modules ]; then
+        mkdir ~/app/node_modules
+        cd ~/app
+        npm install --production
+        cd -
+      fi
+      weston-launch > /dev/null 2>&1
+    else
+      # if package.json has been renamed to package.jsno/jsoff
+      # it was an explicit reboot-to-shell operation
+      # make it load normally next reboot
+      if [ -f ~/app/package.jsno ]; then
+        mv ~/app/package.jsno ~/app/package.json
+      else
+        if [ -f ~/app/package.jsoff ]; then
+          mv ~/app/package.jsoff ~/app/package.json
+        fi
+      fi
+      # welcome the user
+      echo -e "${OS_LOGO}"
+      echo ''
+    fi

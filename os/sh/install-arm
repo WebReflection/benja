@@ -118,6 +118,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   sudo cp bash-info ~/${OS_NAME}-tmp-install/bash-info
   sudo cp install-arm ~/${OS_NAME}-tmp-install/install
+  sudo cp install-common ~/${OS_NAME}-tmp-install/install-common
   sudo cp utils ~/${OS_NAME}-tmp-install/utils
   sudo cp utils-platform ~/${OS_NAME}-tmp-install/utils-platform
 
@@ -155,7 +156,7 @@ WantedBy=multi-user.target
   echo '  moving prepared files'
   sudo mv ${OS_NAME}-disk.service root/etc/systemd/system/${OS_NAME}-disk.service
   sudo mv ${OS_NAME}-platform root/root/${OS_NAME}-platform
-  sudo mv {install,bash-info,utils,utils-platform,wifi-setup} root/root/
+  sudo mv {install,install-common,bash-info,utils,utils-platform,wifi-setup} root/root/
   sudo chmod a+x root/root/install
   sudo chmod a+x root/root/wifi-setup
   sync
@@ -189,7 +190,7 @@ if [ "$USER" != "root" ]; then
   exit 1
 fi
 
-if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ]; then
+if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ] || [ ! -f install-common ]; then
   echo ' something is wrong here.'
   echo ' please visit https://benja.io/ to know how to install'
   exit 1
@@ -214,88 +215,10 @@ timedatectl set-local-rtc 1 > /dev/null 2>&1
 
 # updating system
 echo ' updating core and kernel (this might take a while)'
-pacman -Syu --needed --noconfirm ${OS_KERNEL} ${OS_HEADERS}
+pacman -Syu --needed --noconfirm ${OS_KERNEL} ${OS_HEADERS} cpupower
 
-echo ' configuring platform'
-configure_platform ''
-
-echo ' installing dependencies (this might take a while)'
-
-# installing minimum required software
-pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
-
-# all the (commonly) necessary to build via node-gyp
-pacman -S --needed --noconfirm base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
-
-WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
-HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
-
-# basic info
-echo ''
-icho "Configuring [*]${OS_NAME}[/] on a ${WIDTH}x${HEIGHT}[/] screen"
-echo ''
-sleep 2
-
-# trying not to stress too much per each group of packages
-
-# test in case somebody would like to use native themes
-pacman -S --needed --noconfirm gnome-themes-standard
-
-# fonts
-# sync && sleep 1 && pacman -S --needed --noconfirm ttf-dejavu ttf-liberation ttf-symbola ttf-droid
-
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  noto-fonts noto-fonts-emoji
-
-# gstreamer
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  gst-plugins-base gst-plugins-good gst-libav
-
-# extras
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  libva-vdpau-driver libva-mesa-driver
-
-# probably unnecessary extras ( in some case expected there by default )
-pacman -S --needed --noconfirm \
-  gconf nss pulseaudio pulseaudio-alsa gperf libexif
-
-# provide some theme by default
-pacman -S --neede --noconfirm adwaita-icon-theme
-
-# TODO: install yaourt
-
-if [[ $? -ne 0 ]] ; then
-  echo ''
-  icho " [*][r]WARNING[/] some library couldn't be installed"
-  exit 1
-fi
-
-sync
-npm install -g node-gyp node-pre-gyp
-
-if [ "$OS_BOOTINTO" = "electron" ]; then
-  # unfortunately required by current electron
-  # since it doesn't work on Wayland
-  pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr xorg-xhost gtk2 libxss
-
-  if [[ $? -ne 0 ]] ; then
-    echo ''
-    icho " [*][r]WARNING[/] some library couldn't be installed"
-    exit 1
-  fi
-
-  if [[ $? -ne 0 ]] ; then
-    echo ''
-    icho " [*][r]WARNING[/] electron couldn't be installed"
-    exit 1
-  fi
-
-  npm install -g electron-prebuilt
-
-elif [ "$OS_BOOTINTO" = "jsgtk" ]; then
-  pacman -S --needed --noconfirm gjs webkit2gtk
-  yaourt -S --needed --noconfirm jsgtk
-fi
+echo ' configuring platform before common procedures'
+configure_before ''
 
 if [ "$(contains '/etc/default/cpupower' "# ${OS_NAME} cpupower")" = "false" ]; then
   echo " boosting CPU performance"
@@ -306,117 +229,23 @@ governor='performance'">>/etc/default/cpupower
   systemctl start cpupower.service
 fi
 
-# create quite improbable to hack root password
-# just use sudo for root operations
-# and be sure the user password is a good one
-# by default, it's the user name itself
-ROOTPWD=$(cat /dev/urandom | head | tail | sha256sum | sed -e 's/  -//')
-echo -e "${ROOTPWD}
-${ROOTPWD}" | passwd
-ROOTPWD=""
-
-if [ -d /home/alarm ]; then
-  echo " removing alarm user"
-  userdel -r alarm
-  echo " adding ${OS_USER} user"
-  useradd -m -g users -G wheel,storage,power,video -s /bin/bash $OS_USER
-  echo -e "${OS_USER}
-${OS_USER}" | passwd $OS_USER
-fi
-
-if [ -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
-  echo " preparing ${OS_NAME} app folder"
-  mkdir -p ${OS_USER_DIR}/app
-  systemctl start ${OS_NAME}-disk.service
-  systemctl enable ${OS_NAME}-disk.service
-fi
-sleep 1
-
-curl -LOs "${OS_REMOTE_FILES}/sh/weston.service"
-mv weston.service /etc/systemd/system
-
-# automatic login for the user
-if [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
-  echo ' creating automatic login'
-  mkdir -p /etc/systemd/system/getty@tty1.service.d
-  echo "[Service]
-ExecStart=
-ExecStart=-/usr/sbin/agetty -n -i -a ${OS_USER} %I
-" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
-fi
-
-# sudo powers
-if [ "$(contains '/etc/sudoers' "# ${OS_NAME} sudoers")" = "false" ]; then
-  echo ' updating /etc/sudoers'
-  echo "
-# ${OS_NAME} sudoers + rules
-%wheel ALL=(ALL) ALL
-${OS_USER} ALL=NOPASSWD: /usr/bin/npm
-" >>/etc/sudoers
-fi
-
-# drop initial welcome mesasge
-if [ -f /etc/motd ]; then
-  echo ' removing /etc/motd'
-  rm /etc/motd
-fi
-
-echo ' downloading rmate'
-curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
-chmod a+x rmate
-mv rmate /usr/bin/rmate
-
-cd $OS_USER_DIR
-curl -L -O "${OS_REMOTE_FILES}/sh/install-user"
-icho "${OS_FULL_LOGO}">./${OS_NAME}-logo
-chown "${OS_USER}:users" ./${OS_NAME}-logo
-sudo -H -u $OS_USER bash -c "OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
-rm install-user
-rm -f ${OS_USER_DIR}/${OS_NAME}-logo
-cd -
-
-echo ' creating 80 to 8080 redirect'
-echo "[Unit]
-Description=${OS_NAME} 80 to 8080 service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
-ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
-
-[Install]
-WantedBy=multi-user.target
-" >/etc/systemd/system/${OS_NAME}-80to8080.service
-systemctl enable ${OS_NAME}-80to8080.service
-systemctl start ${OS_NAME}-80to8080.service
-
-# simple hostname configuration
-echo ' configuring hostname'
-echo "${OS_USER}.local" > /etc/hostname
-hostnamectl set-hostname "${OS_USER}.local"
-sed -i "s/localhost\$/localhost$(printf '\t')${OS_USER}.local/g" /etc/hosts
-
-# trying to avoid suspend mode
-echo 'HandleSuspendKey=ignore
-HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
-
-# most common situation so far
-configure_X11 ''
+# proceed with common install operations
+. ./install-common
 
 # last chance to change something
 configure_after ''
 
+# cleanup and optimize
 pacman -Sc --noconfirm
-
-echo '
----------------------------------------------
-                                          OK
-'
+pacman-optimize
 
 # drop this very same file
 rm $0
+rm bash-info
 rm utils
 rm utils-platform
 rm ${OS_NAME}-platform
+rm install-common
+
+# boot into B.E.N.J.A.
 reboot

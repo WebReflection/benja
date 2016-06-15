@@ -277,7 +277,7 @@ configure_X11() {
   sed -i 's/weston --width=/# weston --width=/' "$OS_USER_DIR/.xinitrc"
   sync
   echo '
-./.launch-app' >> "$OS_USER_DIR/.xinitrc"
+./.app-launcher' >> "$OS_USER_DIR/.xinitrc"
 }
 
 # before rebooting, after whole install

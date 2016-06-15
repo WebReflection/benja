@@ -252,12 +252,10 @@ fi
 sync
 sleep 1
 
-TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode"
+TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode linux-headers dialog wpa_supplicant iw"
 if [ "$UEFI" != "NO" ]; then
   TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
 fi
-
-TOPACKSTRAP="$TOPACKSTRAP dialog wpa_supplicant iw"
 
 pacstrap benja $TOPACKSTRAP
 sync
@@ -290,6 +288,7 @@ fi
 
 echo "#!/usr/bin/env bash
 
+. /bash-info
 . /utils
 
 echo '
@@ -328,37 +327,7 @@ fi
 
 pacman -Syu --noconfirm
 pacman-db-upgrade
-
-echo '###############
-##   root    ##
-###############'
-echo -e '$PASSWD
-$PASSWD' | passwd
-
-useradd -m -g users -G wheel,storage,power,video,lp -s /bin/bash $USER
-echo '##################
-## $USER ##
-##################'
-echo -e '$UPASSWD
-$UPASSWD' | passwd $USER
-
-echo '
-# ${OS_NAME} sudoers + rules
-%wheel ALL=(ALL) ALL
-${OS_USER} ALL=NOPASSWD: /usr/bin/npm
-' >>/etc/sudoers
-
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-echo '[Service]
-ExecStart=
-ExecStart=-/usr/sbin/agetty -n -i -a $USER %I'>/etc/systemd/system/getty@tty1.service.d/autologin.conf
-
-sync
-
-free -h
-
-curl -LOs '${OS_REMOTE_FILES}/sh/weston.service'
-mv weston.service /etc/systemd/system
+pacman -Syu --needed --noconfirm ntp weston $GPU_DRIVERS xorg-server-xwayland
 
 syslinux-install_update -ia
 
@@ -372,33 +341,6 @@ if [ '$UEFI' != 'NO' ]; then
   cp -r /usr/lib/syslinux/$UEFI/syslinux.efi $SYSLINUX_ROOT/syslinux
 fi
 
-echo '[Unit]
-Description=${OS_NAME} ${OS_USER_DIR}/app disk
-
-[Service]
-User=root
-Type=simple
-ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
-
-[Install]
-WantedBy=multi-user.target
-'>/etc/systemd/system/${OS_NAME}-disk.service
-
-echo ' preparing ${OS_NAME} app folder'
-systemctl enable ${OS_NAME}-disk.service
-sudo -H -u $OS_USER mkdir -p '${OS_USER_DIR}/app'
-mount $APP ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
-
-pacman -Syu --needed --noconfirm \
-  weston $GPU_DRIVERS xorg-server-xwayland \
-  ntp gjs \
-  gstreamer-vaapi gst-libav \
-  alsa-utils xdg-utils \
-  hunspell-en \
-  file-roller \
-  bluez bluez-utils \
-  ttf-liberation ttf-symbola ttf-droid ttf-freefont
-
 echo 'TIMEOUT 0
 PROMPT 0
 DEFAULT arch
@@ -409,9 +351,6 @@ LABEL arch
       $APPEND
 
 '> $SYSLINUX_ROOT/syslinux/syslinux.cfg
-
-pacman-db-upgrade
-sync
 
 if [ '$UEFI' != 'NO' ]; then
   if [ -d /usr/share/efitools/efi/ ]; then
@@ -430,104 +369,21 @@ if [ '$UEFI' != 'NO' ]; then
   sync
 fi
 
-sleep 3
-
 mkinitcpio -p linux
-
-sync
-
-# installing minimum required software
-pacman -S --needed --noconfirm sudo curl iptables fbset sed grep cpupower dialog wpa_supplicant openssh libnotify
-
-# all the (commonly) necessary to build via node-gyp
-pacman -S --needed --noconfirm base-devel linux-headers git python2 nodejs npm diffstat chrpath wget cpio pv
-
-# test in case somebody would like to use native themes
-pacman -S --needed --noconfirm gnome-themes-standard
-
-# fonts
-# sync && sleep 1 && pacman -S --needed --noconfirm ttf-dejavu ttf-liberation ttf-symbola ttf-droid
-
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  noto-fonts noto-fonts-emoji
-
-# gstreamer
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  gst-plugins-base gst-plugins-good gst-libav
-
-# extras
-sync && sleep 1 && pacman -S --needed --noconfirm \
-  libva-vdpau-driver libva-mesa-driver \
-  gconf nss pulseaudio pulseaudio-alsa gperf libexif
-
-# provide some theme by default
-pacman -S --neede --noconfirm adwaita-icon-theme
-
-sync
-npm install -g node-gyp node-pre-gyp
-
-# electron
-pacman -S --needed --noconfirm xorg-server-xwayland xorg-xhost gtk2 libxss
-npm install -g electron-prebuilt
-
-echo ' creating 80 to 8080 redirect'
-echo '[Unit]
-Description=${OS_NAME} 80 to 8080 service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
-ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
-
-[Install]
-WantedBy=multi-user.target
-' >/etc/systemd/system/${OS_NAME}-80to8080.service
-systemctl enable ${OS_NAME}-80to8080.service
-
-echo ' configuring hostname'
-echo '${OS_USER}.local' > /etc/hostname
-hostnamectl set-hostname '${OS_USER}.local'
-sync
-sed -i \"s/localhost\\\$/localhost\$(printf '\\t')${OS_USER}.local/g\" /etc/hosts
-
-# trying to avoid suspend mode
-echo 'HandleSuspendKey=ignore
-HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 
 # making first wifi-setup straight forward
 curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
 chmod a+x wifi-setup
 mv wifi-setup /usr/bin
 
-# adding rmate
-echo ' downloading rmate'
-curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
-chmod a+x rmate
-mv rmate /usr/bin/rmate
-
-echo ' configuring user'
-cd $OS_USER_DIR
-curl -LOs "${OS_REMOTE_FILES}/sh/install-user"
-sed -i 's/weston-launch > \\/dev\\/null 2>&1/exit \\& sleep 2 \\&\\& weston-launch/' ./install-user
-chown '${OS_USER}:users' /${OS_NAME}-logo
-mv /${OS_NAME}-logo $OS_USER_DIR
-sudo -H -u $OS_USER bash -c \"OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user\"
-sync
-sleep 1
-rm install-user
-rm -f $OS_USER_DIR/${OS_NAME}-logo
-cd -
+curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
+. ./install-common
 
 systemctl enable dhcpcd
 systemctl enable ntpd.service
 systemctl enable sshd
 
-if [ '$OS_BOOTINTO' = 'jsgtk' ]; then
-  pacman -S --needed --noconfirm gjs webkit2gtk
-  yaourt -S --needed --noconfirm jsgtk
-fi
-
+rm /bash-info
 rm /utils
 rm /benja
 
@@ -539,6 +395,7 @@ exit
 
 mv benja.bash benja/benja
 chmod a+x benja/benja
+cp bash-info benja/bash-info
 cp utils benja/utils
 
 arch-chroot benja /benja

@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 ##
 # Copyright (c) 2016 Andrea Giammarchi
 # 
@@ -22,31 +20,42 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-# some exported default
-if [ "$OS_BOOTINTO" = "" ]; then
-  export OS_BOOTINTO="electron"
-fi
+export OS_KERNEL='linux'
+export OS_HEADERS='linux-headers'
+export OS_ARCHIVE='ArchLinuxARM-armv7-latest.tar.gz'
+export OS_MAX_RESOLUTION=1280x720
 
-# common configuration
-export LANG=en_US.UTF-8
-export CURRENT_PLATFORM="$(uname)"
-export CURRENT_ARCH="$(uname -m)"
-export OS_INSTALLER="0.2.0"
-export OS_VERSION="0.3.0"
-export OS_NAME="BENJA"
-export OS_WEBSITE="https://benja.io"
-export OS_USER="benja"
-export OS_LOGO=" 
- [d]┌────────────────┐[/]
- [d]│[/] [*][b]╔╗ ╔═╗╔╗╔ ╦╔═╗[/] [d]│[/] [l]Bootable[/]
- [d]│[/] [*][c]╠╩╗║╣ ║║║ ║╠═╣[/] [d]│[/] [l]Electron[/]
- [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
- [d]└────────────────┘[/]
-  [l]${OS_WEBSITE}[/l]"
+# partition_sd /dev/mmblk0 3200M
+partition_sd() {
+  echo 'nothing to do'
+}
 
-export OS_INSTALLER_LOGO="
-  [*]installer ${OS_INSTALLER}[/]${OS_LOGO}"
+# returns ordered partitions
+get_partitions() {
+  echo 'nothing to do'
+}
 
-export OS_REMOTE_FILES="${OS_WEBSITE}/os"
-export OS_USER_DIR="/home/${OS_USER}"
-export OS_APP_LAUNCHER='.app-launcher'
+# format_sd /dev/mmblk0
+format_sd() {
+  echo 'nothing to do'
+}
+
+# install_os /dev/mmblk0 Archive.gz
+install_os() {
+  echo 'nothing to do'
+}
+
+# finalize installation
+unmount_os() {
+  echo 'nothing to do'
+}
+
+# install and configure the platform (at least the Desktop env)
+configure_before() {
+  pacman -S --needed --noconfirm weston
+}
+
+# once everything is already installed
+configure_after() {
+  echo 'nothing to do'
+}

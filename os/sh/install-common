@@ -1,0 +1,214 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+# verify exported constants are not empty
+if [ "$OS_USER" = "" ] || [ "$OS_USER_DIR" = "" ] || [ "$OS_NAME" = "" ]; then
+  echo ' unable to proceed with the setup'
+  exit 1
+fi
+
+
+
+pacman -S --needed --noconfirm fbset sed grep > /dev/null 2>&1
+clear
+WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
+HEIGHT=$(fbset | grep 'mode ' | sed -e 's/mode "[0-9]*x//' | sed -e 's/"//')
+echo ''
+icho "Configuring [*]${OS_NAME}[/] on a ${WIDTH}x${HEIGHT}[/] screen"
+echo ''
+sync && sleep 1
+
+
+
+# configure users
+if [ -d /home/alarm ]; then
+  echo " removing alarm user"
+  userdel -r alarm
+  if [ -d /home/alarm ]; then
+    rm -rf /home/alarm
+  fi
+  sync && sleep 1
+fi
+if [ ! -d "/home/${OS_USER}" ]; then
+  echo " preparing ${OS_USER} user"
+  useradd -m -g users -G wheel,storage,power,video -s /bin/bash ${OS_USER}
+  echo -e "${OS_USER}
+${OS_USER}" | passwd ${OS_USER}
+  sync && sleep 1
+fi
+
+
+
+# configure automatic login
+if [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+  echo " preparing ${OS_USER} automatic login"
+  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  echo "[Service]
+ExecStart=
+ExecStart=-/usr/sbin/agetty -n -i -a ${OS_USER} %I
+" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+  # avoid login welcome message
+  if [ -f /etc/motd ]; then
+    rm /etc/motd
+  fi
+  sync && sleep 1
+fi
+
+
+
+# install commonly needed packages
+echo ' installing dependencies (this might take a while)'
+pacman -S --needed --noconfirm sudo curl iptables dialog wpa_supplicant openssh libnotify
+pacman -S --needed --noconfirm base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
+pacman -S --needed --noconfirm gnome-themes-standard adwaita-icon-theme
+pacman -S --needed --noconfirm noto-fonts noto-fonts-emoji
+pacman -S --needed --noconfirm gst-plugins-base gst-plugins-good gst-libav
+pacman -S --needed --noconfirm libva-vdpau-driver libva-mesa-driver
+pacman -S --needed --noconfirm gconf nss pulseaudio pulseaudio-alsa gperf libexif
+pacman -S --needed --noconfirm gjs webkit2gtk
+# unfortunately required by current electron
+# since it doesn't work on Wayland
+pacman -S --needed --noconfirm xorg-server-xwayland xorg-xrandr xorg-xhost gtk2 libxss
+sync && sleep 1
+
+
+
+# install yaourt to handle user packages
+curl -LOs "${OS_REMOTE_FILES}/sh/install-yaourt"
+bash install-yaourt
+sync && sleep 1
+rm install-yaourt
+# including jsgtk
+sudo -H -u ${OS_USER} yaourt -S --needed --noconfirm jsgtk
+
+
+
+# configure global npm modules
+npm install -g node-gyp node-pre-gyp
+npm install -g electron-prebuilt
+
+
+
+# configure weston after login
+if [ ! -f /etc/systemd/system/weston-compositor.service ]; then
+  echo " preparing Weston Compositor"
+  curl -LOs '${OS_REMOTE_FILES}/sh/weston-compositor.service'
+  mv weston-compositor.service /etc/systemd/system
+  systemctl enable weston-compositor
+  sync && sleep 1
+fi
+
+
+
+# configure app folder
+echo " preparing ${OS_NAME} app folder"
+if [ ! -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
+  echo "[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">/etc/systemd/system/${OS_NAME}-disk.service
+fi
+mkdir -p ${OS_USER_DIR}/app
+systemctl start ${OS_NAME}-disk.service
+systemctl enable ${OS_NAME}-disk.service
+sync && sleep 1
+
+
+
+# configure 8080 to 80 redirect
+if [ ! -f /etc/systemd/system/${OS_NAME}-80to8080.service ]; then
+  echo " preparing 8080 to 80 redirect"
+  echo "[Unit]
+Description=${OS_NAME} 80 to 8080 service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+
+[Install]
+WantedBy=multi-user.target
+" >/etc/systemd/system/${OS_NAME}-80to8080.service
+  systemctl enable ${OS_NAME}-80to8080.service
+  systemctl start ${OS_NAME}-80to8080.service
+  sync && sleep 1
+fi
+
+
+
+# configure sudo
+if [ "$(cat /etc/sudoers | grep /usr/bin/npm)" = "" ]; then
+  echo " preparing /etc/sudoers"
+  echo "
+# ${OS_NAME} rules
+%wheel ALL=(ALL) ALL
+${OS_USER} ALL=NOPASSWD: /usr/bin/npm
+" >>/etc/sudoers
+  sync && sleep 1
+fi
+
+
+
+# configure rmate
+if [ ! -f /usr/bin/rmate ]; then
+  echo " preparing rmate"
+  curl -LOs 'https://raw.githubusercontent.com/WebReflection/rmate/master/rmate'
+  chmod a+x rmate
+  mv rmate /usr/bin/rmate
+  sync && sleep 1
+fi
+
+
+
+# configure hostname
+if [ ! -f /etc/hostname ] || [ "$(cat /etc/hostname | grep ${OS_USER}.local)" = "" ]; then
+  echo " preparing /etc/hostname"
+  echo "${OS_USER}.local" >> /etc/hostname
+  hostnamectl set-hostname "${OS_USER}.local"
+  sed -i "s/localhost\$/localhost$(printf '\t')${OS_USER}.local/g" /etc/hosts
+fi
+
+
+
+# TODO: verify this is not neede anymore (Wewston should take care of this)
+# trying to avoid suspend mode
+# echo 'HandleSuspendKey=ignore
+# HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
+
+
+
+# prepare user/app folder
+cd $OS_USER_DIR
+curl -LOs "${OS_REMOTE_FILES}/sh/install-user"
+icho "${OS_FULL_LOGO}">./${OS_NAME}-logo
+chown "${OS_USER}:users" ./${OS_NAME}-logo
+sudo -H -u $OS_USER bash -c "OS_MAX_RESOLUTION='${OS_MAX_RESOLUTION}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
+rm install-user
+rm -f ${OS_USER_DIR}/${OS_NAME}-logo
+cd -

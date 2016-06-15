@@ -9,8 +9,3 @@ governor=\"performance\"
   sudo systemctl enable cpupower.service
   sudo systemctl start cpupower.service
 fi
-
-if [[ $? -ne 0 ]] ; then
-  echo 'Unable to setup governor'
-  exit 1
-fi

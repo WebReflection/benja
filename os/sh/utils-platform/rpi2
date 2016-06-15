@@ -115,13 +115,7 @@ unmount_os() {
 }
 
 # install and configure the platform
-configure_platform() {
-  configurePI ''
-  pacman -S --needed --noconfirm weston-rpi gst-omx-rpi libcec-rpi mesa mesa-libgl
-}
-
-# Raspberry PI special configuration
-configurePI() {
+configure_before() {
   # use 128MB of Display Memory on Raspberry Pi
   if [ "$(contains '/boot/config.txt' 'dispmanx_offline=1')" = "false" ]; then
     echo ' updating /boot/config.txt'
@@ -139,11 +133,7 @@ configurePI() {
   fi
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
-}
-
-# override X11 configuration
-configure_X11() {
-  echo 'X11 not needed'
+  pacman -S --needed --noconfirm weston-rpi gst-omx-rpi libcec-rpi mesa mesa-libgl
 }
 
 # once everything is already installed
