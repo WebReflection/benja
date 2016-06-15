@@ -291,32 +291,10 @@ echo "#!/usr/bin/env bash
 . /bash-info
 . /utils
 
-echo '
-en_US.UTF-8 UTF-8
-en_GB.UTF-8 UTF-8
-' >> /etc/locale.gen
-
-if [ '$LOCALE' != '' ]; then
-  echo '$LOCALE.UTF-8 UTF-8' >> /etc/locale.gen
-fi
-
-if [ '$LOCALE' != '' ]; then
-  echo '
-LANG=$LOCALE.UTF-8
-LC_TIME=$LOCALE.UTF-8
-'>>/etc/locale.conf
-else
-  echo '
-LANG=$LANG
-LC_TIME=$LANG
-'>>/etc/locale.conf
-fi
-
-hwclock --systohc --utc
-
-localectl set-locale LANG=\$LANG
-locale-gen
-locale > /etc/locale.conf
+# making first wifi-setup straight forward
+curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
+chmod a+x wifi-setup
+mv wifi-setup /usr/bin
 
 if [ '$(uname -m)' = 'x86_64' ]; then
   echo '
@@ -371,11 +349,6 @@ fi
 
 mkinitcpio -p linux
 
-# making first wifi-setup straight forward
-curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
-chmod a+x wifi-setup
-mv wifi-setup /usr/bin
-
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 . ./install-common
 
@@ -386,6 +359,7 @@ systemctl enable sshd
 rm /bash-info
 rm /utils
 rm /benja
+rm /${OS_NAME}-logo
 
 sync
 umount $APP
