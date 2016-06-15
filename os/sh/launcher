@@ -39,6 +39,7 @@ if [ -f ~/app/package.json ]; then
   # NOTE: npm is unfortunately very slow in some case.
   #       It adds ~2 extra seconds to the bootstrap time.
 else
+  cd ~/
   # if there is no package, we assume it's a terminal session.
   # if package.json has been renamed to package.jsno/jsoff
   # it was an explicit reboot-to-shell operation
