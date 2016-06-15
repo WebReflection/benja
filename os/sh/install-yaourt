@@ -24,11 +24,11 @@
 
 installFromAUR() {
   local package="$1"
-  cd ~/tmp-yaourt-install
+  cd /home/tmp-yaourt-install
   echo  " downloading ${package}"
-  curl -LOs "https://aur.archlinux.org/cgit/aur.git/snapshot/${package}.tar.gz"
+  sudo -H -u nobody curl -LOs "https://aur.archlinux.org/cgit/aur.git/snapshot/${package}.tar.gz"
   echo " extracting ${package}"
-  tar -xzf "${package}.tar.gz"
+  sudo -H -u nobody tar -xzf "${package}.tar.gz"
   echo " installing ${package}"
   cd "${package}"
   sudo -H -u nobody makepkg -Asc --needed --noconfirm
@@ -38,16 +38,14 @@ installFromAUR() {
   cd -
 }
 
+mkdir -p /home/tmp-yaourt-install
 echo "
 $(tput bold)yaourt installer$(tput sgr0)
  "
 echo  " installing dependencies"
 sudo pacman -S --needed --noconfirm base-devel linux-headers git sudo diffstat chrpath wget cpio pv > /dev/null 2>&1
-
-mkdir -p ~/tmp-yaourt-install
 installFromAUR "package-query"
 sync && sleep 1
 installFromAUR "yaourt"
 sync && sleep 1
-
-rm -rf ~/tmp-yaourt-install
+rm -rf /home/tmp-yaourt-install

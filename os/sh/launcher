@@ -51,31 +51,3 @@ else
   # We are already a Weston session. Let's use its terminal.
   weston-terminal --fullscreen
 fi
-
-
-
-
-    if [ -f ~/app/package.json ]; then
-      # first time configuration
-      if [ ! -d ~/app/node_modules ]; then
-        mkdir ~/app/node_modules
-        cd ~/app
-        npm install --production
-        cd -
-      fi
-      weston-launch > /dev/null 2>&1
-    else
-      # if package.json has been renamed to package.jsno/jsoff
-      # it was an explicit reboot-to-shell operation
-      # make it load normally next reboot
-      if [ -f ~/app/package.jsno ]; then
-        mv ~/app/package.jsno ~/app/package.json
-      else
-        if [ -f ~/app/package.jsoff ]; then
-          mv ~/app/package.jsoff ~/app/package.json
-        fi
-      fi
-      # welcome the user
-      echo -e "${OS_LOGO}"
-      echo ''
-    fi

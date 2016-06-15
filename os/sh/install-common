@@ -28,6 +28,27 @@ fi
 
 
 
+# configuring minimum local requirements
+echo '
+en_US.UTF-8 UTF-8
+en_GB.UTF-8 UTF-8
+' >> /etc/locale.gen
+
+if [ "$LOCALE" != "" ]; then
+  echo "${LOCALE}.UTF-8 UTF-8" >> /etc/locale.gen
+else
+  LOCALE=en_US.UTF-8
+fi
+echo "
+LANG=${LOCALE}.UTF-8
+LC_TIME=${LOCALE}.UTF-8
+">>/etc/locale.conf
+localectl set-locale LANG=${LOCALE}
+locale-gen
+locale > /etc/locale.conf
+
+
+
 pacman -S --needed --noconfirm fbset sed grep > /dev/null 2>&1
 clear
 WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
@@ -111,7 +132,7 @@ npm install -g electron-prebuilt
 # configure weston after login
 if [ ! -f /etc/systemd/system/weston-compositor.service ]; then
   echo " preparing Weston Compositor"
-  curl -LOs '${OS_REMOTE_FILES}/sh/weston-compositor.service'
+  curl -LOs "${OS_REMOTE_FILES}/sh/weston-compositor.service"
   mv weston-compositor.service /etc/systemd/system
   systemctl enable weston-compositor
   sync && sleep 1
