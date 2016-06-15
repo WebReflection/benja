@@ -67,7 +67,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   TMP_ROOT_SIZE="3500000"
 
   if [ $TMP_SD_SIZE \> $TMP_ROOT_SIZE ]; then
-    TMP_ROOT_SIZE="3200M"
+    TMP_ROOT_SIZE="3500M"
   else
     TMP_ROOT_SIZE="1900M"
   fi

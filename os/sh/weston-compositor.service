@@ -1,13 +1,15 @@
 [Unit]
 Description=Weston Compositor
 Conflicts=getty@tty1.service
-After=getty@tty1.service rc-local.service systemd-user-sessions.service
+After=getty@tty1.service systemd-user-sessions.service
 
 [Service]
+Restart=always
+RestartSec=2
+TimeoutSec=2
 User=benja
 Environment='XDG_RUNTIME_DIR=/tmp'
 ExecStart=/usr/bin/weston-launch
-Restart=always
 IgnoreSIGPIPE=no
 StandardOutput=syslog
 StandardError=inherit

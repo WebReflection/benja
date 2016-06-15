@@ -215,6 +215,16 @@ fi
 
 
 
+# configure weston on boot, if available
+if [ -f /usr/bin/weston-launch ]; then
+  groupadd weston-launch
+  usermod -aG weston-launch ${OS_USER}
+  chown root /usr/bin/weston-launch
+  chmod +s /usr/bin/weston-launch
+fi
+
+
+
 # TODO: verify this is not neede anymore (Wewston should take care of this)
 # trying to avoid suspend mode
 # echo 'HandleSuspendKey=ignore
