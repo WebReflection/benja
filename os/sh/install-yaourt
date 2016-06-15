@@ -24,21 +24,19 @@
 
 installFromAUR() {
   local package="$1"
-  cd /home/tmp-yaourt-install
   echo  " downloading ${package}"
-  sudo -H -u nobody curl -LOs "https://aur.archlinux.org/cgit/aur.git/snapshot/${package}.tar.gz"
+  sudo -H -u nobody sh -c "cd /home/tmp-yaourt-install; curl -LOs https://aur.archlinux.org/cgit/aur.git/snapshot/${package}.tar.gz"
   echo " extracting ${package}"
-  sudo -H -u nobody tar -xzf "${package}.tar.gz"
-  echo " installing ${package}"
-  cd "${package}"
-  sudo -H -u nobody makepkg -Asc --needed --noconfirm
-  sudo pacman -U --needed --noconfirm "${package}*.pkg.tar.xz"
+  sudo -H -u nobody sh -c "cd /home/tmp-yaourt-install; tar -xzf ${package}.tar.gz"
+  echo " creating ${package} package"
+  sudo -H -u nobody sh -c "cd /home/tmp-yaourt-install/${package}; makepkg -Asc --needed --noconfirm"
+  sudo pacman -U --needed --noconfirm "/home/tmp-yaourt-install/${package}*.pkg.tar.xz"
   sync && sleep 1
   echo " $(tput bold)$(pacman -Q ${package})$(tput sgr0) successfully installed"
   cd -
 }
 
-sudo -H -u nobody mkdir -p /home/tmp-yaourt-install
+sudo -H -u nobody sh -c 'mkdir -p /home/tmp-yaourt-install'
 echo "
 $(tput bold)yaourt installer$(tput sgr0)
  "
@@ -48,4 +46,4 @@ installFromAUR "package-query"
 sync && sleep 1
 installFromAUR "yaourt"
 sync && sleep 1
-sudo -H -u nobody rm -rf /home/tmp-yaourt-install
+sudo -H -u nobody sh -c 'rm -rf /home/tmp-yaourt-install'
