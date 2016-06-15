@@ -38,7 +38,7 @@ installFromAUR() {
   cd -
 }
 
-mkdir -p /home/tmp-yaourt-install
+sudo -H -u nobody mkdir -p /home/tmp-yaourt-install
 echo "
 $(tput bold)yaourt installer$(tput sgr0)
  "
@@ -48,4 +48,4 @@ installFromAUR "package-query"
 sync && sleep 1
 installFromAUR "yaourt"
 sync && sleep 1
-rm -rf /home/tmp-yaourt-install
+sudo -H -u nobody rm -rf /home/tmp-yaourt-install
