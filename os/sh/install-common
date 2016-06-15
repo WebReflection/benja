@@ -225,10 +225,9 @@ fi
 
 
 
-# TODO: verify this is not neede anymore (Wewston should take care of this)
-# trying to avoid suspend mode
-# echo 'HandleSuspendKey=ignore
-# HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
+# trying to avoid suspend mode when on terminal
+echo 'HandleSuspendKey=ignore
+HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 
 
 
