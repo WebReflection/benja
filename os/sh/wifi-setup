@@ -22,7 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-clear
 echo "
 Please choose your wifi and write its password when/if asked.
 Please ignore possible info coming up during this process.
