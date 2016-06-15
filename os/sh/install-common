@@ -101,7 +101,7 @@ echo ' installing dependencies (this might take a while)'
 pacman -S --needed --noconfirm sudo curl iptables dialog wpa_supplicant openssh libnotify
 pacman -S --needed --noconfirm base-devel git python2 nodejs npm diffstat chrpath wget cpio pv
 pacman -S --needed --noconfirm gnome-themes-standard adwaita-icon-theme
-pacman -S --needed --noconfirm noto-fonts noto-fonts-emoji
+pacman -S --needed --noconfirm ttf-dejavu noto-fonts noto-fonts-emoji
 pacman -S --needed --noconfirm gst-plugins-base gst-plugins-good gst-libav
 pacman -S --needed --noconfirm libva-vdpau-driver libva-mesa-driver
 pacman -S --needed --noconfirm gconf nss pulseaudio pulseaudio-alsa gperf libexif
@@ -134,6 +134,16 @@ if [ ! -f /etc/systemd/system/weston-compositor.service ]; then
   mv weston-compositor.service /etc/systemd/system
   systemctl enable weston-compositor
   sync && sleep 1
+fi
+
+
+
+# configure weston on boot, if available
+if [ -f /usr/bin/weston-launch ]; then
+  groupadd weston-launch
+  usermod -aG weston-launch ${OS_USER}
+  chown root /usr/bin/weston-launch
+  chmod +s /usr/bin/weston-launch
 fi
 
 
@@ -211,16 +221,6 @@ if [ ! -f /etc/hostname ] || [ "$(cat /etc/hostname | grep ${OS_USER}.local)" = 
   echo "${OS_USER}.local" >> /etc/hostname
   hostnamectl set-hostname "${OS_USER}.local"
   sed -i "s/localhost\$/localhost$(printf '\t')${OS_USER}.local/g" /etc/hosts
-fi
-
-
-
-# configure weston on boot, if available
-if [ -f /usr/bin/weston-launch ]; then
-  groupadd weston-launch
-  usermod -aG weston-launch ${OS_USER}
-  chown root /usr/bin/weston-launch
-  chmod +s /usr/bin/weston-launch
 fi
 
 
