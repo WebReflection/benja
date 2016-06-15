@@ -32,7 +32,7 @@ installFromAUR() {
   echo " creating ${package} package"
   sudo -H -u nobody sh -c "cd ${folder}/${package}; makepkg -Asc --needed --noconfirm"
   echo " installing ${package}"
-  sudo pacman -U --needed --noconfirm "${folder}/${package}*.pkg.tar.xz"
+  sudo pacman -U --needed --noconfirm "${folder}/${package}/${package}*.pkg.tar.xz"
   sync && sleep 1
   echo " $(tput bold)$(pacman -Q ${package})$(tput sgr0) successfully installed"
   cd -
