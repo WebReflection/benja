@@ -30,9 +30,9 @@ installFromAUR() {
   echo " extracting ${package}"
   sudo -H -u nobody sh -c "cd ${folder}; tar -xzf ${package}.tar.gz"
   echo " creating ${package} package"
-  sudo -H -u nobody sh -c "cd ${folder}/${package}; makepkg -Asc --needed --noconfirm"
+  sudo -H -u nobody sh -c "cd ${folder}/${package}; makepkg -Asfc --needed --noconfirm"
   echo " installing ${package}"
-  sudo pacman -U --needed --noconfirm "${folder}/${package}/${package}*.pkg.tar.xz"
+  sudo pacman -U --needed --noconfirm ${folder}/${package}/${package}*.pkg.tar.xz
   sync && sleep 1
   echo " $(tput bold)$(pacman -Q ${package})$(tput sgr0) successfully installed"
   cd -
