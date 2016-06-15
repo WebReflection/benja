@@ -3,7 +3,6 @@
 const
   Gtk = require('Gtk'),
   Gdk = require('Gdk'),
-  gtkSettings = Gtk.Settings.getDefault(),
   Application = function Application(events) {
     const app = new Gtk.Application();
     for (let key in events)
@@ -12,13 +11,11 @@ const
   }
 ;
 
-gtkSettings.gtkApplicationPreferDarkTheme = true;
-gtkSettings.gtkThemeName = 'Adwaita';
-
 new Application({
   startup: function() {
     const
       screen = Gdk.Screen.getDefault(),
+      gtkSettings = Gtk.Settings.getDefault(),
       win = new Gtk.ApplicationWindow({
         application: this.application,
         title: 'benja OS',
@@ -32,7 +29,9 @@ new Application({
         marginTop: Math.round(screen.getHeight() * 35 / 100)
       })
     ;
-    label.setMarkup('<big><b>benja OS</b></big>');
+    gtkSettings.gtkApplicationPreferDarkTheme = true;
+    gtkSettings.gtkThemeName = 'Adwaita';
+    label.setMarkup('<big><b>Benja OS</b></big>');
     ipAddress.setLabel(findReachableIPV4Address().join(', '));
     resolution.setMarkup([
       screen.getWidth(),
