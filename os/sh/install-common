@@ -118,8 +118,6 @@ curl -LOs "${OS_REMOTE_FILES}/sh/install-yaourt"
 bash install-yaourt
 sync && sleep 1
 rm install-yaourt
-# including jsgtk
-sudo -H -u ${OS_USER} yaourt -S --needed --noconfirm jsgtk
 
 
 

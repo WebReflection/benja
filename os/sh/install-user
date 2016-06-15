@@ -119,4 +119,6 @@ echo ' downloading logo'
 curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
 curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
 touch reload
+echo ${OS_USER} | sudo -S ls
+yaourt -S --needed --noconfirm jsgtk
 cd -
