@@ -167,6 +167,11 @@ else
   fi
   . utils
 
+  if [ ! -f install-common ]; then
+    curl -LOs "${OS_REMOTE_FILES}/sh/install-common"
+    sync
+  fi
+
   if [ "${OS_PLATFORM}" = "" ]; then
     if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
       # update system time
