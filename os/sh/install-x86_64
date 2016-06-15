@@ -192,14 +192,18 @@ sync
 
 if [ "$UEFI" != "NO" ]; then
   mkfs.vfat $EFI
+  dosfslabel $APP benja-boot
 fi
 yes | mkfs.ext4 $ROOT
 sync
 ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+tune2fs -L benja-root $ROOT
 tune2fs -U $ROOT_UUID $ROOT
 sync
 mkfs.vfat $APP
-sleep 3
+sync
+dosfslabel $APP benja-app
+sleep 2
 
 # print out info
 echo "GPU:             ${GPU}"
