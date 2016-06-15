@@ -3,6 +3,7 @@
 const
   Gtk = require('Gtk'),
   Gdk = require('Gdk'),
+  gtkSettings = Gtk.Settings.getDefault(),
   Application = function Application(events) {
     const app = new Gtk.Application();
     for (let key in events)
@@ -11,21 +12,8 @@ const
   }
 ;
 
-function findReachableIPV4Address() {
-  var
-    ni = require('os').networkInterfaces(),
-    out = []
-  ;
-  Object.keys(ni).forEach(function (key) {
-    var ifaces = ni[key];
-    ifaces.forEach(function (iface) {
-      if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
-        out.push(iface.address);
-      }
-    });
-  });
-  return out;
-}
+gtkSettings.gtkApplicationPreferDarkTheme = true;
+gtkSettings.gtkThemeName = 'Adwaita';
 
 new Application({
   startup: function() {
@@ -64,3 +52,19 @@ new Application({
     this.applicationWindow.showAll();
   }
 }).application.run([]);
+
+function findReachableIPV4Address() {
+  var
+    ni = require('os').networkInterfaces(),
+    out = []
+  ;
+  Object.keys(ni).forEach(function (key) {
+    var ifaces = ni[key];
+    ifaces.forEach(function (iface) {
+      if (iface.family === 'IPv4' && iface.address !== '127.0.0.1') {
+        out.push(iface.address);
+      }
+    });
+  });
+  return out;
+}

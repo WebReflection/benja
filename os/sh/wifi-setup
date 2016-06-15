@@ -22,7 +22,6 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-pacman -Syu --needed --noconfirm dialog wpa_supplicant
 clear
 echo "
 Please choose your wifi and write its password when/if asked.

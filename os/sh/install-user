@@ -44,8 +44,6 @@ modules=xwayland.so"
 
 [shell]
 client=/home/${OS_USER}/${OS_APP_LAUNCHER}
-# background-image=none
-# panel-location=none
 animation=none
 close-animation=none
 startup-animation=none
@@ -56,7 +54,8 @@ fi
 # OS Bootstrap
 echo ' updating ~/.bashrc'
 OS_LOGO=$(cat ${OS_NAME}-logo)
-echo "# ${OS_NAME} bootstrap
+echo "
+# ${OS_NAME} OS
 
 # maximum Xorg resolution
 export OS_MAX_RESOLUTION=${OS_MAX_RESOLUTION}

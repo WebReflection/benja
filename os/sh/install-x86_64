@@ -295,6 +295,8 @@ echo "#!/usr/bin/env bash
 . /bash-info
 . /utils
 
+export APP_UUID='${APP_UUID}'
+
 # making first wifi-setup straight forward
 curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
 chmod a+x wifi-setup
@@ -355,6 +357,7 @@ mkinitcpio -p linux
 
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 . ./install-common
+rm ./install-common
 
 systemctl enable dhcpcd
 systemctl enable ntpd.service
@@ -364,6 +367,7 @@ rm /bash-info
 rm /utils
 rm /benja
 rm /${OS_NAME}-logo
+rm \$0
 
 sync
 umount $APP
