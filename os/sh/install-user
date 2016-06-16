@@ -59,47 +59,12 @@ OS_LOGO=$(cat ${OS_NAME}-logo)
 echo "
 # ${OS_NAME} OS
 
-# maximum Xorg resolution
-export OS_MAX_RESOLUTION=${OS_MAX_RESOLUTION}
-
 # logo
 OS_LOGO=\"${OS_LOGO}"\" >>~/.bashrc
 
 echo '
-# npm and nodejs global modules
-export PATH="$PATH:$HOME/.npm-packages/bin"
-export NODE_PATH="$NODE_PATH:$HOME/.npm-packages/lib/node_modules"
-
-# Wayland backend
-export GDK_BACKEND=wayland
-export CLUTTER_BACKEND=wayland
-export QT_QPA_PLATFORM=wayland
-export SDL_VIDEODRIVER=wayland
-export GTK_THEME="Adwaita:dark"
-
-# LD and XDG
-export LD_LIBRARY_PATH="/usr/lib"
-if [ "$XDG_RUNTIME_DIR" = "" ]; then
-  export XDG_RUNTIME_DIR=/tmp
-fi
-if [ "$XDG_CONFIG_HOME" = "" ]; then
-  export XDG_CONFIG_HOME="${HOME}/.config"
-fi
-
-SESSION_TYPE=terminal
-
-# recognize SSH session from normal one
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-  SESSION_TYPE=remote/ssh
-else
-  case $(ps -o comm= -p $PPID) in
-    sshd|*/sshd) SESSION_TYPE=remote/ssh;;
-  esac
-fi
-
-# print welcome or eventually launch weston
+# print a welcome message
 echo -e "${OS_LOGO}
-  ${SESSION_TYPE} session
  "
 ' >>~/.bashrc
 echo ' installing launcher'

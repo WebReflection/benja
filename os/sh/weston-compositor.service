@@ -8,7 +8,7 @@ Restart=always
 RestartSec=2
 TimeoutSec=2
 User=benja
-Environment='XDG_RUNTIME_DIR=/tmp'
+EnvironmentFile=/etc/environment
 ExecStart=/usr/bin/weston-launch
 IgnoreSIGPIPE=no
 StandardOutput=syslog
