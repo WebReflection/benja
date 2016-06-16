@@ -134,6 +134,8 @@ TMP_ROOT_SIZE="6000000"
 
 if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
   TMP_ROOT_SIZE="3800M"
+else
+  TMP_ROOT_SIZE="6000M"
 fi
 
 if [ "$UEFI" = "NO" ]; then

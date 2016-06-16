@@ -68,6 +68,8 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
     TMP_ROOT_SIZE="3800M"
+  else
+    TMP_ROOT_SIZE="6000M"
   fi
 
   echo "  SD card total space: $TMP_SD_SIZE"
