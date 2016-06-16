@@ -20,6 +20,8 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
+
+
 # verify exported constants are not empty
 if [ "$OS_USER" = "" ] || [ "$OS_USER_DIR" = "" ] || [ "$OS_NAME" = "" ]; then
   echo ' unable to proceed with the setup'
@@ -28,7 +30,7 @@ fi
 
 
 
-# configuring minimum local requirements
+# configure minimum locale requirements
 echo '
 en_US.UTF-8 UTF-8
 en_GB.UTF-8 UTF-8
@@ -49,6 +51,7 @@ locale > /etc/locale.conf
 
 
 
+# show a message indicating current resolution
 pacman -S --needed --noconfirm fbset sed grep > /dev/null 2>&1
 clear
 WIDTH=$(fbset | grep 'mode ' | sed -e 's/mode "//' | sed -e 's/x.*//')
@@ -222,14 +225,17 @@ fi
 
 
 
-# trying to avoid suspend mode when on terminal
+# attempt to avoid suspend mode when on terminal
 echo 'HandleSuspendKey=ignore
 HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 
 
+
+# configure common environment variables for all users
 echo "
 LD_LIBRARY_PATH=/usr/lib
-XDG_RUNTIME_DIR=/run/user/1000
+# XDG_RUNTIME_DIR=/run/user/1000 npm start # to avoid sudo
+XDG_RUNTIME_DIR=/tmp
 XDG_CONFIG_HOME=${OS_USER_DIR}/.config
 OS_MAX_RESOLUTION=${OS_MAX_RESOLUTION}
 NODE_PATH=${OS_USER_DIR}/.npm-packages/lib/node_modules
@@ -240,10 +246,15 @@ SDL_VIDEODRIVER=wayland
 GTK_THEME='Adwaita:dark'
 " >>/etc/environment
 
+
+
+# make every profile aware of benja global modules
 echo "
 PATH=$PATH:${OS_USER_DIR}/.npm-packages/bin
 export PATH
 " >>/etc/profile
+
+
 
 # prepare user/app folder
 cd $OS_USER_DIR

@@ -4,10 +4,10 @@ Conflicts=getty@tty1.service
 After=getty@tty1.service systemd-user-sessions.service
 
 [Service]
+User=benja
 Restart=always
 RestartSec=2
 TimeoutSec=2
-User=benja
 EnvironmentFile=/etc/environment
 ExecStart=/usr/bin/weston-launch
 IgnoreSIGPIPE=no

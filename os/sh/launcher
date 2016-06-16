@@ -22,7 +22,7 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-# grants access to the local screen (needed by some Xorg configuration)
+# grants access to the local screen
 xhost +local:
 
 # if there is a package json

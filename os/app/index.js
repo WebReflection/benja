@@ -1,3 +1,9 @@
+// to have access to local or global scripts
+require('module').globalPaths.push(
+  process.cwd() + '/node_modules',
+  process.env.NODE_PATH
+);
+
 // simple server example
 require('http')
   .createServer(require('tiny-cdn').create({}))
@@ -11,7 +17,7 @@ const
   BrowserWindow = electron.BrowserWindow
 ;
 
-// in case by default WebGL doesn't work ...
+// in case by default WebGL doesn't work ... (rpi or others)
 app.commandLine.appendSwitch('--ignore-gpu-blacklist');
 
 // once the app is ready

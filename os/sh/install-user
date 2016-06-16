@@ -89,13 +89,13 @@ curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
 curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
 touch reload
 
-# configure global npm modules
+# configure benja global npm modules
 npm install -g tiny-cdn
 npm install -g node-gyp
 npm install -g node-pre-gyp
 npm install -g electron-prebuilt
 
-# install jsgtk for Weston based JS tasks
+# install jsgtk for Weston based JS GTK tasks
 echo ${OS_USER} | sudo -S ls
 yaourt -S --needed --noconfirm jsgtk
 cd -
