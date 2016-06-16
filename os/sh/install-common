@@ -121,12 +121,6 @@ rm install-yaourt
 
 
 
-# configure global npm modules
-npm install -g node-gyp node-pre-gyp
-npm install -g electron-prebuilt
-
-
-
 # configure weston after login
 if [ ! -f /etc/systemd/system/weston-compositor.service ]; then
   echo " preparing Weston Compositor"
@@ -198,6 +192,9 @@ if [ "$(cat /etc/sudoers | grep /usr/bin/npm)" = "" ]; then
 # ${OS_NAME} rules
 %wheel ALL=(ALL) ALL
 ${OS_USER} ALL=NOPASSWD: /usr/bin/npm
+
+# password once asked never expires
+Defaults env_reset, timestamp_timeout=-1
 " >>/etc/sudoers
   sync && sleep 1
 fi
