@@ -141,5 +141,4 @@ configure_before() {
 configure_after() {
   pacman -S --needed --noconfirm wiringpi i2c-tools lm_sensors
   echo 'i2c-dev' >> /etc/modules-load.d/raspberrypi.conf
-  sudo -H -u benja bash -c 'npm install -g johnny-five raspi-io'
 }
