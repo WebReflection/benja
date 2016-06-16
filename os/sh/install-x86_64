@@ -130,10 +130,10 @@ sleep 2
 
 # verify and format the SD card
 TMP_SD_SIZE=$(sudo fdisk -s $DISK)
-ROOT_SIZE="6000000"
+TMP_ROOT_SIZE="6000000"
 
-if [ $TMP_SD_SIZE \> $ROOT_SIZE ]; then
-  ROOT_SIZE="3800M"
+if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
+  TMP_ROOT_SIZE="3800M"
 fi
 
 if [ "$UEFI" = "NO" ]; then
@@ -147,12 +147,12 @@ else
 fi
 
 if [ "$SWAP" = "0" ]; then
-  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT $ROOT_SIZE
+  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT $TMP_ROOT_SIZE
 else
   parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
-  parted --script --align optimal $DISK mkpart primary ext4 $SWAP $ROOT_SIZE
+  parted --script --align optimal $DISK mkpart primary ext4 $SWAP $TMP_ROOT_SIZE
 fi
-parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+parted --script --align optimal $DISK mkpart primary fat32 $TMP_ROOT_SIZE 100%
 
 sync
 sleep 1

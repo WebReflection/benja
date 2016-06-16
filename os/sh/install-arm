@@ -66,7 +66,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
   TMP_ROOT_SIZE="6000000"
 
-  if [ $TMP_SD_SIZE \> $TMP_ROOT_SIZE ]; then
+  if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
     TMP_ROOT_SIZE="3800M"
   fi
 
