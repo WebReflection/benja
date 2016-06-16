@@ -24,14 +24,12 @@
 
 cd ~/
 
+# configure files and folders
 touch ~/.hushlogin
 mkdir -p ~/.config
 mkdir -p ~/app/node_modules
 mkdir -p ~/.npm-packages/bin
 npm config set prefix '~/.npm-packages'
-
-# avoid bin-links
-npm config set bin-links false
 
 # initial Weston configuration
 if [ ! -f ~/.config/weston.ini ]; then
@@ -94,6 +92,9 @@ npm install -g tiny-cdn
 npm install -g node-gyp
 npm install -g node-pre-gyp
 npm install -g electron-prebuilt
+
+# avoid bin-links
+# npm config set bin-links false
 
 # install jsgtk for Weston based JS GTK tasks
 echo ${OS_USER} | sudo -S ls
