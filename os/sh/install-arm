@@ -64,12 +64,10 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   # verify and format the SD card
   TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
-  TMP_ROOT_SIZE="3500000"
+  TMP_ROOT_SIZE="6000000"
 
   if [ $TMP_SD_SIZE \> $TMP_ROOT_SIZE ]; then
-    TMP_ROOT_SIZE="3500M"
-  else
-    TMP_ROOT_SIZE="1900M"
+    TMP_ROOT_SIZE="3800M"
   fi
 
   echo "  SD card total space: $TMP_SD_SIZE"

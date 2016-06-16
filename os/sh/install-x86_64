@@ -128,7 +128,13 @@ dd if=/dev/zero of=$DISK bs=1 count=2048
 sync
 sleep 2
 
-ROOT_SIZE=3500M
+# verify and format the SD card
+TMP_SD_SIZE=$(sudo fdisk -s $DISK)
+ROOT_SIZE="6000000"
+
+if [ $TMP_SD_SIZE \> $ROOT_SIZE ]; then
+  ROOT_SIZE="3800M"
+fi
 
 if [ "$UEFI" = "NO" ]; then
   PARTED_START_AT="2048s"
