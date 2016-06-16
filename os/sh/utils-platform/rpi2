@@ -81,9 +81,7 @@ format_sd() {
     exit 1
   else
     sudo mkfs.vfat "$BOOT"
-    sudo dosfslabel "$BOOT" BENJA-BOOT
     yes | sudo mkfs.ext4 "$ROOT"
-    sudo tune2fs -L BENJA-ROOT "$ROOT"
     sudo mkfs.vfat "$WWW"
     sudo dosfslabel "$WWW" BENJA-APP
   fi
