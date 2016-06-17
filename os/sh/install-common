@@ -240,10 +240,11 @@ ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER}
 [Install]
 WantedBy=multi-user.target
 ">/etc/systemd/system/${OS_NAME}-disk.service
+else
+  mkdir -p ${OS_USER_DIR}/app
+  systemctl start ${OS_NAME}-disk.service
 fi
-mkdir -p ${OS_USER_DIR}/app
 systemctl enable ${OS_NAME}-disk.service
-systemctl start ${OS_NAME}-disk.service
 sync && sleep 2
 
 
