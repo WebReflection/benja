@@ -178,7 +178,6 @@ WantedBy=multi-user.target
 " >/etc/systemd/system/${OS_NAME}-80to8080.service
   systemctl enable ${OS_NAME}-80to8080.service
   systemctl start ${OS_NAME}-80to8080.service
-  systemctl status ${OS_NAME}-80to8080.service
   sync && sleep 2
 fi
 
@@ -245,7 +244,6 @@ fi
 mkdir -p ${OS_USER_DIR}/app
 systemctl enable ${OS_NAME}-disk.service
 systemctl start ${OS_NAME}-disk.service
-systemctl status ${OS_NAME}-disk.service
 sync && sleep 2
 
 
