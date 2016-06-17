@@ -418,9 +418,6 @@ chmod a+x benja/benja
 cp bash-info benja/bash-info
 cp utils benja/utils
 
-mkdir -p benja${OS_USER_DIR}/app
-mount --uuid ${APP_UUID} benja${OS_USER_DIR}/app -o gid=users,umask=0000
-
 sync && sleep 2
 
 arch-chroot benja /benja

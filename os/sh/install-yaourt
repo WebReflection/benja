@@ -35,7 +35,6 @@ installFromAUR() {
   sudo pacman -U --needed --noconfirm ${folder}/${package}/${package}*.pkg.tar.xz
   sync && sleep 1
   echo " $(tput bold)$(pacman -Q ${package})$(tput sgr0) successfully installed"
-  cd -
 }
 
 sudo mkdir -p /home/tmp-yaourt-install
