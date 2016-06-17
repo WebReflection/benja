@@ -51,6 +51,13 @@ locking=false
 " >~/.config/weston.ini
 fi
 
+# prepare app launcher
+if [ ! -f ${OS_APP_LAUNCHER} ]; then
+  echo ' installing launcher'
+  curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
+  chmod a+x ${OS_APP_LAUNCHER}
+fi
+
 # OS Bootstrap
 echo ' updating ~/.bashrc'
 OS_LOGO=$(cat ${OS_NAME}-logo)
@@ -74,9 +81,7 @@ if [ -f ~/need-wifi ]; then
 fi
 
 ' >>~/.bashrc
-echo ' installing launcher'
-curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
-chmod a+x ${OS_APP_LAUNCHER}
+
 cd ~/app
 if [ "$OS_BOOTINTO" = "electron" ]; then
   echo ' installing electron app'
@@ -96,6 +101,10 @@ curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
 curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
 touch reload
 
+# install jsgtk for Weston based JS GTK tasks
+echo ${OS_USER} | sudo -S ls
+yaourt -S --needed --noconfirm jsgtk
+
 # configure benja global npm modules
 npm install -g tiny-cdn
 npm install -g node-gyp
@@ -105,7 +114,4 @@ npm install -g electron-prebuilt
 # avoid bin-links
 # npm config set bin-links false
 
-# install jsgtk for Weston based JS GTK tasks
-echo ${OS_USER} | sudo -S ls
-yaourt -S --needed --noconfirm jsgtk
 cd -

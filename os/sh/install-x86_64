@@ -387,7 +387,7 @@ fi
 
 mkinitcpio -p linux
 sync
-sleep 2
+sleep 3
 
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 if [ ! -f install-common ]; then

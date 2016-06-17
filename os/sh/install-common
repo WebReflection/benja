@@ -116,6 +116,22 @@ sync && sleep 1
 
 
 
+# configure sudo
+if [ "$(cat /etc/sudoers | grep /usr/bin/npm)" = "" ]; then
+  echo " preparing /etc/sudoers"
+  echo "
+# ${OS_NAME} rules
+%wheel ALL=(ALL) ALL
+${OS_USER} ALL=NOPASSWD: /usr/bin/npm
+
+# password once asked never expires
+Defaults env_reset, timestamp_timeout=-1
+" >>/etc/sudoers
+  sync && sleep 1
+fi
+
+
+
 # install yaourt to handle user packages
 curl -LOs "${OS_REMOTE_FILES}/sh/install-yaourt"
 bash install-yaourt
@@ -158,10 +174,10 @@ ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER}
 [Install]
 WantedBy=multi-user.target
 ">/etc/systemd/system/${OS_NAME}-disk.service
+  systemctl enable ${OS_NAME}-disk.service
 fi
 mkdir -p ${OS_USER_DIR}/app
 systemctl start ${OS_NAME}-disk.service
-systemctl enable ${OS_NAME}-disk.service
 sync && sleep 1
 
 
@@ -183,22 +199,6 @@ WantedBy=multi-user.target
 " >/etc/systemd/system/${OS_NAME}-80to8080.service
   systemctl enable ${OS_NAME}-80to8080.service
   systemctl start ${OS_NAME}-80to8080.service
-  sync && sleep 1
-fi
-
-
-
-# configure sudo
-if [ "$(cat /etc/sudoers | grep /usr/bin/npm)" = "" ]; then
-  echo " preparing /etc/sudoers"
-  echo "
-# ${OS_NAME} rules
-%wheel ALL=(ALL) ALL
-${OS_USER} ALL=NOPASSWD: /usr/bin/npm
-
-# password once asked never expires
-Defaults env_reset, timestamp_timeout=-1
-" >>/etc/sudoers
   sync && sleep 1
 fi
 
