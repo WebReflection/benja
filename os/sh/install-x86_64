@@ -129,7 +129,7 @@ sync
 sleep 2
 
 # verify and format the SD card
-TMP_SD_SIZE=$(sudo fdisk -s $DISK)
+TMP_SD_SIZE=$(fdisk -s $DISK)
 TMP_ROOT_SIZE="6000000"
 
 if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
