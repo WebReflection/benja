@@ -64,6 +64,15 @@ echo '
 # print a welcome message
 echo -e "${OS_LOGO}
  "
+
+# in case this is the first boot
+if [ -f ~/need-wifi ]; then
+  echo "$(tput bold)WiFi Configuration$(tput sgr0)"
+  rm ~/need-wifi
+  sudo wifi-setup
+  sudo systemctl enable weston-compositor
+fi
+
 ' >>~/.bashrc
 echo ' installing launcher'
 curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"

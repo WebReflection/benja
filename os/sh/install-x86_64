@@ -361,8 +361,6 @@ if [ '$UEFI' != 'NO' ]; then
   sync
 fi
 
-mkinitcpio -p linux
-
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 . ./install-common
 rm ./install-common
@@ -378,6 +376,9 @@ rm /${OS_NAME}-logo
 rm \$0
 
 sync
+
+mkinitcpio -p linux
+
 umount $APP
 
 exit
