@@ -389,7 +389,7 @@ mkinitcpio -p linux
 
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 if [ ! -f wifi-setup ]; then
-  icho '[*][r]WARNING[/]: the network dropped in the process!'
+  icho '[*][r]WARNING[/]: the network dropped during the process!'
   exit 1
 fi
 . ./install-common
@@ -417,6 +417,10 @@ cp bash-info benja/bash-info
 cp utils benja/utils
 sync
 arch-chroot benja /benja
+
+if [[ $? -ne 0 ]]; then
+  exit 1
+fi
 
 echo ' user configured'
 sync
