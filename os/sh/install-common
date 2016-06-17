@@ -161,27 +161,6 @@ fi
 
 
 
-# configure app folder
-echo " preparing ${OS_NAME} app folder"
-if [ ! -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
-  echo "[Unit]
-Description=${OS_NAME} ${OS_USER_DIR}/app disk
-
-[Service]
-Type=simple
-ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
-
-[Install]
-WantedBy=multi-user.target
-">/etc/systemd/system/${OS_NAME}-disk.service
-  systemctl enable ${OS_NAME}-disk.service
-fi
-mkdir -p ${OS_USER_DIR}/app
-systemctl start ${OS_NAME}-disk.service
-sync && sleep 1
-
-
-
 # configure 8080 to 80 redirect
 if [ ! -f /etc/systemd/system/${OS_NAME}-80to8080.service ]; then
   echo " preparing 8080 to 80 redirect"
@@ -199,7 +178,8 @@ WantedBy=multi-user.target
 " >/etc/systemd/system/${OS_NAME}-80to8080.service
   systemctl enable ${OS_NAME}-80to8080.service
   systemctl start ${OS_NAME}-80to8080.service
-  sync && sleep 1
+  systemctl status ${OS_NAME}-80to8080.service
+  sync && sleep 2
 fi
 
 
@@ -245,6 +225,28 @@ QT_QPA_PLATFORM=wayland
 SDL_VIDEODRIVER=wayland
 GTK_THEME='Adwaita:dark'
 " >>/etc/environment
+
+
+
+# configure app folder
+echo " preparing ${OS_NAME} app folder"
+if [ ! -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
+  echo "[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">/etc/systemd/system/${OS_NAME}-disk.service
+fi
+mkdir -p ${OS_USER_DIR}/app
+systemctl enable ${OS_NAME}-disk.service
+systemctl start ${OS_NAME}-disk.service
+systemctl status ${OS_NAME}-disk.service
+sync && sleep 2
 
 
 
