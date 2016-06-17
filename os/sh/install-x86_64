@@ -300,11 +300,12 @@ fi
 
 echo "#!/usr/bin/env bash
 
-echo 'Preparing chroot'
-sleep 3
-
 . /bash-info
 . /utils
+
+clear
+icho '[*]Preparing Benja OS[/]'
+sleep 3
 
 export APP_UUID='${APP_UUID}'
 
