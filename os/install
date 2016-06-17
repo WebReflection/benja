@@ -191,6 +191,10 @@ else
 
       . install-x86_64
 
+      if [[ $? -ne 0 ]]; then
+        exit 1
+      fi
+
       echo ''
       icho ' [*]Benja OS is ready[/]'
       echo ''
