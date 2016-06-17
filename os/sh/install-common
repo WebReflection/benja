@@ -99,6 +99,29 @@ fi
 
 
 
+# configure app folder
+echo " preparing ${OS_NAME} app folder"
+mkdir -p ${OS_USER_DIR}/app
+if [ ! -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
+  echo "[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">/etc/systemd/system/${OS_NAME}-disk.service
+  mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+else
+  systemctl start ${OS_NAME}-disk.service
+fi
+systemctl enable ${OS_NAME}-disk.service
+sync && sleep 2
+
+
+
 # install commonly needed packages
 echo ' installing dependencies (this might take a while)'
 pacman -S --needed --noconfirm sudo curl iptables dialog wpa_supplicant openssh libnotify
@@ -223,29 +246,6 @@ QT_QPA_PLATFORM=wayland
 SDL_VIDEODRIVER=wayland
 GTK_THEME='Adwaita:dark'
 " >>/etc/environment
-
-
-
-# configure app folder
-echo " preparing ${OS_NAME} app folder"
-mkdir -p ${OS_USER_DIR}/app
-if [ ! -f /etc/systemd/system/${OS_NAME}-disk.service ]; then
-  echo "[Unit]
-Description=${OS_NAME} ${OS_USER_DIR}/app disk
-
-[Service]
-Type=simple
-ExecStart=/usr/bin/mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
-
-[Install]
-WantedBy=multi-user.target
-">/etc/systemd/system/${OS_NAME}-disk.service
-  mount --uuid ${APP_UUID} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
-else
-  systemctl start ${OS_NAME}-disk.service
-fi
-systemctl enable ${OS_NAME}-disk.service
-sync && sleep 2
 
 
 
