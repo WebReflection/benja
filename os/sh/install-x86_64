@@ -37,6 +37,19 @@ if [ "$DISK" = "" ]; then
     exit 1
   else
     DISK="$1"
+    echo ''
+    icho " [*][r][WARNING][/]"
+    icho "  disk [o]${DISK}[/] will be completely [*]erased[/]"
+    echo "  and every data in it will be lost."
+    echo ''
+    read -n1 -r -p "$(icho "  prepare [*]${OS_PLATFORM}[/] and erase [*]${DISK}[/]? [y/N]")" CHOICE
+
+    if [[ $? -ne 0 ]] || [ "$CHOICE" != "y" ]; then
+      echo ''
+      echo '  bye bye'
+      echo ''
+      exit 1
+    fi
   fi
 fi
 
@@ -122,6 +135,7 @@ for CHOICE in $POSSIBLEDISKS; do
     fi
   fi
 done
+
 
 dd if=/dev/zero of=$DISK bs=1 count=2048
 
