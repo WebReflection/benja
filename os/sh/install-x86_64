@@ -386,9 +386,11 @@ if [ '$UEFI' != 'NO' ]; then
 fi
 
 mkinitcpio -p linux
+sync
+sleep 2
 
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
-if [ ! -f wifi-setup ]; then
+if [ ! -f install-common ]; then
   icho '[*][r]WARNING[/]: the network dropped during the process!'
   exit 1
 fi
