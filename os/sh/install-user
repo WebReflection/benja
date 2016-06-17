@@ -22,6 +22,10 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
+# install jsgtk for Weston based JS GTK tasks
+echo ${OS_USER} | sudo -S ls
+yaourt -S --needed --noconfirm jsgtk
+
 cd ~/
 
 # configure files and folders
@@ -78,6 +82,7 @@ if [ -f ~/need-wifi ]; then
   rm ~/need-wifi
   sudo wifi-setup
   sudo systemctl enable weston-compositor
+  sudo reboot
 fi
 
 ' >>~/.bashrc
@@ -100,10 +105,6 @@ echo ' downloading logo'
 curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
 curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
 touch reload
-
-# install jsgtk for Weston based JS GTK tasks
-echo ${OS_USER} | sudo -S ls
-yaourt -S --needed --noconfirm jsgtk
 
 # configure benja global npm modules
 npm install -g tiny-cdn
