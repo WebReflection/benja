@@ -300,13 +300,22 @@ fi
 
 echo "#!/usr/bin/env bash
 
+echo 'Preparing chroot'
+sleep 3
+
 . /bash-info
 . /utils
 
 export APP_UUID='${APP_UUID}'
 
-# making first wifi-setup straight forward
+# utils to make first wifi-setup straight forward
 curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
+
+# verify chroot works as expected
+if [ ! -f wifi-setup ]; then
+  icho '[*][r]WARNING[/]: there is no network!'
+  exit 1
+fi
 chmod a+x wifi-setup
 mv wifi-setup /usr/bin
 
@@ -364,6 +373,10 @@ fi
 mkinitcpio -p linux
 
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
+if [ ! -f wifi-setup ]; then
+  icho '[*][r]WARNING[/]: the network dropped in the process!'
+  exit 1
+fi
 . ./install-common
 rm ./install-common
 
@@ -387,7 +400,7 @@ mv benja.bash benja/benja
 chmod a+x benja/benja
 cp bash-info benja/bash-info
 cp utils benja/utils
-
+sync
 arch-chroot benja /benja
 
 echo ' user configured'
