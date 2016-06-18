@@ -57,17 +57,17 @@ for tmp in $@; do
       OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
-    odroid-xu3)
+    beaglebone-black)
+      OS_PLATFORM="BeagleBone Black"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    tbt-odroid-xu3)
       OS_PLATFORM="ODROID-XU3"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
-    odroid-xu4)
+    tbt-odroid-xu4)
       OS_PLATFORM="ODROID-XU4"
       OS_PLATFORM_UTILS="odroid-xu3"
-      ;;
-    tbt-beaglebone-black)
-      OS_PLATFORM="BeagleBone Black"
-      OS_PLATFORM_UTILS="${tmp}"
       ;;
     tbt-cubieboard)
       OS_PLATFORM="Cubieboard"
