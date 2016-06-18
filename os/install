@@ -57,7 +57,11 @@ for tmp in $@; do
       OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
-    beaglebone-black)
+    cubox-i)
+      OS_PLATFORM="CuBox-i"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    tbt-beaglebone-black)
       OS_PLATFORM="BeagleBone Black"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
@@ -105,10 +109,6 @@ for tmp in $@; do
       ;;
     tbt-odroid-xu)
       OS_PLATFORM="ODROID-XU"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-cubox-i)
-      OS_PLATFORM="CuBox-i"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
     esac

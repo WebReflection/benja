@@ -90,6 +90,15 @@ install_os() {
   sudo bsdtar -xpf "$ARCHIVE" -C root
   sync
 
+  git clone https://github.com/RobertCNelson/bb-kernel.git
+  cd bb-kernel
+  git checkout origin/am33x-v4.5 -b tmp-sgx
+  ./sgx_create_package.sh
+  cd ..
+  sudo mv bb-kernel/deploy/GFX_*.gz root/
+  sync
+  rm -rf bb-kernel
+
   sudo dd if=root/boot/MLO of=$DISK count=1 seek=1 conv=notrunc bs=128k
   sudo dd if=root/boot/u-boot.img of=$DISK count=2 seek=1 conv=notrunc bs=384k
   sync
@@ -103,6 +112,14 @@ unmount_os() {
 }
 
 # install and configure the platform
-configure_platform() {
-  pacman -S --needed --noconfirm xf86-video-omap weston
+configure_before() {
+  pacman -S --needed weston base-devel git lsb-release
+  tar xfv /GFX_5.01.01.02.tar.gz -C /
+  cd /opt/gfxinstall/
+  ./sgx-install.sh
+  cd -
+}
+
+configure_after() {
+  echo 'done'
 }

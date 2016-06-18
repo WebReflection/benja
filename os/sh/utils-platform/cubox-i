@@ -20,16 +20,16 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_KERNEL='linux-am33x'
-export OS_HEADERS='linux-am33x-headers'
-export OS_ARCHIVE='ArchLinuxARM-am33x-latest.tar.gz'
+export OS_KERNEL='linux-imx6'
+export OS_HEADERS='linux-imx6-headers'
+export OS_ARCHIVE='ArchLinuxARM-imx6-cubox-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
-  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
+  sudo dd if=/dev/zero of=$DISK bs=1024 count=4
   sync
   sleep 2
   if [ "$(uname)" = "Darwin" ]; then
@@ -73,6 +73,7 @@ format_sd() {
   else
     yes | sudo mkfs.ext4 "$ROOT"
     sudo mkfs.vfat "$WWW"
+    sudo dosfslabel "$WWW" BENJA-APP
   fi
 
   echo 'OK'
@@ -84,45 +85,32 @@ install_os() {
   local ARCHIVE="$1"
   local DISK=$2
   local ROOT=$3
-  local OLDPWD=$(pwd)
 
   mkdir -p root
   sudo mount $ROOT root
   sudo bsdtar -xpf "$ARCHIVE" -C root
   sync
 
-  sudo dd if=root/boot/MLO of=$DISK count=1 seek=1 conv=notrunc bs=128k
-  sudo dd if=root/boot/u-boot.img of=$DISK count=2 seek=1 conv=notrunc bs=384k
+  sudo dd if=root/boot/SPL of=$DISK bs=1K seek=1
+  sudo dd if=root/boot/u-boot.img of=$DISK bs=1K seek=42
   sync
-
-  mkdir -p ${OLDPWD}/builds
-  cd ${OLDPWD}/builds
-  if [ ! -d bb-kernel ]; then
-    git clone https://github.com/RobertCNelson/bb-kernel.git
-    cd bb-kernel/
-    git checkout origin/am33x-v4.1 -b tmp-sgx
-    ./sgx_create_package.sh
-    sudo cp ./deploy/GFX_* ${OLDPWD}/root/
-  fi
-  cd ${OLDPWD}
 
 }
 
 # finalize installation
 unmount_os() {
   local ROOT=$1
+  sudo sed -i 's/pacman -Syu --needed --noconfirm/yes y | pacman -Syu --needed uboot-cubox-i/g' ~/${OS_NAME}-tmp-install/root/root/install
+  sync
   sudo umount $ROOT
 }
 
-# install and configure the platform
+# install and configure the platform and its graphic environment
 configure_before() {
-  tar xfv /GFX_*.tar.gz -C /
-  cd /opt/gfxinstall/
-  ./sgx-install.sh
-  cd -
   pacman -S --needed --noconfirm weston
 }
 
+# patch the system after everything else has been installed
 configure_after() {
-  echo 'done'
+  echo 'OK'
 }
