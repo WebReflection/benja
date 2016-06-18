@@ -403,7 +403,6 @@ systemctl enable sshd
 
 rm /bash-info
 rm /utils
-rm /benja
 rm /${OS_NAME}-logo
 rm \$0
 
