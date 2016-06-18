@@ -262,6 +262,6 @@ cd $OS_USER_DIR
 curl -LOs "${OS_REMOTE_FILES}/sh/install-user"
 icho "${OS_FULL_LOGO}">./${OS_NAME}-logo
 chown "${OS_USER}:users" ./${OS_NAME}-logo
-sudo -H -u $OS_USER bash -c "OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
+sudo -H -u $OS_USER bash -c "OS_BACKEND='${OS_BACKEND}' OS_APP_LAUNCHER='${OS_APP_LAUNCHER}' OS_BOOTINTO='${OS_BOOTINTO}' OS_REMOTE_FILES='${OS_REMOTE_FILES}' OS_NAME='${OS_NAME}' OS_USER='${OS_USER}' sh ./install-user"
 rm install-user
 rm -f ${OS_USER_DIR}/${OS_NAME}-logo

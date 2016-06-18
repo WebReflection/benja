@@ -44,6 +44,10 @@ idle-time=0"
     WESTON_INI="$WESTON_INI
 modules=xwayland.so"
   fi
+  if [ "$OS_BACKEND" = "electron" ]; then
+    WESTON_INI="$WESTON_INI
+backend=${OS_BACKEND}"
+  fi
   echo "${WESTON_INI}
 
 [shell]

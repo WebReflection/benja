@@ -24,6 +24,7 @@ export OS_KERNEL='linux-odroid-c1'
 export OS_HEADERS='linux-odroid-c1-headers'
 export OS_ARCHIVE='ArchLinuxARM-odroid-c1-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=fbdev-backend.so
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
@@ -112,12 +113,11 @@ unmount_os() {
 # install and configure the platform and its graphic environment
 configure_before() {
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/boot.ini
-  pacman -S --needed --noconfirm weston odroid-c1-libgl aml-libs-c1 # xf86-video-odroid-c1
+  pacman -S --needed --noconfirm weston odroid-c1-libgl-fb odroid-c1-libgl-headers aml-libs-c1
 }
 
 # patch the system after everything else has been installed
 configure_after() {
-  # pacman -S --needed --noconfirm xorg-server xorg-xinit xorg-xset
-  # sudo -H -u ${OS_USER} bash -c "curl -L -s -o ${OS_USER_DIR}/.xinitrc ${OS_REMOTE_FILES}/sh/xinitrc"
-  systemctl disable weston-compositor
+  pacman -S --needed --noconfirm wiringc1 i2c-tools lm_sensors
+  echo 'i2c-dev' >> /etc/modules-load.d/odroidc1.conf
 }

@@ -79,7 +79,7 @@ for tmp in $@; do
       OS_PLATFORM="Raspberry Pi 3"
       OS_PLATFORM_UTILS="rpi2"
       ;;
-    tbt-odroid-c1)
+    odroid-c1)
       OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
