@@ -75,7 +75,7 @@ if [ "$SWAP" = "" ]; then
 fi
 
 # EDD needed in some board
-if [ "$EDD" = "NO" ] || [ "$EDD" = "0" ] || [ "$EDD" = "false" ]; then
+if [ "$EDD" = "NO" ] || [ "$EDD" = "OFF" ] || [ "$EDD" = "0" ] || [ "$EDD" = "false" ]; then
   EDD=off
 fi
 
