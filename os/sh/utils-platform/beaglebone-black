@@ -20,50 +20,23 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_KERNEL='linux-odroid-xu3'
-export OS_HEADERS='linux-odroid-xu3-headers'
-export OS_ARCHIVE='ArchLinuxARM-odroid-xu3-latest.tar.gz'
+export OS_KERNEL='linux-am33x'
+export OS_HEADERS='linux-am33x-headers'
+export OS_ARCHIVE='ArchLinuxARM-am33x-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
-  curl -LO http://os.archlinuxarm.org/os/exynos/xuboot.img
-  sudo dd if=xuboot.img of=$DISK bs=512
+  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
   sync
   sleep 2
-  rm xuboot.img
   if [ "$(uname)" = "Darwin" ]; then
     echo 'I HAVE NO IDEA WHAT TO DO'
     exit 1
   else
-    # ma-ma-ma-ma-ma-ma-ma-ma-mad-mad-ness
-    sudo sh -c "sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk $DISK
-      n # new
-      p # primary
-      1 # first
-        # start from default
-      +100M # add 100M
-      t # change type
-      c # FAT
-      n # new
-      p # primary
-      2 # second
-        # start from default
-      +$ROOT_SIZE # add 3200M
-      n # new
-      p # primary
-      3 # third
-        # start from default
-        # till the end
-      t # change type
-      3 # for the third
-      c # FAT
-      p # print (to double check manually)
-      w # write
-      q # GTFO
-    EOF">/dev/null
+    sudo sh -c "echo -e 'o\nn\np\n1\n\n+${ROOT_SIZE}\nn\np\n2\n\n\nt\n2\nc\nw\nq\n' | fdisk ${DISK}" > /dev/null
   fi
   echo 'OK'
 }
@@ -72,39 +45,32 @@ partition_sd() {
 get_partitions() {
   local DISK=$1
   local POSSIBLEDISKS=$(ls ${DISK}*)
-  local BOOT=""
   local ROOT=""
   local WWW=""
   local CHOICE=""
   for CHOICE in $POSSIBLEDISKS; do
     if [ "$CHOICE" != "$DISK" ]; then
-      if [ "$BOOT" = "" ]; then
-        BOOT="$CHOICE"
+      if [ "$ROOT" = "" ]; then
+        ROOT="$CHOICE"
       else
-        if [ "$ROOT" = "" ]; then
-          ROOT="$CHOICE"
-        else
-          WWW="$CHOICE"
-        fi
+        WWW="$CHOICE"
       fi
     fi
   done
 
-  echo "${BOOT} ${ROOT} ${WWW}"
+  echo "${ROOT} ${WWW}"
 }
 
 # format_sd /dev/mmblk0
 format_sd() {
   local DISK=$1
-  local BOOT=$2
-  local ROOT=$3
-  local WWW=$4
+  local ROOT=$2
+  local WWW=$3
 
   if [ "$(uname)" = "Darwin" ]; then
     echo 'I HAVE NO IDEA WHAT TO DO'
     exit 1
   else
-    sudo mkfs.vfat "$BOOT"
     yes | sudo mkfs.ext4 "$ROOT"
     sudo mkfs.vfat "$WWW"
   fi
@@ -117,23 +83,46 @@ format_sd() {
 install_os() {
   local ARCHIVE="$1"
   local DISK=$2
-  local BOOT=$3
-  local ROOT=$4
+  local ROOT=$3
+  local OLDPWD=$(pwd)
 
-  mkdir -p boot
-  sudo mount "$BOOT" boot
   mkdir -p root
-  sudo mount "$ROOT" root
+  sudo mount $ROOT root
   sudo bsdtar -xpf "$ARCHIVE" -C root
   sync
-  sleep 2
-  sudo cp root/boot/* boot
+
+  sudo dd if=root/boot/MLO of=$DISK count=1 seek=1 conv=notrunc bs=128k
+  sudo dd if=root/boot/u-boot.img of=$DISK count=2 seek=1 conv=notrunc bs=384k
   sync
+
+  mkdir -p ${OLDPWD}/builds
+  cd ${OLDPWD}/builds
+  if [ ! -d bb-kernel ]; then
+    git clone https://github.com/RobertCNelson/bb-kernel.git
+    cd bb-kernel/
+    git checkout origin/am33x-v4.1 -b tmp-sgx
+    ./sgx_create_package.sh
+    sudo cp ./deploy/GFX_* ${OLDPWD}/root/
+  fi
+  cd ${OLDPWD}
+
 }
 
 # finalize installation
 unmount_os() {
-  local BOOT=$1
-  local ROOT=$2
-  sudo umount $BOOT $ROOT
+  local ROOT=$1
+  sudo umount $ROOT
+}
+
+# install and configure the platform
+configure_before() {
+  tar xfv /GFX_*.tar.gz -C /
+  cd /opt/gfxinstall/
+  ./sgx-install.sh
+  cd -
+  pacman -S --needed --noconfirm weston
+}
+
+configure_after() {
+  echo 'done'
 }

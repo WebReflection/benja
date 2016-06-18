@@ -24,46 +24,22 @@ export OS_KERNEL='linux-odroid-xu3'
 export OS_HEADERS='linux-odroid-xu3-headers'
 export OS_ARCHIVE='ArchLinuxARM-odroid-xu3-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=fbdev-backend.so
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
-  curl -LO http://os.archlinuxarm.org/os/exynos/xuboot.img
-  sudo dd if=xuboot.img of=$DISK bs=512
+  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
   sync
   sleep 2
-  rm xuboot.img
   if [ "$(uname)" = "Darwin" ]; then
     echo 'I HAVE NO IDEA WHAT TO DO'
     exit 1
   else
-    # ma-ma-ma-ma-ma-ma-ma-ma-mad-mad-ness
-    sudo sh -c "sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk $DISK
-      n # new
-      p # primary
-      1 # first
-        # start from default
-      +100M # add 100M
-      t # change type
-      c # FAT
-      n # new
-      p # primary
-      2 # second
-        # start from default
-      +$ROOT_SIZE # add 3200M
-      n # new
-      p # primary
-      3 # third
-        # start from default
-        # till the end
-      t # change type
-      3 # for the third
-      c # FAT
-      p # print (to double check manually)
-      w # write
-      q # GTFO
-    EOF">/dev/null
+    sudo parted --script $DISK mklabel msdos
+    sudo parted --script --align optimal $DISK mkpart primary ext4 2048s $ROOT_SIZE
+    sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
   fi
   echo 'OK'
 }
@@ -72,41 +48,35 @@ partition_sd() {
 get_partitions() {
   local DISK=$1
   local POSSIBLEDISKS=$(ls ${DISK}*)
-  local BOOT=""
   local ROOT=""
   local WWW=""
   local CHOICE=""
   for CHOICE in $POSSIBLEDISKS; do
     if [ "$CHOICE" != "$DISK" ]; then
-      if [ "$BOOT" = "" ]; then
-        BOOT="$CHOICE"
+      if [ "$ROOT" = "" ]; then
+        ROOT="$CHOICE"
       else
-        if [ "$ROOT" = "" ]; then
-          ROOT="$CHOICE"
-        else
-          WWW="$CHOICE"
-        fi
+        WWW="$CHOICE"
       fi
     fi
   done
 
-  echo "${BOOT} ${ROOT} ${WWW}"
+  echo "${ROOT} ${WWW}"
 }
 
 # format_sd /dev/mmblk0
 format_sd() {
   local DISK=$1
-  local BOOT=$2
-  local ROOT=$3
-  local WWW=$4
+  local ROOT=$2
+  local WWW=$3
 
   if [ "$(uname)" = "Darwin" ]; then
     echo 'I HAVE NO IDEA WHAT TO DO'
     exit 1
   else
-    sudo mkfs.vfat "$BOOT"
     yes | sudo mkfs.ext4 "$ROOT"
     sudo mkfs.vfat "$WWW"
+    sudo dosfslabel "$WWW" BENJA-APP
   fi
 
   echo 'OK'
@@ -117,23 +87,37 @@ format_sd() {
 install_os() {
   local ARCHIVE="$1"
   local DISK=$2
-  local BOOT=$3
-  local ROOT=$4
+  local ROOT=$3
 
-  mkdir -p boot
-  sudo mount "$BOOT" boot
   mkdir -p root
-  sudo mount "$ROOT" root
+  sudo mount $ROOT root
   sudo bsdtar -xpf "$ARCHIVE" -C root
   sync
-  sleep 2
-  sudo cp root/boot/* boot
+  cd root/boot
+  sudo sed -i 's/^setenv m "1080p"/# setenv m "1080p"/' boot.ini
   sync
+  sudo sed -i 's/^# setenv m "720p"/setenv m "720p"/' boot.ini
+  sync
+  sudo sh sd_fusing.sh $DISK
+  sync
+  sleep 2
+  cd ../..
 }
 
 # finalize installation
 unmount_os() {
-  local BOOT=$1
-  local ROOT=$2
-  sudo umount $BOOT $ROOT
+  local ROOT=$1
+  sudo umount $ROOT
+}
+
+# install and configure the platform and its graphic environment
+configure_before() {
+  sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/boot.ini
+  pacman -S --needed --noconfirm weston odroid-xu3-libgl-fb odroid-xu3-libgl-headers
+}
+
+# patch the system after everything else has been installed
+configure_after() {
+  pacman -S --needed --noconfirm i2c-tools lm_sensors
+  echo 'i2c-dev' >> /etc/modules-load.d/odroidxu3.conf
 }

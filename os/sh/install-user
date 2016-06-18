@@ -40,11 +40,11 @@ if [ ! -f ~/.config/weston.ini ]; then
   echo ' creating ~/.config/weston.ini'
   WESTON_INI="[core]
 idle-time=0"
-  if [ "$OS_BOOTINTO" = "electron" ]; then
+  if [ "${OS_BOOTINTO}" = "electron" ]; then
     WESTON_INI="$WESTON_INI
 modules=xwayland.so"
   fi
-  if [ "$OS_BACKEND" = "electron" ]; then
+  if [ "${OS_BACKEND}" != "" ]; then
     WESTON_INI="$WESTON_INI
 backend=${OS_BACKEND}"
   fi
@@ -92,7 +92,7 @@ fi
 ' >>~/.bashrc
 
 cd ~/app
-if [ "$OS_BOOTINTO" = "electron" ]; then
+if [ "${OS_BOOTINTO}" = "electron" ]; then
   echo ' installing electron app'
   curl -LOs "${OS_REMOTE_FILES}/app/index.js"
   curl -LOs "${OS_REMOTE_FILES}/app/index.html"

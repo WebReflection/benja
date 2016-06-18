@@ -45,6 +45,26 @@ for tmp in $@; do
     fi
   else
     case $tmp in
+    rpi2)
+      OS_PLATFORM="Raspberry Pi 2"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    rpi3)
+      OS_PLATFORM="Raspberry Pi 3"
+      OS_PLATFORM_UTILS="rpi2"
+      ;;
+    odroid-c1)
+      OS_PLATFORM="ODROID-C1"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    odroid-xu3)
+      OS_PLATFORM="ODROID-XU3"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    odroid-xu4)
+      OS_PLATFORM="ODROID-XU4"
+      OS_PLATFORM_UTILS="odroid-xu3"
+      ;;
     tbt-beaglebone-black)
       OS_PLATFORM="BeagleBone Black"
       OS_PLATFORM_UTILS="${tmp}"
@@ -69,18 +89,6 @@ for tmp in $@; do
     tbt-rpi1)
       # TODO: test this actually works
       OS_PLATFORM="Raspberry Pi 1"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    rpi2)
-      OS_PLATFORM="Raspberry Pi 2"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    rpi3)
-      OS_PLATFORM="Raspberry Pi 3"
-      OS_PLATFORM_UTILS="rpi2"
-      ;;
-    odroid-c1)
-      OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
     tbt-odroid-c2)
