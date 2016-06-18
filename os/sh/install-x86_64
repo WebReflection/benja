@@ -389,18 +389,19 @@ mkinitcpio -p linux
 sync
 sleep 3
 
+cd /
 curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
 if [ ! -f install-common ]; then
   icho '[*][r]WARNING[/]: the network dropped during the process!'
   exit 1
 fi
 . ./install-common
-rm ./install-common
 
 systemctl enable dhcpcd
 systemctl enable ntpd.service
 systemctl enable sshd
 
+rm /install-common
 rm /bash-info
 rm /utils
 rm /${OS_NAME}-logo
