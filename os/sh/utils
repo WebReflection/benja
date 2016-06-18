@@ -262,25 +262,13 @@ installFromAUR() {
 
 # PLATFORMS DEFAULTS
 
-# minimal requirements
+# minimal X11 requirements
 configure_platform() {
   pacman -S --needed --noconfirm xf86-video-fbdev weston
 }
 
-# common steps to configure Xorg
-configure_X11() {
-  pacman -S --needed --noconfirm xorg-server xorg-xinit xorg-xset
-  # workaround for missing tty ¯\_(ツ)_/¯
-  sed -i 's/weston-launch > \/dev\/null 2>&1/exit \& sleep 2 \&\& startx/' "$OS_USER_DIR/.bashrc"
-  curl -L -s -o "$OS_USER_DIR/.xinitrc" "${OS_REMOTE_FILES}/sh/xinitrc"
-  sync
-  sed -i 's/weston --width=/# weston --width=/' "$OS_USER_DIR/.xinitrc"
-  sync
-  echo '
-./.app-launcher' >> "$OS_USER_DIR/.xinitrc"
-}
-
 # before rebooting, after whole install
 configure_after() {
-  echo 'OK'
+  pacman -S --needed --noconfirm xorg-server xorg-xinit xorg-xset
+  curl -L -s -o "$OS_USER_DIR/.xinitrc" "${OS_REMOTE_FILES}/sh/xinitrc"
 }
