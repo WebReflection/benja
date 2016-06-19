@@ -65,5 +65,6 @@ xrandr -s ${WIDTH}x${HEIGHT}
 # avoid monitor goes to sleep
 xset s off -dpms
 
-# launch weston accordingly
-weston --width=$WIDTH --height=$HEIGHT
+# launch the app
+cd ~/
+./.app-launch

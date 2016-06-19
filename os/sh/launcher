@@ -49,6 +49,10 @@ else
   elif [ -f ~/app/package.jsoff ]; then
     mv ~/app/package.jsoff ~/app/package.json
   fi
-  # We are already a Weston session. Let's use its terminal.
-  weston-terminal --fullscreen
+  # launch any available terminal
+  if [ -f /usr/bin/xterm ]; then
+    xterm -maximized
+  else
+    weston-terminal --fullscreen
+  fi
 fi
