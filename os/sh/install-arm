@@ -31,9 +31,9 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
     exit 1
   fi
 
-  if [ -f ../os/sh/utils-platform/${OS_PLATFORM_UTILS} ]; then
+  if [ -f ${OS_INSTALLER_SRC}/../os/sh/utils-platform/${OS_PLATFORM_UTILS} ]; then
     echo ' using local platform file'
-    cp ../os/sh/utils-platform/${OS_PLATFORM_UTILS} ./utils-platform
+    cp ${OS_INSTALLER_SRC}/../os/sh/utils-platform/${OS_PLATFORM_UTILS} ./utils-platform
   fi
 
   if [ ! -f utils-platform ]; then

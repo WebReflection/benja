@@ -2,184 +2,187 @@ html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  font-family: sans-serif;
-  font-size: 1em;
-  line-height: 1.5em;
-  background: #000000;
 }
 
 *, *:before, *:after {
   box-sizing: inherit;
 }
 
-body {
-  background: #292929;
-  color: #eeeeec;
-  font-family: sans-serif;
-  padding: 0;
+.hidden {
+  display: none;
+}
+
+html, body, header, main, footer, h1, h2, h3, h4, h5, h6, #powered-by, #powered-by * {
   margin: 0;
+  padding: 0;
+}
+
+h1, h2, h4, h6, main, #powered-by li {
   text-align: center;
 }
 
-a, a:visited {
-  color: silver;
+html, body {
+  color: #aaadb2;
+  background-color: #2b353e;
+  font-family: 'Open Sans', sans-serif;
 }
 
-.menu > li:first-child {
-  padding-left: 48px;
-  background: transparent url(/img/benja-dark.png) left no-repeat;
-  background-size: 32px;
+header {
+  background-color: #34414a;
+  min-height: 514px;
+  background-image: url(/img/benja-dark.png);
+  background-repeat: no-repeat;
+  background-position: center 32px;
+  background-size: 116px;
+  padding-top: 208px;
 }
 
-.menu > li:first-child span {
-  color: darkgrey;
+header, main, #powered-by {
+  border-bottom: 1px solid #1b2228;
 }
 
-.menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  background-color: #111111;
-  background-color: rgba(16,16,16, .8);
-  position: fixed;
-  right: 0;
-  left: 0;
-  top: 0;
-  width: 100%;
+h1 strong {
+  color: #fff;
+  font-weight: 400;
 }
 
-/* there is a position fixed in this page,
-   be sure anchors works as expected */
-body, #about {
-  padding-top: 58px;
+h1 span {
+  color: #cdced2;
+  font-weight: 300;
 }
 
-.menu > li {
-  display: inline-block;
-  padding: 0 16px;
-  margin: 0;
-  border-bottom: 4px solid rgba(16,16,16, .8);
+h2 {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 12px;
 }
 
-.menu > li:first-child {
-  left: 16px;
-  padding-top: 4px;
-  border-bottom: 0;
+h2 abbr {
+  border-bottom: 1px dotted #2b353e;
+  cursor: help;
 }
 
-.menu > li.active {
-  border-bottom: 4px solid #1793d1;
-}
-
-.menu > li * {
-  line-height: 48px;
-}
-
-.menu > li a {
-  padding: 8px;
+a, a:visited, a:hover {
   text-decoration: none;
-  font-weight: bold;
+  color: #6a9eb6;
 }
 
-.menu > li a, .menu > li a:hover, .menu > li a:active, .menu > li a:focus {
-  outline: 0;
+main > section {
+  margin: 42px auto auto auto;
+  text-align: left;
 }
 
 main {
-  margin: auto;
-  max-width: 920px;
+  padding: 0 28px 42px 28px;
 }
 
-iframe {
-  max-width: 100%;
-  margin: auto;
+main > section,
+#powered-by ul {
+  max-width: 942px;
 }
 
-ul.inline, ul.inline > li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-ul.inline {
-  text-align: left;
-  margin: auto;
-  display: inline-block;
-}
-ul.inline:after {
-  display: block;
-  content: '';
-  clear: left;
-}
-
-ul.inline > li {
-  display: inline-block;
-  float: left;
-  max-width: 33%;
-  padding: 8px;
-}
-
-ul.inline img {
-  margin: auto;
-  width: 100%;
-}
-
-a {
-  text-decoration: none;
-}
-
-#about {
-  text-align: left;
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-bottom: 58px;
+main > section > p,
+#powered-by .description {
+  line-height: 28px;
 }
 
 footer {
-  display: block;
-  margin: 52px 0 0 0;
-  padding: 0;
-  background: #000;
-  color: #999;
+  background-color: #2a343d;
 }
 
-h1 {
-  text-align: center;
-  padding-bottom: 58px;
+#carousel {
+  margin: -160px auto auto auto;
+  max-width: 560px;
+}
+
+#powered-by {
+  background-color: #212a31;
+  padding: 28px 0;
+}
+
+#powered-by ul,
+#powered-by li {
+  list-style: none;
+}
+
+#powered-by ul {
+  margin: 28px auto;
+}
+
+#powered-by li {
+  width: 32%;
+  display: inline-block;
+}
+
+#powered-by img {
+  margin: auto;
+  width: 75%;
+  border: 0;
+}
+
+#powered-by .description {
+  color: #979ea4;
+  background: #313e47;
+  margin: 0 auto;
+  max-width: 842px;
+  border-radius: 4px;
+  padding: 28px;
+  position: relative;
+}
+
+#powered-by .description .arrow {
+  position: absolute;
+  top: -10px;
+  margin-left: -17px;
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #313e47;
+  -webkit-transition: all .35s ease-in-out;
+  -moz-transition: all .35s ease-in-out;
+  -ms-transition: all .35s ease-in-out;
+  -o-transition: all .35s ease-in-out;
+  transition: all .35s ease-in-out;
 }
 
 h3 {
-  color: #1793d1;
-  margin-left: -16px;
-  text-shadow: 1px 1px 2px #000;
+  color: #d7d7d9;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+h4 {
+  color: #636a70;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 h6 {
-  font-weight: 200;
-  padding: 4px;
+  color: #aaafb3;
+  line-height: 50px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 @media (max-width: 639px) {
-  .menu > li {
-    width: auto;
+  #carousel {
+    width: 100%;
   }
-  .menu > li:first-child span {
+  h1 strong:after {
+    content: '.';
+    color: #cdced2;
+  }
+  h1 span {
     display: none;
   }
-  .menu > li:first-child strong:after {
-    content: '.';
+  h1:after {
+    content: 'Bootable Electron Node JS Application';
+    display: block;
+    font-weight: 300;
+    font-size: 16px;
   }
-  ul.inline > li {
-    float: none;
-    min-width: 100%;
-    padding: 32px;
-  }
-}
-
-@media (max-width: 380px) {
-  .menu > li:first-child:after {
-    content: '\00a0';
-  }
-  .menu > li:first-child strong {
+  h2 {
     display: none;
   }
 }

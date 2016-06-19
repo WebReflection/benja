@@ -69,46 +69,8 @@ for tmp in $@; do
       OS_PLATFORM="CuBox-i"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
-    tbt-beaglebone-black)
-      OS_PLATFORM="BeagleBone Black"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-odroid-xu3)
-      OS_PLATFORM="ODROID-XU3"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-odroid-xu4)
-      OS_PLATFORM="ODROID-XU4"
-      OS_PLATFORM_UTILS="odroid-xu3"
-      ;;
-    tbt-cubieboard)
-      OS_PLATFORM="Cubieboard"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-cubieboard-1)
-      OS_PLATFORM="Cubieboard"
-      OS_PLATFORM_UTILS="cubieboard"
-      ;;
-    tbt-cubieboard-2)
-      OS_PLATFORM="Cubieboard 2"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-rpi)
-      # TODO: test this actually works
-      OS_PLATFORM="Raspberry Pi 1"
-      OS_PLATFORM_UTILS="rpi1"
-      ;;
-    tbt-rpi1)
-      # TODO: test this actually works
-      OS_PLATFORM="Raspberry Pi 1"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-odroid-c2)
-      OS_PLATFORM="ODROID-C2"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-odroid-xu)
-      OS_PLATFORM="ODROID-XU"
+    pcduino)
+      OS_PLATFORM="pcDuino"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
     esac

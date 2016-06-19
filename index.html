@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="css/main.css" media="screen">
     <!--[if lt IE 9]>
     <script defer src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,91 +14,86 @@
     <script defer src="js/main.js"></script>
     <title>Benja OS</title>
   </head>
-  <body id="home">
-    <ul class="menu">
-      <li>
+  <body>
+    <header>
+      <h1>
         <strong>B</strong><span>ootable</span>
         <strong>E</strong><span>lectron</span>
         <strong>N</strong><span>ode</span>
         <strong>J</strong><span>S</span>
         <strong>A</strong><span>pplication</span>
-      </li>
-      <li class="active"><a href="#home">Home</a></li>
-      <li><a href="#about">About</a></li>
-    </ul>
-    <header>
+      </h1>
+      <h2>
+        An <abbr title="HardWare">HW</abbr> Accelerated <abbr title="Internet of Things">IoT</abbr> oriented Web <a href="https://en.wikipedia.org/wiki/Kiosk_software">Kiosk</a> for Makers
+      </h2>
     </header>
     <main>
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/AsVvoy2K8d8" allowfullscreen></iframe>
-      <ul class="inline">
-        <li>
-          <a href="https://www.archlinux.org/"><img src="img/archlinux.png" alt="ArchLinux"></a>
-          <p>
-            Open Source centric and community driven, <a href="https://www.archlinux.org/">Arch Linux</a> is one of the most
-            popular and well documented Linux distributions out there.
-            <br>
-            Simple, lightweight, and always up-to-date,
-            its <a href="https://archlinuxarm.org/">ARM</a> counterpart
-            has been working on hacker-friendly boards long time before others and
-            it can bootstrap in just a few seconds.
-          </p>
-        </li>
-        <li>
-          <a href="https://nodejs.org/"><img src="img/nodejs.png" alt="NodeJS"></a>
-          <p>
-            Based on <a href="https://developers.google.com/v8/">Chrome's V8 JavaScript engine</a>,
-            NodeJS is the powerful JavaScript runtime used by backend developers as wenn as system administrators.
-            <br>
-            Thanks to <a href="https://www.npmjs.com/">npm</a> modules such <a href="https://www.npmjs.com/package/serialport">serialport</a>
-            or <a href="https://www.npmjs.com/package/johnny-five">johnny-five</a>,
-            NodeJS can be used to drive Arduino, Raspberry Pi, and many other <abbr title="Internet of Things">IoT</abbr> oriented boards.
-          </p>
-        </li>
-        <li>
-          <a href="http://electron.atom.io/"><img src="img/electron.png" alt="Electron"></a>
-          <p>
-            Electron is an <a href="https://github.com/electron/electron">open source project maintained by GitHub</a> with an active community of contributors.
-            <br>
-            It uses Chromium and NodeJS, providing the ability to build any kind of app using the HTML, CSS and JavaScript Web stack.
-            <br>
-            B.E.N.J.A. uses it to create a restrictions-free Web full of potentials.
-          </p>
-        </li>
-      </ul>
-      <div id="about">
-        <h1>Coming Soon!</h1>
-        <section>
-          <h3>A Simplified Web UI Bootstrap</h3>
-          <p>
-            B.E.N.J.A. is an installer that makes you focus on what matters:
-            developing amazing projects!<br>
-            You don't need to know much about Linux, it's already prepared for you.<br>
-            You don't need to configure drivers or UI: plug the micro SD card and just play.<br>
-            You can edit a project remotely, or directly on your computer.
-            You can make the project portable simply copying it around.
-          </p>
-        </section>
-        <section>
-          <h3>Beyond the Web</h3>
-          <p>
-            The B.E.N.J.A. environment doesn't have usual Web constrains:
-            you have full Hardware and Operating System acces!<br>
-            It's NodeJS on top of Linux, delivered through an Electron instance
-            that runs on the lightweight, <a href="https://wayland.freedesktop.org/">Wayland</a> driven, <a href="https://wayland.freedesktop.org/building.html">Weston</a> compositor.
-          </p>
-        </section>
-        <section>
-          <h3>A Web driven Internet of Things</h3>
-          <p>
-            Differently from every other platform,
-            B.E.N.J.A. provides a way for makers to create via Web interface.<br>
-            Switch on the light, check humidity, temperature,
-            make the coffee, spy your cat, and show him your face on TV,
-            there's no limit in what you could do through a privileged Web view!
-          </p>
-        </section>
-      </div>
+      <iframe id="carousel" width="560" height="315" src="https://www.youtube.com/embed/AsVvoy2K8d8" allowfullscreen frameborder="0"></iframe>
+      <section>
+        <h3>A Simplified Web UI Bootstrap</h3>
+        <p>
+          B.E.N.J.A. is an installer that makes you focus on what matters:
+          developing amazing projects!<br>
+          You don't need to know much about Linux, it's already prepared for you.<br>
+          You don't need to configure drivers or UI: plug the micro SD card and just play.<br>
+          You can edit a project remotely, or directly on your computer.
+          You can make the project portable simply copying it around.
+        </p>
+      </section>
+      <section>
+        <h3>Beyond the Web</h3>
+        <p>
+          The B.E.N.J.A. environment doesn't have usual Web constrains:
+          you have full Hardware and Operating System acces!<br>
+          It's NodeJS on top of Linux, delivered through an Electron instance
+          that runs on the lightweight, <a href="https://wayland.freedesktop.org/">Wayland</a> driven, <a href="https://wayland.freedesktop.org/building.html">Weston</a> compositor.
+        </p>
+      </section>
+      <section>
+        <h3>A Web driven Internet of Things</h3>
+        <p>
+          Differently from every other platform,
+          B.E.N.J.A. provides a way for makers to create via Web interface.<br>
+          Switch on the light, check humidity, temperature,
+          make the coffee, spy your cat, and show him your face on TV,
+          there's no limit in what you could do through a privileged Web view!
+        </p>
+      </section>
     </main>
+    <div id="powered-by">
+      <h4>POWERED BY</h4>
+      <ul>
+        <li><img alt="Arch Linux" src="/img/archlinux.svg"></li>
+        <li><img alt="Node JS" src="/img/nodejs.svg"></li>
+        <li><img alt="Electron" src="/img/electron.svg"></li>
+      </ul>
+      <div class="description">
+        <p>
+          Open Source centric and community driven, <a href="https://www.archlinux.org/">Arch Linux</a> is one of the most
+          popular and well documented Linux distributions out there.
+          <br>
+          Simple, lightweight, and always up-to-date,
+          its <a href="https://archlinuxarm.org/">ARM</a> counterpart
+          has been working on hacker-friendly boards long time before others and
+          it can bootstrap in just a few seconds.
+        </p>
+        <p>
+          Based on <a href="https://developers.google.com/v8/">Chrome's V8 JavaScript engine</a>,
+          NodeJS is the powerful JavaScript runtime used by backend developers as wenn as system administrators.
+          <br>
+          Thanks to <a href="https://www.npmjs.com/">npm</a> modules such <a href="https://www.npmjs.com/package/serialport">serialport</a>
+          or <a href="https://www.npmjs.com/package/johnny-five">johnny-five</a>,
+          NodeJS can be used to drive Arduino, Raspberry Pi, and many other <abbr title="Internet of Things">IoT</abbr> oriented boards.
+        </p>
+        <p>
+          Electron is an <a href="https://github.com/electron/electron">open source project maintained by GitHub</a> with an active community of contributors.
+          <br>
+          It uses Chromium and NodeJS, providing the ability to build any kind of app using the HTML, CSS and JavaScript Web stack.
+          <br>
+          B.E.N.J.A. uses it to create a restrictions-free Web full of potentials.
+        </p>
+      </div>
+    </div>
     <footer>
       <h6>&copy; 2016 WebReflection Ltd</h6>
     </footer>

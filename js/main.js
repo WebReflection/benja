@@ -1,19 +1,32 @@
 document.addEventListener(
   'DOMContentLoaded',
   function () {
-    document.queryAll('.menu li').forEach(function (li, i, all) {
-      if (i) li.addEventListener('click', this);
-      else this.all = all;
-    }, {
-      dropActive: function (li) {
-        li.classList.remove('active');
+    var arrow = document.createElement('span');
+    arrow.classList.add('arrow');
+    document.queryAll('#powered-by .description p').forEach(
+      function (p, i, all) {
+        function magic(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          all.forEach(function (p, j) {
+            if (j !== i) p.classList.add('hidden');
+          });
+          p.classList.remove('hidden');
+          switch (i) {
+            case 0: arrow.style.left = '10%'; break;
+            case 1: arrow.style.left = '50%'; break;
+            case 2: arrow.style.left = '90%'; break;
+          }
+        }
+        this[i].addEventListener('click', magic);
+        this[i].addEventListener('mouseover', magic);
+        if (!i) {
+          p.parentNode.appendChild(arrow);
+          this[i].dispatchEvent(new CustomEvent('click'));
+        }
       },
-      handleEvent: function (e) {
-        e.stopPropagation();
-        this.all.forEach(this.dropActive);
-        e.currentTarget.classList.add('active');
-      }
-    });
+      document.queryAll('#powered-by li')
+    );
   },
   {once: true}
 );
