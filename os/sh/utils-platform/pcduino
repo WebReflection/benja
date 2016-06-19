@@ -30,18 +30,16 @@ export OS_BACKEND=fbdev-backend.so
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
-  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
-  sync
-  sleep 2
-  if [ "$(uname)" = "Darwin" ]; then
-    echo 'I HAVE NO IDEA WHAT TO DO'
-    exit 1
-  else
-    sudo parted --script $DISK mklabel msdos
-    sudo parted --script --align optimal $DISK mkpart primary ext4 2048s $ROOT_SIZE
-    sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+  if [ ! -d ${OS_INSTALLER_SRC}/../builds/sunxi-bsp ]; then
+    mkdir -p ${OS_INSTALLER_SRC}/../builds
+    cd ${OS_INSTALLER_SRC}/../builds
+    git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
   fi
-  echo 'OK'
+  cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
+  ./configure pcduino
+  make
+  ./scripts/sunxi-media-create.sh ${DISK} ./output/pcduino_hwpack.tar.xz ${ARCHIVE}
+  sync
 }
 
 # returns ordered partitions
@@ -69,18 +67,6 @@ format_sd() {
   local DISK=$1
   local ROOT=$2
   local WWW=$3
-
-  if [ "$(uname)" = "Darwin" ]; then
-    echo 'I HAVE NO IDEA WHAT TO DO'
-    exit 1
-  else
-    yes | sudo mkfs.ext4 "$ROOT"
-    sudo mkfs.vfat "$WWW"
-    sudo dosfslabel "$WWW" BENJA-APP
-  fi
-
-  echo 'OK'
-
 }
 
 # install_os /dev/mmblk0 Archive.gz
@@ -89,15 +75,6 @@ install_os() {
   local DISK=$2
   local BOOT=$3
   local ROOT=$4
-  if [ ! -d ${OS_INSTALLER_SRC}/../builds/sunxi-bsp ]; then
-    mkdir -p ${OS_INSTALLER_SRC}/../builds
-    cd ${OS_INSTALLER_SRC}/../builds
-    git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
-  fi
-  cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
-  ./configure pcduino
-  make
-  # ./scripts/sunxi-media-create.sh ${DISK}  ${ARCHIVE}
 }
 
 # finalize installation
