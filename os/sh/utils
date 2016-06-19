@@ -258,17 +258,3 @@ installFromAUR() {
     icho " [*][g]✔[/] [*]${name}[/] successfully [*]installed[/]"
   fi
 }
-
-
-# PLATFORMS DEFAULTS
-
-# minimal X11 requirements
-configure_platform() {
-  pacman -S --needed --noconfirm xf86-video-fbdev weston
-}
-
-# before rebooting, after whole install
-configure_after() {
-  pacman -S --needed --noconfirm xorg-server xorg-xinit xorg-xset
-  curl -L -s -o "$OS_USER_DIR/.xinitrc" "${OS_REMOTE_FILES}/sh/xinitrc"
-}

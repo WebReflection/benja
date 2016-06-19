@@ -20,24 +20,25 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_KERNEL='linux-imx6'
-export OS_HEADERS='linux-imx6-headers'
-export OS_ARCHIVE='ArchLinuxARM-imx6-cubox-latest.tar.gz'
+export OS_KERNEL='linux-odroid-u2'
+export OS_HEADERS='linux-headers-odroid'
+export OS_ARCHIVE='ArchLinuxARM-odroid-u2-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
-export OS_LD_LIBRARY_PATH=/opt/fsl/lib
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
-  sudo dd if=/dev/zero of=$DISK bs=1024 count=4
+  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
   sync
   sleep 2
   if [ "$(uname)" = "Darwin" ]; then
     echo 'I HAVE NO IDEA WHAT TO DO'
     exit 1
   else
-    sudo sh -c "echo -e 'o\nn\np\n1\n\n+${ROOT_SIZE}\nn\np\n2\n\n\nt\n2\nc\nw\nq\n' | fdisk ${DISK}" > /dev/null
+    sudo parted --script $DISK mklabel msdos
+    sudo parted --script --align optimal $DISK mkpart primary ext4 2048s $ROOT_SIZE
+    sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
   fi
   echo 'OK'
 }
@@ -91,28 +92,25 @@ install_os() {
   sudo mount $ROOT root
   sudo bsdtar -xpf "$ARCHIVE" -C root
   sync
-
-  sudo dd if=root/boot/SPL of=$DISK bs=1K seek=1
-  sudo dd if=root/boot/u-boot.img of=$DISK bs=1K seek=42
+  cd root/boot
+  sudo sh sd_fusing.sh $DISK
   sync
-
+  sleep 2
+  cd ../..
 }
 
 # finalize installation
 unmount_os() {
   local ROOT=$1
-  sudo sed -i 's/pacman -Syu --needed --noconfirm/yes y | pacman -Syu --needed uboot-cubox-i/g' ~/${OS_NAME}-tmp-install/root/root/install
-  sync
   sudo umount $ROOT
 }
 
-# install and configure the platform and its graphic environment
+# install and configure the platform
 configure_before() {
-  sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/uEnv.txt
-  pacman -S --needed --noconfirm weston imx-gpu-viv-fb
+  echo 'optargs=quiet splash loglevel=0' >>/boot/uEnv.txt
+  pacman -S --needed --noconfirm weston
 }
 
-# patch the system after everything else has been installed
 configure_after() {
   echo 'OK'
 }

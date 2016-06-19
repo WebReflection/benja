@@ -234,7 +234,6 @@ HandleLidSwitch=ignore' >>/etc/systemd/logind.conf
 
 # configure common environment variables for all users
 echo "
-LD_LIBRARY_PATH=/usr/lib
 # XDG_RUNTIME_DIR=/run/user/1000 npm start # to avoid sudo
 XDG_RUNTIME_DIR=/tmp
 XDG_CONFIG_HOME=${OS_USER_DIR}/.config
@@ -247,6 +246,11 @@ SDL_VIDEODRIVER=wayland
 GTK_THEME='Adwaita:dark'
 " >>/etc/environment
 
+if [ "${OS_LD_LIBRARY_PATH}" = "" ]; then
+  echo "LD_LIBRARY_PATH=/usr/lib" >>/etc/environment
+else
+  echo "LD_LIBRARY_PATH=/usr/lib:${OS_LD_LIBRARY_PATH}" >>/etc/environment
+fi
 
 
 # make every profile aware of benja global modules

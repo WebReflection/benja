@@ -57,6 +57,14 @@ for tmp in $@; do
       OS_PLATFORM="ODROID-C1"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
+    odroid-u2)
+      OS_PLATFORM="ODROID-U2"
+      OS_PLATFORM_UTILS="${tmp}"
+      ;;
+    odroid-u3)
+      OS_PLATFORM="ODROID-U3"
+      OS_PLATFORM_UTILS="odroid-u2"
+      ;;
     cubox-i)
       OS_PLATFORM="CuBox-i"
       OS_PLATFORM_UTILS="${tmp}"
@@ -99,14 +107,6 @@ for tmp in $@; do
       OS_PLATFORM="ODROID-C2"
       OS_PLATFORM_UTILS="${tmp}"
       ;;
-    tbt-odroid-u2)
-      OS_PLATFORM="ODROID-U2"
-      OS_PLATFORM_UTILS="${tmp}"
-      ;;
-    tbt-odroid-u3)
-      OS_PLATFORM="ODROID-U3"
-      OS_PLATFORM_UTILS="odroid-u2"
-      ;;
     tbt-odroid-xu)
       OS_PLATFORM="ODROID-XU"
       OS_PLATFORM_UTILS="${tmp}"
@@ -145,6 +145,7 @@ if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
  following a list of possible platforms:
   
    rpi2 rpi3
+   odroid-c1
  "
   exit 0
 else
