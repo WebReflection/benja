@@ -24,6 +24,7 @@ export OS_KERNEL='linux-imx6'
 export OS_HEADERS='linux-imx6-headers'
 export OS_ARCHIVE='ArchLinuxARM-imx6-cubox-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=x11-backend.so
 export OS_LD_LIBRARY_PATH=/opt/fsl/lib
 
 # partition_sd /dev/mmblk0 3200M
@@ -116,6 +117,8 @@ configure_before() {
 configure_after() {
   systemctl disable weston-compositor
   rm /etc/systemd/system/weston-compositor
-  sudo -H -u $OS_USER bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
-  sudo -H -u $OS_USER bash -c 'echo "[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx" >> ${OS_USER_DIR}/.bashrc'
+  sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
+  sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/startx"
+  sudo -H -u ${OS_USER} bash -c "cat startx >> ${OS_USER_DIR}/.bashrc"
+  sudo -H -u ${OS_USER} bash -c "rm startx && sync"
 }
