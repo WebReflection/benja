@@ -146,6 +146,7 @@ if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
   
    rpi2 rpi3
    odroid-c1
+   odroid-u2 odroid-u3
    cubox-i
  "
   exit 0
