@@ -36,6 +36,7 @@ partition_sd() {
     git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
   fi
   cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
+  make clean
   git submodule foreach git fetch
   ./configure pcduino
   make
