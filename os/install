@@ -142,10 +142,11 @@ if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
     fi
   done
   echo "
- following a list of possible platforms:
+ following a list of possible ARM platforms:
   
    rpi2 rpi3
    odroid-c1
+   cubox-i
  "
   exit 0
 else
