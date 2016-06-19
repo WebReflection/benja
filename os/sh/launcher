@@ -25,6 +25,10 @@
 # grants access to the local screen
 xhost +local:
 
+if [ -f /usr/bin/xset ]; then
+  xset s off -dpms
+fi
+
 # if there is a package json
 if [ -f ~/app/package.json ]; then
   cd ~/app
