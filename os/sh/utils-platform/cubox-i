@@ -114,6 +114,8 @@ configure_before() {
 
 # patch the system after everything else has been installed
 configure_after() {
-  sed -i "s/weston-launch/startx/" /etc/systemd/system/weston-compositor
-  curl -L -s -o "${OS_USER_DIR}/.xinitrc" "${OS_REMOTE_FILES}/sh/xinitrc"
+  systemctl disable weston-compositor
+  rm /etc/systemd/system/weston-compositor
+  sudo -H -u $OS_USER bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
+  sudo -H -u $OS_USER bash -c 'echo "[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx" >> ${OS_USER_DIR}/.bashrc'
 }

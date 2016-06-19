@@ -66,5 +66,4 @@ xrandr -s ${WIDTH}x${HEIGHT}
 xset s off -dpms
 
 # launch the app
-cd ~/
-./.app-launch
+weston --width=${WIDTH} --height=${HEIGHT}
