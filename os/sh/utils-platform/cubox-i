@@ -24,6 +24,7 @@ export OS_KERNEL='linux-imx6'
 export OS_HEADERS='linux-imx6-headers'
 export OS_ARCHIVE='ArchLinuxARM-imx6-cubox-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=fbdev-backend.so
 export OS_LD_LIBRARY_PATH=/opt/fsl/lib
 
 # partition_sd /dev/mmblk0 3200M
