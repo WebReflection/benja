@@ -54,6 +54,7 @@ mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe mali
   sudo modprobe drm
   sudo modprobe mali_drm
+  sudo modprobe cedar_dev
 fi
 
 if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
