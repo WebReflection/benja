@@ -53,7 +53,7 @@ partition_sd() {
   echo ' resizing partition'
   sleep 2
   PARTITIONS=($(get_partitions $DISK))
-  sudo e2sfsck -f ${PARTITIONS[1]}
+  sudo e2fsck -f ${PARTITIONS[1]}
   sudo resize2fs ${PARTITIONS[1]} $ROOT_SIZE
   sync
   echo ' creating BENJA_APP'
