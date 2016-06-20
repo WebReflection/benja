@@ -40,9 +40,7 @@ partition_sd() {
     git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
   fi
   cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
-  if [ -f ./${HW_PACK} ]; then
-    echo ' using already prepared package'
-  else
+  if [ ! -f ./${HW_PACK} ]; then
     make clean
     git submodule foreach git fetch
     ./configure ${OS_HWPACK}
