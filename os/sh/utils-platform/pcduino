@@ -25,22 +25,29 @@ export OS_HEADERS='linux-headers'
 export OS_ARCHIVE='ArchLinuxARM-armv7-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
 export OS_BACKEND=fbdev-backend.so
+export OS_HWPACK='pcduino'
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
+  local ARCHIVE=$3
+  local HW_PACK=output/${OS_HWPACK}_hwpack.tar.xz
   if [ ! -d ${OS_INSTALLER_SRC}/../builds/sunxi-bsp ]; then
     mkdir -p ${OS_INSTALLER_SRC}/../builds
     cd ${OS_INSTALLER_SRC}/../builds
     git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
   fi
   cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
-  make clean
-  git submodule foreach git fetch
-  ./configure pcduino
-  make
-  ./scripts/sunxi-media-create.sh ${DISK} ./output/pcduino_hwpack.tar.xz ${ARCHIVE}
+  if [ -f ./${HW_PACK} ]; then
+    echo ' using already prepared package'
+  else
+    make clean
+    git submodule foreach git fetch
+    ./configure ${OS_HWPACK}
+    make
+  fi
+  ./scripts/sunxi-media-create.sh ${DISK} ./${HW_PACK} ${ARCHIVE}
   sync
 }
 

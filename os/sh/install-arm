@@ -101,9 +101,18 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
     exit 1
   fi
 
+  if [ -f ~/Downloads/$OS_ARCHIVE ]; then
+    echo "  using $OS_ARCHIVE found in ~/Downloads"
+    TMP_ARCHIVE=~/Downloads/$OS_ARCHIVE
+  else
+    echo "  downloading $OS_ARCHIVE"
+    curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
+    TMP_ARCHIVE=./$OS_ARCHIVE
+  fi
+
   echo ''
   echo '  partitioning'
-  if [ "$(partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE)" != "OK" ]; then
+  if [ "$(partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE")" != "OK" ]; then
     echo ''
     icho " [r][*][WARNING][/] unable to [*]partition[/] ${OS_SDCARD}"
     echo ''
@@ -152,15 +161,6 @@ WantedBy=multi-user.target
 ">${OS_NAME}-disk.service
 
   sed -i "s/clear/export OS_BOOTINTO='${OS_BOOTINTO}';clear/" install
-
-  if [ -f ~/Downloads/$OS_ARCHIVE ]; then
-    echo "  using $OS_ARCHIVE found in ~/Downloads"
-    TMP_ARCHIVE=~/Downloads/$OS_ARCHIVE
-  else
-    echo "  downloading $OS_ARCHIVE"
-    curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
-    TMP_ARCHIVE=./$OS_ARCHIVE
-  fi
 
   echo '  extracting the OS (this might take a while)'
   install_os "$TMP_ARCHIVE" "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]}
