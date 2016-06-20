@@ -50,6 +50,7 @@ partition_sd() {
   fi
   yes y | sudo bash ./scripts/sunxi-media-create.sh ${DISK} ./${HW_PACK} ${ARCHIVE}
   export OS_INTERNAL_ROOT_SIZE="$ROOT_SIZE"
+  echo 'OK'
 }
 
 # returns ordered partitions
@@ -88,11 +89,13 @@ format_sd() {
   sync
   sudo parted --script --align optimal $DISK mkpart primary fat32 $OS_INTERNAL_ROOT_SIZE 100%
   sync
-  PARTITIONS=($(get_partitions $DISK))
-  WWW=${PARTITIONS[-1]}
+  for WWW in $(ls ${DISK}*); do
+    WWW="$WWW"
+  done
   sudo mkfs.vfat "$WWW"
   sudo dosfslabel "$WWW" BENJA-APP
   OS_SDCARD_PARTITIONS[2]="$WWW"
+  echo 'OK'
 }
 
 # install_os /dev/mmblk0 Archive.gz
