@@ -112,13 +112,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   echo ''
   echo '  partitioning'
-  if [ "$(partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE")" != "OK" ]; then
-    echo ''
-    icho " [r][*][WARNING][/] unable to [*]partition[/] ${OS_SDCARD}"
-    echo ''
-    exit 1
-  fi
-
+  partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE"
   sync
 
   export OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
