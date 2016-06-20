@@ -126,20 +126,20 @@ if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
   EndSection
   ' > ~/.sunxi-mali/99-fbturbo.conf
   sudo mv ~/.sunxi-mali/99-fbturbo.conf /etc/X11/xorg.conf.d/99-fbturbo.conf
-
-  sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
-  for fb in $(ls /dev/fb*); do
-    sudo chmod 666 $fb
-  done
-
-  echo 'KERNEL=="mali", MODE="0660", GROUP="video"
-  KERNEL=="ump", MODE="0660", GROUP="video"
-  KERNEL=="disp", MODE="0660", GROUP="video"
-  KERNEL=="g2d", MODE="0660", GROUP="video"
-  KERNEL=="fb*", MODE="0660", GROUP="video"
-  KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > ~/.sunxi-mali/50-mali.rules
-  sudo mv ~/.sunxi-mali/50-mali.rules /etc/udev/rules.d/50-mali.rules
 fi
+
+sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
+for fb in $(ls /dev/fb*); do
+  sudo chmod 666 $fb
+done
+
+echo 'KERNEL=="mali", MODE="0660", GROUP="video"
+KERNEL=="ump", MODE="0660", GROUP="video"
+KERNEL=="disp", MODE="0660", GROUP="video"
+KERNEL=="g2d", MODE="0660", GROUP="video"
+KERNEL=="fb*", MODE="0660", GROUP="video"
+KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > ~/.sunxi-mali/50-mali.rules
+sudo mv ~/.sunxi-mali/50-mali.rules /etc/udev/rules.d/50-mali.rules
 
 if [ ! -d ~/.sunxi-mali/libcedrus ]; then
   cd ~/.sunxi-mali
@@ -185,4 +185,3 @@ fi
 if [ -f /boot/script.bin ]; then
   sudo umount /boot
 fi
-sudo reboot
