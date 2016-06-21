@@ -8,8 +8,24 @@ html {
   box-sizing: inherit;
 }
 
+html, body {
+  color: #aaaeb2;
+  background-color: #2b353e;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+}
+
 .hidden {
   display: none;
+}
+
+.no-us {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 html, body, header, main, footer, h1, h2, h3, h4, h5, h6, #powered-by, #powered-by * {
@@ -17,44 +33,43 @@ html, body, header, main, footer, h1, h2, h3, h4, h5, h6, #powered-by, #powered-
   padding: 0;
 }
 
-h1, h2, h4, h6, main, #powered-by li {
+header, h1, h2, h4, h6, main, #powered-by li {
   text-align: center;
-}
-
-html, body {
-  color: #aaadb2;
-  background-color: #2b353e;
-  font-family: 'Open Sans', sans-serif;
 }
 
 header {
   background-color: #34414a;
   min-height: 514px;
-  background-image: url(/img/benja-dark.png);
-  background-repeat: no-repeat;
-  background-position: center 32px;
-  background-size: 116px;
-  padding-top: 208px;
+  background-image: url(/img/benja-pattern.png);
+}
+
+header > img {
+  margin: 42px auto;
 }
 
 header, main, #powered-by {
   border-bottom: 1px solid #1b2228;
 }
 
-h1 strong {
+h1 {
+  font-size: 32px;
+  letter-spacing: 1px;
   color: #fff;
+}
+
+h1 strong {
   font-weight: 400;
 }
 
 h1 span {
-  color: #cdced2;
   font-weight: 300;
 }
 
 h2 {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 18px;
   margin-top: 12px;
+  color: #aeb3b7;
 }
 
 h2 abbr {
@@ -83,6 +98,7 @@ main > section,
 
 main > section > p,
 #powered-by .description {
+  font-weight: 400;
   line-height: 28px;
 }
 
@@ -121,7 +137,6 @@ footer {
 }
 
 #powered-by .description {
-  color: #979ea4;
   background: #313e47;
   margin: 0 auto;
   max-width: 842px;
@@ -147,21 +162,20 @@ footer {
 }
 
 h3 {
-  color: #d7d7d9;
-  font-size: 22px;
-  font-weight: 800;
+  color: #d5d7d8;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 h4 {
-  color: #636a70;
-  font-size: 14px;
-  font-weight: 800;
+  color: #646a6f;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 h6 {
-  color: #aaafb3;
   line-height: 50px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -169,9 +183,16 @@ h6 {
   #carousel {
     width: 100%;
   }
+  header {
+    min-height: 400px;
+  }
+  header > img {
+    margin: 28px auto 16px auto;
+    height: 92px;
+  }
   h1 strong:after {
     content: '.';
-    color: #cdced2;
+    font-weight: 300;
   }
   h1 span {
     display: none;
