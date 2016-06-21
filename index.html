@@ -16,7 +16,7 @@
   </head>
   <body>
     <header>
-      <img class="no-us" alt="BENJA" src="img/benja-dark.png" height="128px">
+      <img class="no-us" alt="BENJA" src="img/benja-dark.svg" onerror="this.src=this.src.replace('.svg','.png')" height="128px">
       <h1>
         <strong>B</strong><span>ootable</span>
         <strong>E</strong><span>lectron</span>
@@ -31,17 +31,16 @@
     <main>
       <iframe id="carousel" width="560" height="315" src="https://www.youtube.com/embed/AsVvoy2K8d8" allowfullscreen frameborder="0"></iframe>
       <section id="simplified-web-kiosk">
-        <h3>Simplified Kiosk Bootstrap</h3>
+        <h3>A Web Kiosk Bootstrap</h3>
         <p>
           B.E.N.J.A. is an installer that makes you focus on what matters: developing amazing projects!<br>
           You don't need to know much about Linux, it's already prepared for you.<br>
-          You don't need to configure drivers or UI: plug the micro SD card and just play.<br>
-          You can edit a project remotely, or directly on your computer.
-          You can make the project portable simply copying it around.
+          You don't need to configure drivers or UI: it's a <em>plug &amp; make</em> micro SD card.<br>
+          You can edit a project remotely, or directly on your computer and can make it portable simply copying it around.
         </p>
       </section>
       <section id="internet-of-things">
-        <h3>A Web driven Internet of Things</h3>
+        <h3>An Inter-Web of Things</h3>
         <p>
           Differently from every other platform,
           B.E.N.J.A. provides a way for makers to create via Web interface.<br>
@@ -54,18 +53,19 @@
         <h3>Beyond the Web</h3>
         <p>
           The B.E.N.J.A. environment doesn't have usual Web constrains:
-          you have full Hardware and Operating System acces!<br>
+          you have full Hardware access as well as all Operating System features!<br>
           It's NodeJS on top of Linux, delivered through an Electron instance
-          that runs on the lightweight, <a href="https://wayland.freedesktop.org/">Wayland</a> driven, <a href="https://wayland.freedesktop.org/building.html">Weston</a> compositor.
+          that runs on the lightweight, <a href="https://wayland.freedesktop.org/">Wayland</a> driven, <a href="https://wayland.freedesktop.org/building.html">Weston</a> compositor,
+          falling back to a bare minimum accelerated Xorg.
         </p>
       </section>
     </main>
     <div id="powered-by">
       <h4>POWERED BY</h4>
       <ul class="no-us">
-        <li><img alt="Arch Linux" src="/img/archlinux.svg"></li>
-        <li><img alt="Node JS" src="/img/nodejs.svg"></li>
-        <li><img alt="Electron" src="/img/electron.svg"></li>
+        <li><img alt="Arch Linux" src="/img/archlinux.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
+        <li><img alt="Node JS" src="/img/nodejs.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
+        <li><img alt="Electron" src="/img/electron.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
       </ul>
       <div class="description">
         <p>
