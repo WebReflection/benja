@@ -72,7 +72,8 @@ h2 {
   color: #aeb3b7;
 }
 
-h2 abbr {
+h2 abbr[title] {
+  text-decoration: none;
   border-bottom: 1px dotted #2b353e;
   cursor: help;
 }
@@ -88,7 +89,6 @@ main > section {
 }
 
 main {
-  display: block;
   padding: 0 28px 42px 28px;
 }
 
@@ -108,7 +108,7 @@ footer {
 }
 
 #carousel {
-  margin-top: -160px auto auto auto;
+  margin: -160px auto auto auto;
   max-width: 560px;
 }
 
