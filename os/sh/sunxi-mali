@@ -54,7 +54,6 @@ mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe mali
   sudo modprobe drm
   sudo modprobe mali_drm
-  sudo modprobe cedar_dev
 fi
 
 if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
@@ -185,4 +184,32 @@ fi
 
 if [ -f /boot/script.bin ]; then
   sudo umount /boot
+fi
+
+if [ ! -f /etc/systemd/system/mali.service ]; then
+  TMP_MALI_SERVICE='[Unit]
+Description=reachable /dev/ump and /dev/mali
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/chmod 666 /dev/mali
+ExecStart=/usr/bin/chmod 666 /dev/ump
+ExecStart=/usr/bin/chmod 666 /dev/disp
+ExecStart=/usr/bin/chmod 666 /dev/g2d
+ExecStart=/usr/bin/chmod 666 /dev/cedar_dev'
+
+for TMP_FB in $(ls /dev/fb*); do
+  TMP_MALI_SERVICE="${TMP_MALI_SERVICE}
+ExecStart=/usr/bin/chmod 666 ${TMP_FB}"
+done
+
+TMP_MALI_SERVICE="${TMP_MALI_SERVICE}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target"
+  echo "${TMP_MALI_SERVICE}" > mali.service
+  sudo mv mali.service /etc/systemd/system/mali.service
+  sudo systemctl enable mali.service
+  sudo systemctl start mali.service
 fi
