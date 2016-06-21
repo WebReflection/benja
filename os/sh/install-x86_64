@@ -397,6 +397,8 @@ if [ ! -f install-common ]; then
 fi
 . ./install-common
 
+systemctl enable ntpd.service
+
 rm /install-common
 rm /bash-info
 rm /utils
