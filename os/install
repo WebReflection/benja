@@ -182,6 +182,11 @@ else
       sync
     fi
 
+    if [ ! -f sunxi-media-create.sh ]; then
+      curl -LOs "${OS_REMOTE_FILES}/sh/sunxi-media-create.sh"
+      sync
+    fi
+
     export OS_PREPARE_SD=true
 
     . install-arm

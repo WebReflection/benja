@@ -65,7 +65,6 @@ get_partitions() {
       fi
     fi
   done
-
   echo "${BOOT} ${ROOT} ${WWW}"
 }
 

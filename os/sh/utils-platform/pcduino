@@ -47,7 +47,8 @@ partition_sd() {
     make
   fi
   sync
-  sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+  cd ${OS_REMOTE_FILES}
+  sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
 }
 
 # returns ordered partitions
