@@ -166,6 +166,8 @@ WantedBy=multi-user.target
   sudo mv {install,install-common,bash-info,utils,utils-platform,wifi-setup} root/root/
   sudo chmod a+x root/root/install
   sudo chmod a+x root/root/wifi-setup
+  sudo sh -c 'echo "HandleSuspendKey=ignore">>root/etc/systemd/logind.conf'
+  sudo sh -c 'echo "HandleLidSwitch=ignore">>root/etc/systemd/logind.conf'
   sync
   echo '  cleaning up'
   sync

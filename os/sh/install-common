@@ -253,6 +253,7 @@ else
 fi
 
 
+
 # make every profile aware of benja global modules
 echo "
 PATH=$PATH:${OS_USER_DIR}/.npm-packages/bin
