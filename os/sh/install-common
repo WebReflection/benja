@@ -272,7 +272,7 @@ rm -f ${OS_USER_DIR}/${OS_NAME}-logo
 
 
 
-# autostart common services
+# enable common services
 systemctl enable sshd
 systemctl enable dhcpcd
 systemctl enable ntpd.service
