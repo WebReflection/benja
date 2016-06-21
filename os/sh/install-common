@@ -270,6 +270,9 @@ sudo -H -u $OS_USER bash -c "OS_BACKEND='${OS_BACKEND}' OS_APP_LAUNCHER='${OS_AP
 rm install-user
 rm -f ${OS_USER_DIR}/${OS_NAME}-logo
 
+
+
+# autostart common services
+systemctl enable sshd
 systemctl enable dhcpcd
 systemctl enable ntpd.service
-systemctl enable sshd
