@@ -83,12 +83,12 @@ partitionSD () {
 		die "$dev: failed to zero the first MB"
 
 	x=$(expr $BOOT_SIZE \* 2048)
-  ext4=$(expr $ROOT_SIZE \* 2048)
+	ext4=$(expr $ROOT_SIZE \* 2048)
 
 	sfdisk --in-order -L -uS "$dev" <<-EOT
 	2048,$x,c
 	,$ext4,L
-  ,,c
+	,,c
 	EOT
 
 	[ $? -eq 0 ] ||
