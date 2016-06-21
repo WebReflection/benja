@@ -88,6 +88,7 @@ main > section {
 }
 
 main {
+  display: block;
   padding: 0 28px 42px 28px;
 }
 
@@ -107,7 +108,7 @@ footer {
 }
 
 #carousel {
-  margin: -160px auto auto auto;
+  margin-top: -160px auto auto auto;
   max-width: 560px;
 }
 
