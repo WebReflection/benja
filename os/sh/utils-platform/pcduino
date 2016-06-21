@@ -123,5 +123,8 @@ configure_after() {
   mount /dev/mmcblk0p1 /boot
   sudo -H -u ${OS_USER} bash -c "bash sunxi-mali"
   sync && sleep 2
+  sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/startx"
+  sudo -H -u ${OS_USER} bash -c "cat startx >> ${OS_USER_DIR}/.bashrc"
+  sudo -H -u ${OS_USER} bash -c "rm startx && sync"
   sudo -H -u ${OS_USER} bash -c "rm sunxi-mali ; rm cpupower"
 }

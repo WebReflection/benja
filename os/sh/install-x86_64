@@ -397,10 +397,6 @@ if [ ! -f install-common ]; then
 fi
 . ./install-common
 
-systemctl enable dhcpcd
-systemctl enable ntpd.service
-systemctl enable sshd
-
 rm /install-common
 rm /bash-info
 rm /utils
