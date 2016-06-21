@@ -130,7 +130,6 @@ umount_sd() {
 
   local CHOICE=
   local DISK="${1}"
-
   local POSSIBLEDISKS="$(get_drives $DISK)"
 
   if [ "$POSSIBLEDISKS" = "" ]; then
