@@ -47,7 +47,7 @@ partition_sd() {
     make
   fi
   sync
-  cd ${OS_REMOTE_FILES}
+  cd ${OS_INSTALLER_SRC}
   yes y | sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
 }
 
