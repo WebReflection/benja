@@ -48,7 +48,7 @@ partition_sd() {
   fi
   sync
   cd ${OS_REMOTE_FILES}
-  sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
+  yes y | sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
 }
 
 # returns ordered partitions

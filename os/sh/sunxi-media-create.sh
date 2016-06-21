@@ -88,6 +88,7 @@ partitionSD () {
 	sfdisk --in-order -L -uS "$dev" <<-EOT
 	2048,$x,c
 	,$ext4,L
+  ,,c
 	EOT
 
 	[ $? -eq 0 ] ||
