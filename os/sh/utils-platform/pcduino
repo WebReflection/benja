@@ -20,8 +20,8 @@
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ##
 
-export OS_KERNEL='linux'
-export OS_HEADERS='linux-headers'
+export OS_KERNEL='linux-armv7'
+export OS_HEADERS='linux-armv7-headers'
 export OS_ARCHIVE='ArchLinuxARM-armv7-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
 export OS_BACKEND=fbdev-backend.so

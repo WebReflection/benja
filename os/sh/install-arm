@@ -114,7 +114,6 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   echo '  partitioning'
   partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE"
 
-  # . utils-platform
   sync && sleep 2
 
   export OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
@@ -197,6 +196,25 @@ if [ "$USER" != "root" ]; then
   echo ' you must be root to perform this action'
   exit 1
 fi
+
+# check network connection
+curl -LOs benja.io/index.html
+if [ ! -f index.html ]; then
+  if [ "$(ip addr | grep ': eth')" != "" ]; then
+    echo ' activating ethernet via dhcpcd ...'
+    dhcpcd
+    sleep 2
+    curl -LOs benja.io/index.html
+  fi
+  if [ ! -f index.html ]; then
+    echo ' a network connection is needed.'
+    echo ' Try using wifi-setup or connect a cable.'
+    exit 1
+  fi
+fi
+echo ' network available'
+rm index.html
+sleep 2
 
 if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ] || [ ! -f install-common ]; then
   echo ' something is wrong here.'
