@@ -267,11 +267,11 @@ pacman-optimize
 
 # drop this very same file
 rm $0
-rm bash-info
-rm utils
-rm utils-platform
-rm ${OS_NAME}-platform
-rm install-common
+rm /root/bash-info
+rm /root/utils
+rm /root/utils-platform
+rm /root/${OS_NAME}-platform
+rm /root/install-common
 
 # boot into B.E.N.J.A.
 reboot

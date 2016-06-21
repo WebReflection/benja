@@ -117,7 +117,7 @@ configure_before() {
 # patch the system after everything else has been installed
 configure_after() {
   systemctl disable weston-compositor
-  rm /etc/systemd/system/weston-compositor
+  rm /etc/systemd/system/weston-compositor.service
   sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
   sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/sunxi-mali"
   mount /dev/mmcblk0p1 /boot
