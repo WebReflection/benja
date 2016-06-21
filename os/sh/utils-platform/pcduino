@@ -122,4 +122,6 @@ configure_after() {
   sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/sunxi-mali"
   mount /dev/mmcblk0p1 /boot
   sudo -H -u ${OS_USER} bash -c "bash sunxi-mali"
+  sync && sleep 2
+  sudo -H -u ${OS_USER} bash -c "rm sunxi-mali ; rm cpupower"
 }
