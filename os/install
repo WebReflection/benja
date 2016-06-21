@@ -71,7 +71,7 @@ for tmp in $@; do
       ;;
     pcduino)
       OS_PLATFORM="pcDuino"
-      OS_PLATFORM_UTILS="${tmp}"
+      OS_PLATFORM_UTILS="pcduino"
       ;;
     esac
   fi

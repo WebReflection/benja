@@ -38,7 +38,6 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
 
   if [ ! -f utils-platform ]; then
     curl -Ls -o utils-platform "${OS_REMOTE_FILES}/sh/utils-platform/${OS_PLATFORM_UTILS}"
-    sync
   fi
   sync && sleep 1
   . utils-platform
