@@ -49,6 +49,8 @@ partition_sd() {
   sync
   cd ${OS_INSTALLER_SRC}
   yes y | sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
+  cd ${OS_INSTALLER_SRC}
+  sync
 }
 
 # returns ordered partitions
