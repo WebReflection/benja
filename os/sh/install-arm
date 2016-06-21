@@ -113,9 +113,9 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   echo ''
   echo '  partitioning'
   partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE"
-  sync
-  . utils-platform
-  sleep 2
+
+  # . utils-platform
+  sync && sleep 2
 
   export OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
 

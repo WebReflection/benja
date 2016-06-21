@@ -102,7 +102,9 @@ install_os() {
 
 # finalize installation
 unmount_os() {
-  local ROOT=$1
+  local BOOT=$1
+  local ROOT=$2
+  sudo umount $BOOT
   sudo umount $ROOT
 }
 
