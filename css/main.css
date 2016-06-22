@@ -8,6 +8,17 @@ html {
   box-sizing: inherit;
 }
 
+quote {
+  font-style: italic;
+  margin-right: 2px;
+}
+quote:before {
+  content: '\201c';
+}
+quote:after {
+  content: '\201d';
+}
+
 html, body {
   color: #aaaeb2;
   background-color: #2b353e;
@@ -26,6 +37,15 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  cursor: default;
+}
+
+.t-all {
+  -webkit-transition: all .35s ease-in-out;
+  -moz-transition: all .35s ease-in-out;
+  -ms-transition: all .35s ease-in-out;
+  -o-transition: all .35s ease-in-out;
+  transition: all .35s ease-in-out;
 }
 
 html, body, header, main, footer, h1, h2, h3, h4, h5, h6, #powered-by, #powered-by * {
@@ -98,7 +118,8 @@ main > section,
 }
 
 main > section > p,
-#powered-by .description {
+#powered-by .description,
+#carousel .board {
   font-weight: 400;
   line-height: 28px;
 }
@@ -108,8 +129,123 @@ footer {
 }
 
 #carousel {
+  position: relative;
   margin: -160px auto auto auto;
-  max-width: 560px;
+  max-width: 760px;
+  min-height: 320px;
+}
+
+#carousel .scene-3d {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-perspective: 920px;
+  -moz-perspective: 920px;
+  -ms-perspective: 920px;
+  perspective: 920px;
+}
+
+#carousel .skeweed-bg {
+  width: 100%;
+  height: 100%;
+  background-color: #1b2228;
+  -webkit-animation: hypno 10s infinite;
+  -moz-animation: hypno 10s infinite;
+  animation: hypno 10s infinite ease-in-out;
+}
+
+@-webkit-keyframes hypno {
+  0% { -webkit-transform: rotateY(-5deg) translateX(-10px); }
+  50% { -webkit-transform: rotateY(-25deg) translateX(-40px); }
+  100% { -webkit-transform: rotateY(-5deg) translateX(-10px); }
+}
+
+@-moz-keyframes hypno {
+  0% { -moz-transform: rotateY(-5deg) translateX(-10px); }
+  50% { -moz-transform: rotateY(-25deg) translateX(-40px); }
+  100% { -moz-transform: rotateY(-5deg) translateX(-10px); }
+}
+
+@keyframes hypno {
+  0% { transform: rotateY(-5deg) translateX(-10px); }
+  50% { transform: rotateY(-25deg) translateX(-40px); }
+  100% { transform: rotateY(-5deg) translateX(-10px); }
+}
+
+#carousel .skeweed-bg:before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0;
+  height: 0;
+  margin-left: -29px;
+  margin-top: -30px;
+  border-bottom: 30px solid transparent;
+  border-top: 30px solid transparent;
+  border-right: 30px solid #1b2228;
+}
+
+#carousel .skeweed-bg:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 0;
+  height: 0;
+  margin-right: -19px;
+  margin-top: -20px;
+  border-bottom: 20px solid transparent;
+  border-top: 20px solid transparent;
+  border-left: 20px solid #1b2228;
+}
+
+/*
+#carousel .skeweed-bg:hover:before {
+  border-right-color: #000;
+}
+#carousel .skeweed-bg:hover:after {
+  border-left-color: #000;
+}
+*/
+
+#carousel .board {
+  position: relative;
+  padding: 28px 28px 0 40%;
+  background: transparent url(/img/boards/rpi2.png) center left no-repeat;
+  background-size: auto 50%;
+  text-align: left;
+  color: #aeb3b7;
+}
+
+#carousel .board strong {
+  color: #d5d7d8;
+  font-weight: 400;
+  font-size: 21px;
+  display: block;
+  text-align: center;
+}
+
+#carousel .board > a {
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  padding: 8px;
+  margin-top: 16px;
+  background-color: #212a31;
+  border-radius: 4px;
+}
+
+#carousel .board > a:hover {
+  background-color: #2b353e;
+}
+
+#carousel .board > a.disabled {
+  color: #313e47;
 }
 
 #powered-by {
@@ -150,16 +286,11 @@ footer {
   position: absolute;
   top: -10px;
   margin-left: -17px;
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid #313e47;
-  -webkit-transition: all .35s ease-in-out;
-  -moz-transition: all .35s ease-in-out;
-  -ms-transition: all .35s ease-in-out;
-  -o-transition: all .35s ease-in-out;
-  transition: all .35s ease-in-out;
 }
 
 h3 {
@@ -180,9 +311,39 @@ h6 {
   font-weight: 600;
 }
 
+@media (max-width: 719px) {
+  #carousel .board {
+    padding: 28px 28px 0 43%;
+    background-size: auto 47%;
+  }
+}
+
 @media (max-width: 639px) {
-  #carousel {
-    width: 100%;
+  #carousel .skeweed-bg:before,
+  #carousel .skeweed-bg:after {
+    display: none;
+  }
+  @-webkit-keyframes hypno {
+    0% { -webkit-transform: rotateY(-5deg) translateX(0px); }
+    50% { -webkit-transform: rotateY(-20deg) translateX(-10px); }
+    100% { -webkit-transform: rotateY(-5deg) translateX(0px); }
+  }
+
+  @-moz-keyframes hypno {
+    0% { -moz-transform: rotateY(-5deg) translateX(0px); }
+    50% { -moz-transform: rotateY(-20deg) translateX(-10px); }
+    100% { -moz-transform: rotateY(-5deg) translateX(0px); }
+  }
+
+  @keyframes hypno {
+    0% { transform: rotateY(-5deg) translateX(0px); }
+    50% { transform: rotateY(-20deg) translateX(-10px); }
+    100% { transform: rotateY(-5deg) translateX(0px); }
+  }
+  #carousel .board {
+    padding: 64px 28px 14px 28px;
+    background: transparent url(/img/boards/rpi2.png) center 14px no-repeat;
+    background-size: auto 40px;
   }
   header {
     min-height: 400px;

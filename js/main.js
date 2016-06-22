@@ -2,7 +2,7 @@ document.addEventListener(
   'DOMContentLoaded',
   function () {
     var arrow = document.createElement('span');
-    arrow.classList.add('arrow');
+    arrow.classList.add('arrow', 't-all');
     document.queryAll('#powered-by .description p').forEach(
       function (p, i, all) {
         function magic(e) {
