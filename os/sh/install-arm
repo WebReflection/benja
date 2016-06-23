@@ -101,13 +101,20 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
     exit 1
   fi
 
-  if [ -f ~/Downloads/$OS_ARCHIVE ]; then
+  if [ -f ~/Downloads/${OS_ARCHIVE} ]; then
     echo "  using $OS_ARCHIVE found in ~/Downloads"
-    TMP_ARCHIVE=~/Downloads/$OS_ARCHIVE
+    TMP_ARCHIVE=~/Downloads/${OS_ARCHIVE}
   else
     echo "  downloading $OS_ARCHIVE"
     curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
     TMP_ARCHIVE=${OS_INSTALLER_SRC}/$OS_ARCHIVE
+    if [ -d ~/Downloads ]; then
+      read -n1 -r -p "$(icho "  would like to save [*]${OS_ARCHIVE}[/] into [*]~/Downloads[/]? [Y/n]")" CHOICE
+      if [[ $? -eq 0 ]] || [ "$CHOICE" = "y" ] || [ "$CHOICE" = "Y" ]; then
+        mv ${TMP_ARCHIVE} ~/Downloads/${OS_ARCHIVE}
+        TMP_ARCHIVE=~/Downloads/${OS_ARCHIVE}
+      fi
+    fi
   fi
 
   echo ''
