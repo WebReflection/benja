@@ -81,9 +81,9 @@ for tmp in $@; do
       OS_PLATFORM="pcDuino"
       OS_PLATFORM_UTILS="pcduino"
       ;;
-    cubieboard-2)
+    cubieboard2)
       OS_PLATFORM="Cubieboard 2"
-      OS_PLATFORM_UTILS="cubieboard-2"
+      OS_PLATFORM_UTILS="cubieboard2"
       ;;
     esac
   fi

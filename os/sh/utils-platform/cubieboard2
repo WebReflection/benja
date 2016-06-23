@@ -25,7 +25,7 @@ export OS_HEADERS='linux-armv7-headers'
 export OS_ARCHIVE='ArchLinuxARM-armv7-latest.tar.gz'
 export OS_MAX_RESOLUTION=1280x720
 export OS_BACKEND=fbdev-backend.so
-export OS_HWPACK='cubieboard-2'
+export OS_HWPACK='cubieboard2'
 
 # partition_sd /dev/mmblk0 3200M
 partition_sd() {
