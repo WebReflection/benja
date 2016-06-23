@@ -107,7 +107,7 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
   else
     echo "  downloading $OS_ARCHIVE"
     curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
-    TMP_ARCHIVE=./$OS_ARCHIVE
+    TMP_ARCHIVE=${OS_INSTALLER_SRC}/$OS_ARCHIVE
   fi
 
   echo ''
