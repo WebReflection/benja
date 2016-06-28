@@ -1,0 +1,286 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+if [ "${OS_PREPARE_SD}" = "true" ]; then
+
+  if [ "${OS_SDCARD}" = "" ]; then
+    echo ''
+    icho " [r][*]missing target disk[/]"
+    echo ''
+    exit 1
+  fi
+
+  if [ -f ${OS_INSTALLER_SRC}/../os/sh/utils-platform/${OS_PLATFORM_UTILS} ]; then
+    echo ' using local platform file'
+    cp ${OS_INSTALLER_SRC}/../os/sh/utils-platform/${OS_PLATFORM_UTILS} ./utils-platform
+  fi
+
+  if [ ! -f utils-platform ]; then
+    curl -Ls -o utils-platform "${OS_REMOTE_FILES}/sh/utils-platform/${OS_PLATFORM_UTILS}"
+  fi
+  sync && sleep 1
+  . utils-platform
+
+  export OS_FULL_LOGO=" 
+  [*]${OS_PLATFORM}[/]${OS_LOGO}  ${OS_VERSION}
+"
+
+  icho "${OS_FULL_LOGO}
+  using [*]${OS_ARCHIVE}[/]
+  
+  verifying [*]${OS_SDCARD}[/]"
+
+  if [ "$OS_KERNEL" = "" ] || [ "$OS_HEADERS" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
+    echo ''
+    icho " [r][*]broken configuration[/]: ${OS_PLATFORM_UTILS}"
+    echo ''
+    exit 1
+  fi
+
+  # verify sudo
+  if [ "$(user_is_authorized)" != "OK" ]; then
+    echo ''
+    icho ' [r][*]sudo privileges are needed[/] in order to prepare the SD'
+    echo ''
+    exit 1
+  fi
+
+  # umount sd card, exit if there are problems
+  if [ "$(umount_sd "$OS_SDCARD")" != "OK" ]; then
+    echo ''
+    icho " [r][*]invalid SD target[/]: ${OS_SDCARD}"
+    echo ''
+    exit 1
+  fi
+
+  # verify and format the SD card
+  TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
+  TMP_ROOT_SIZE="6000000"
+
+  if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
+    TMP_ROOT_SIZE="3800M"
+  else
+    TMP_ROOT_SIZE="6000M"
+  fi
+
+  echo "  SD card total space: $TMP_SD_SIZE"
+  icho "  creating a root partition of [*]$TMP_ROOT_SIZE[/]"
+
+  echo ''
+  icho " [r][*][WARNING][/]"
+  icho "  disk [o]${OS_SDCARD}[/] will be completely [*]erased[/]"
+  echo "  and every data in it will be lost."
+  echo ''
+  read -n1 -r -p "$(icho "  prepare [*]${OS_PLATFORM}[/] and erase [*]${OS_SDCARD}[/]? [y/N]")" CHOICE
+
+  if [[ $? -ne 0 ]] || [ "$CHOICE" != "y" ]; then
+    echo ''
+    echo '  bye bye'
+    echo ''
+    exit 1
+  fi
+
+  if [ -f ~/Downloads/${OS_ARCHIVE} ]; then
+    echo "  using $OS_ARCHIVE found in ~/Downloads"
+    TMP_ARCHIVE=~/Downloads/${OS_ARCHIVE}
+  else
+    echo "  downloading $OS_ARCHIVE"
+    curl -LO "http://os.archlinuxarm.org/os/${OS_ARCHIVE}"
+    TMP_ARCHIVE=${OS_INSTALLER_SRC}/$OS_ARCHIVE
+    if [ -d ~/Downloads ]; then
+      read -n1 -r -p "$(icho "  would like to save [*]${OS_ARCHIVE}[/] into [*]~/Downloads[/]? [Y/n]")" CHOICE
+      if [[ $? -eq 0 ]] || [ "$CHOICE" = "y" ] || [ "$CHOICE" = "Y" ]; then
+        mv ${TMP_ARCHIVE} ~/Downloads/${OS_ARCHIVE}
+        TMP_ARCHIVE=~/Downloads/${OS_ARCHIVE}
+      fi
+    fi
+  fi
+
+  echo ''
+  echo '  partitioning'
+  partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE "$TMP_ARCHIVE"
+
+  sync && sleep 2
+
+  export OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
+
+  echo '  formatting'
+  if [ "$(format_sd "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]})" = "" ]; then
+    echo ''
+    icho " [r][*][WARNING][/] unable to [*]format[/] ${OS_SDCARD}"
+    echo ''
+    exit 1
+  fi
+
+  sync
+
+  echo '  preparing first boot'
+
+  mkdir -p ~/${OS_NAME}-tmp-install
+
+  sudo cp bash-info ~/${OS_NAME}-tmp-install/bash-info
+  sudo cp install-arm ~/${OS_NAME}-tmp-install/install
+  sudo cp install-common ~/${OS_NAME}-tmp-install/install-common
+  sudo cp utils ~/${OS_NAME}-tmp-install/utils
+  sudo cp utils-platform ~/${OS_NAME}-tmp-install/utils-platform
+
+  cd ~/${OS_NAME}-tmp-install
+  curl -LOs "${OS_REMOTE_FILES}/sh/wifi-setup"
+
+  echo "${OS_PLATFORM}" >${OS_NAME}-platform
+
+  echo "[Unit]
+Description=${OS_NAME} ${OS_USER_DIR}/app disk
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount ${OS_SDCARD_PARTITIONS[-1]} ${OS_USER_DIR}/app -o uid=${OS_USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">${OS_NAME}-disk.service
+
+  sed -i "s/clear/export OS_BOOTINTO='${OS_BOOTINTO}';clear/" install
+
+  echo '  extracting the OS (this might take a while)'
+  install_os "$TMP_ARCHIVE" "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]}
+
+  echo '  moving prepared files'
+  sudo mv ${OS_NAME}-disk.service root/etc/systemd/system/${OS_NAME}-disk.service
+  sudo mv ${OS_NAME}-platform root/root/${OS_NAME}-platform
+  sudo mv {install,install-common,bash-info,utils,utils-platform,wifi-setup} root/root/
+  sudo chmod a+x root/root/install
+  sudo chmod a+x root/root/wifi-setup
+  sudo sh -c 'echo "HandleSuspendKey=ignore">>root/etc/systemd/logind.conf'
+  sudo sh -c 'echo "HandleLidSwitch=ignore">>root/etc/systemd/logind.conf'
+  sync
+  echo '  cleaning up'
+  sync
+  unmount_os ${OS_SDCARD_PARTITIONS[*]}
+  cd ~/
+  sync
+  sleep 1
+  sudo rm -rf ~/${OS_NAME}-tmp-install
+
+  icho "
+Please [*]remove the SD card[/] and boot it via ${OS_PLATFORM}.
+Once logged in as user [*]root[/] with password [*]root[/]
+simply write [*]./install[/] and wait for it to reboot.
+
+Please note that [*]a network connection is necessary[/]
+and the first intallation might  take a while.
+
+[*]Thanks for using ${OS_NAME}[/]
+
+"
+
+  rm -r "${OS_INSTALLER_SRC}"
+  exit 0
+
+fi
+
+if [ "$USER" != "root" ]; then
+  echo ' you must be root to perform this action'
+  exit 1
+fi
+
+# check network connection
+curl -LOs benja.io/index.html
+if [ ! -f index.html ]; then
+  if [ "$(ip addr | grep ': eth')" != "" ]; then
+    echo ' activating ethernet via dhcpcd ...'
+    dhcpcd
+    sleep 2
+    curl -LOs benja.io/index.html
+  fi
+  if [ ! -f index.html ]; then
+    echo ' a network connection is needed.'
+    echo ' Try using wifi-setup or connect a cable.'
+    exit 1
+  fi
+fi
+echo ' network available'
+rm index.html
+sleep 2
+
+if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ] || [ ! -f install-common ]; then
+  echo ' something is wrong here.'
+  echo ' please visit https://benja.io/ to know how to install'
+  exit 1
+fi
+
+. ./bash-info
+. ./utils
+. ./utils-platform
+
+export OS_PLATFORM=$(cat ${OS_NAME}-platform)
+export OS_FULL_LOGO=" 
+  [*]${OS_PLATFORM}[/]${OS_LOGO}  ${OS_VERSION}
+"
+
+
+icho "[*]${OS_PLATFORM}[/]${OS_INSTALLER_LOGO}
+ "
+
+echo ' trying to update system clock'
+ntpdate pool.ntp.org > /dev/null 2>&1
+timedatectl set-local-rtc 1 > /dev/null 2>&1
+
+# updating system
+echo ' updating core and kernel (this might take a while)'
+pacman -Syu --needed --noconfirm ${OS_KERNEL} ${OS_HEADERS} cpupower
+
+echo ' configuring platform before common procedures'
+configure_before ''
+
+if [ "$(contains '/etc/default/cpupower' "# ${OS_NAME} cpupower")" = "false" ]; then
+  echo " boosting CPU performance"
+  echo "
+# ${OS_NAME} cpupower
+governor='performance'">>/etc/default/cpupower
+  systemctl enable cpupower.service
+  systemctl start cpupower.service
+fi
+
+# proceed with common install operations
+. ./install-common
+
+# last chance to change something
+configure_after ''
+
+# cleanup and optimize
+pacman -Sc --noconfirm
+pacman-optimize
+
+# drop this very same file
+rm $0
+rm /root/bash-info
+rm /root/utils
+rm /root/utils-platform
+rm /root/${OS_NAME}-platform
+rm /root/install-common
+
+# boot into B.E.N.J.A.
+reboot

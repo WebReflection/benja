@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,300,700" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/atelier-cave-dark.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/css/docs.css" media="screen">
+    <!--[if lt IE 9]>
+    <script defer src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Benja OS</title>
+  </head>
+  <body>
+    <header>
+      <a href="/" title="Home Page"><img class="no-us" alt="BENJA" src="/img/benja-dark.svg" onerror="this.src=this.src.replace('.svg','.png')" height="128px"></a>
+      <h1>
+        Documentation
+      </h1>
+      <h2>
+        <strong>B</strong><span>ootable</span>
+        <strong>E</strong><span>lectron</span>
+        <strong>N</strong><span>ode</span>
+        <strong>J</strong><span>S</span>
+        <strong>A</strong><span>pplication</span>
+      </h2>
+    </header>
+    <main><section>
+<p>This page contains most basic information about BENJA and its usage.
+Please note that every supported board might have slightly different setup,
+hardware acceleration capabilities, or setup.</p>
+<h3 id="how-to-create-the-b-e-n-j-a-environment">How to create the B.E.N.J.A. environment</h3>
+<p>The easiest way to have a B.E.N.J.A. environment is to buy a preinstalled Micro SD card, accordingly with the hacker board you’d like to use.
+The list of boards and relative ISO images or preinstalled SD cards is available via the <a href="https://benja.io/">benja.io home page</a>.</p>
+<p>There are also other ways to obtain, test, and use a B.E.N.J.A. environment:</p>
+<ul>
+<li>using an <a href="#how-to-burn-an-already-prepared-iso-image">ISO image already prepared</a> for your target platform</li>
+<li>installing <a href="#how-to-install-b-e-n-j-a-environment-from-the-scratch-arm">from the scratch</a> through repository scripts</li>
+</ul>
+<h4 id="how-to-burn-an-already-prepared-iso-image">How to burn an already prepared ISO image</h4>
+<p>You will need a Micro SD card, possibly Class 10, and with at least 8GB of space.
+This procedure works on <strong>Linux</strong> and <strong>MacOS</strong>, but you can use <strong>Windows</strong> too as long as you have a software that can burn iso files into an SD card.</p>
+<p><strong>Warning</strong> your SD card will lose its data permanently.</p>
+<p>Images are stored as <code>.zip</code> files so once you download one from the <a href="https://benja.io/">benja.io home page</a>,
+using the <strong>DOWNLOAD ISO</strong> link under the right target board,
+be sure you also extract its content somewhere on your Hard Drive.</p>
+<p>Both <strong>Linux</strong> and <strong>MacOS</strong> have a simple way to burn images on SD cards, it’s called <a href="https://en.wikipedia.org/wiki/Dd_(Unix">dd</a>).</p>
+<p>However, if you have any software capable of burning ISO images to CDs or DVDs, you might just use that to burn this image into your Micro SD card.</p>
+<p>If not, be sure you find the right path for your card, once inserted.</p>
+<pre><code class="lang-bash hljs bash"><span class="line">$ lsblk</span>
+<span class="line">NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span>
+<span class="line">sda           8:0    0  477G  0 disk </span>
+<span class="line">├─sda1        8:1    0   60M  0 part /boot</span>
+<span class="line">├─sda2        8:2    0    8G  0 part [SWAP]</span>
+<span class="line">└─sda3        8:3    0  469G  0 part /</span>
+<span class="line">mmcblk0     179:0    0  7.4G  0 disk</span></code></pre><p>Please note the first on the list is the current Hard Drive and not the Micro SD you are looking for, which is <code>/dev/mmcblk0</code> in this case.</p>
+<p>As alternative, you might try</p>
+<pre><code class="lang-sh hljs sh"><span class="line">$ sudo fdisk <span class="hljs-_">-l</span></span>
+<span class="line">Disk /dev/sda: 477 GiB, 512110190592 bytes, 1000215216 sectors</span>
+<span class="line">Units: sectors of 1 * 512 = 512 bytes</span>
+<span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span>
+<span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span>
+<span class="line">Disklabel <span class="hljs-built_in">type</span>: gpt</span>
+<span class="line">Disk identifier: 6C873FA6-408A-49A0-1DE3-F92AC32703C0</span>
+<span class="line"></span>
+<span class="line">Device        Start        End   Sectors  Size Type</span>
+<span class="line">/dev/sda1      2048     124927    122880   60M EFI System</span>
+<span class="line">/dev/sda2    124928   16777215  16652288    8G Linux swap</span>
+<span class="line">/dev/sda3  16777216 1000214527 983437312  469G Linux filesystem</span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line">Disk /dev/mmcblk0: 7.4 GiB, 7948206080 bytes, 15523840 sectors</span>
+<span class="line">Units: sectors of 1 * 512 = 512 bytes</span>
+<span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span>
+<span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span>
+<span class="line">Disklabel <span class="hljs-built_in">type</span>: dos</span>
+<span class="line">Disk identifier: 0x00000000</span></code></pre><p>On <strong>MacOSX</strong> you might need to open <strong>Disks</strong> software and click <em>(i)</em>, or find info, about the sd card.</p>
+<p>Please note you are looking for a driver like <code>/dev/mmcblk0</code>, or better, something that is <em>NOT your Hard Drive</em>.</p>
+<p>Once you’ve found the right path for your Micro SD card, you can write the following on a terminal:</p>
+<pre><code class="lang-sh hljs sh"><span class="line">$ sudo dd <span class="hljs-keyword">if</span>=~/Downloads/benja-rpi2.iso of=/dev/mmcblk0 bs=8192</span></code></pre><p>Accordingly with both your computer SD card slot and the Micro SD card speed,
+it might take up to 5 minutes to burn the entire image.</p>
+<p>Once finished, you can simply remove the card, plug into the board, and see if everything sorked as expected sinply booting it attached to a monitor, or TV, and possibly a network cable.</p>
+<p>If after some second you’ll see the following image, your B.E.N.J.A. environment is ready to rock!</p>
+<p><img src="/img/benja-ok.png" alt="Benja OK Screen"></p>
+<h4 id="how-to-install-b-e-n-j-a-environment-from-the-scratch-arm">How to install B.E.N.J.A. Environment from the scratch - ARM</h4>
+<p>Available for <strong>Linux only</strong>, this procedure is <em>NOT recommended</em> if you’re not familiar with an installation process.
+However, if you’d like to help this project, making it compatible with new boards,
+or you’d like to customize the installation in a convenient way for your needs,
+all you need to do is to write the following in console:</p>
+<pre><code class="lang-bash hljs bash"><span class="line">$ curl -LO benja.io/os/install</span>
+<span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-comment"># to prepare, as example, odroid-c1 image</span></span>
+<span class="line">$ bash install odroid-c1 /dev/mmcblk0</span></code></pre><p>Once the initial procedure is complete, the rest of the installation will continue from the board itself.</p>
+<p>Feel free to plug the Micro SD card and boot it up using <strong>root</strong> as both user and password.</p>
+<p>If you have already the board connected to an Internet connection, you can simply write <code>./install</code> and wait until it ends.</p>
+<p>Once it reboots, you should have a fully updated B.E.N.J.A. environment installed.</p>
+<h4 id="how-to-install-b-e-n-j-a-environment-from-the-scratch-i686-x86_64">How to install B.E.N.J.A. Environment from the scratch - i686 / x86_64</h4>
+<p>In case you’d like to install Benja OS on an i686 or x86_64 compatible hardware,
+you need to start such machine via a recently burned <a href="https://www.archlinux.org/download/">ArchLinux ISO</a>.</p>
+<p>Once you’ll login, feel free to use <code>lsblk</code> to read where is your SD card, and write the following on console:</p>
+<pre><code class="lang-bash hljs bash"><span class="line">$ curl -LO benja.io/os/install</span>
+<span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
+<span class="line"></span>
+<span class="line"><span class="hljs-comment"># erase the SD card and install Benja OS</span></span>
+<span class="line">$ bash install /dev/mmcblk0</span></code></pre><p>This is the very same procedure that has been used for the <a href="https://benja.io/#minnowboard-max">Minnowboard Max</a> so,
+in case of doubts, it’s worth trying that iso out before starting a whole new process.</p>
+<h3 id="how-to-develop">How to Develop</h3>
+<p>Creating applications is as easy as writing the following from the <code>BENJA-APP</code> disk folder:</p>
+<pre><code class="lang-bash hljs bash"><span class="line">$ npm start</span></code></pre><p>This is indeed exactly what gets executed once Benja OS starts.
+If your computer works, the target board will work too!</p>
+<p>But how about editing remotely so you don’t have to keep removing and putting back the SD card?</p>
+<p>As simple as writing:</p>
+<pre><code class="lang-bash hljs bash"><span class="line">$ ssh benja@192.168.1.17</span>
+<span class="line">password: benja</span></code></pre><p>At this point you can use <code>nano ~/app/idnex.js</code> to edit that file or, if your IDE supports it, you can use <a href="https://github.com/textmate/rmate#rmate">rmate</a> which is already available in Benja OS.</p>
+<p>This gives you the ability to also test directly GPIO related operations through the board.</p>
+<h3 id="how-to-update-b-e-n-j-a-os">How to Update Benja OS</h3>
+<p>Bening simply a specially configured Arch Linux OS,
+all you need to update the system is the following:</p>
+<pre><code class="lang-bash hljs bash"><span class="line"><span class="hljs-comment"># updates ArchLinux to the latest</span></span>
+<span class="line">sudo pacman -Syu</span>
+<span class="line"></span>
+<span class="line"><span class="hljs-comment"># update Electron and global modules to the latest</span></span>
+<span class="line">npm update -g</span></code></pre><h3 id="how-to-not-boot-the-app">How to not boot the App</h3>
+<p>If you’d like to play around with Arch Linux instead
+of booting the app, you can either rename <code>~/app/package.json</code>
+into <code>~/app/package.jsno</code> or <code>~/app/package.jsoff</code>,
+or you could remove it or rename it differently, like <code>~/app/package.nope</code>.</p>
+<p>This will inform Benja OS that it should just boot in the first available terminal, either on Weston or X11. </p>
+<h3 id="how-to-install-app-dependencies">How to install App dependencies</h3>
+<p>If you remove the folder <code>~/app/node_modules</code>, Benja will install production dependencies automatically next time it starts.</p>
+<p>This is handy if you have one project that might have dependencies that might conflict with those your computer architecture might encounter.</p>
+<p>In general though, it is strongly suggested to use dependencies that are cross platform friendly,
+and install those requiring builds and node-gyp as global module (also due the fact exacutables are not installed through a runtime mounted folder).</p>
+</section></main>
+    <footer>
+      <h6>&copy; 2016 WebReflection Ltd</h6>
+    </footer>
+  </body>
+</html>

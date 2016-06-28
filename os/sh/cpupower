@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [ ! -f /etc/default/cpupower ] || [ "$(cat /etc/default/cpupower | grep 'governor=\"performance\"')" = "" ]; then
+  sudo pacman -S --needed --noconfirm cpupower
+  sync
+  sudo sh -c "echo '
+governor=\"performance\"
+'>>/etc/default/cpupower"
+  sudo systemctl enable cpupower.service
+  sudo systemctl start cpupower.service
+fi

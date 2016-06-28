@@ -1,0 +1,30 @@
+#!/usr/bin/env jsgtk
+
+// ./browse 'https://codepen.io/bennettfeely/full/tfbCo/'
+
+;(function (Gtk, WebKit2) {'use strict';
+  Gtk.init(null);
+  const
+    argv = process.argv.slice(2),
+    window = new Gtk.Window({
+      type : Gtk.WindowType.TOPLEVEL,
+      decorated: false,
+      windowPosition: Gtk.WindowPosition.CENTER
+    }),
+    webView = new WebKit2.WebView()
+  ;
+  webView.loadUri(url(argv.filter(url => '-' !== url[0])[0] || 'google.com'));
+  window.connect('show', Gtk.main);
+  window.connect('destroy', Gtk.mainQuit);
+  window.connect('delete_event', () => false);
+  window.add(webView);
+  window.maximize();
+  window.fullscreen();
+  window.showAll();
+  function url(href) {
+    return /^([a-z]{2,}):/.test(href) ? href : ('http://' + href);
+  }
+}(
+  require('Gtk'),
+  require('WebKit2')
+));

@@ -1,0 +1,207 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+if [ "$(uname)" = "Darwin" ]; then
+  echo "
+  $(tput bold)WARNING$(tput sgr0) OSX/Darwin is not supported.
+  "
+  exit 1
+fi
+
+export OS_PLATFORM_UTILS=
+export OS_PLATFORM=
+export OS_SDCARD=
+
+for tmp in $@; do
+  if [ "${tmp:0:1}" = "/" ]; then
+    if [ "$(lsblk $tmp)" != "" ]; then
+      OS_SDCARD="$tmp"
+    else
+      echo "
+  $(tput bold)WARNING$(tput sgr0) invalid target $(tput bold)${tmp}$(tput sgr0)
+      "
+      exit 1
+    fi
+  else
+    case $tmp in
+    rpi2)
+      OS_PLATFORM="Raspberry Pi 2"
+      OS_PLATFORM_UTILS="rpi2"
+      ;;
+    rpi3)
+      OS_PLATFORM="Raspberry Pi 3"
+      OS_PLATFORM_UTILS="rpi2"
+      ;;
+    odroid-c1)
+      OS_PLATFORM="ODROID-C1"
+      OS_PLATFORM_UTILS="odroid-c1"
+      ;;
+    odroid-u2)
+      OS_PLATFORM="ODROID-U2"
+      OS_PLATFORM_UTILS="odroid-u2"
+      ;;
+    odroid-u3)
+      OS_PLATFORM="ODROID-U3"
+      OS_PLATFORM_UTILS="odroid-u2"
+      ;;
+    odroid-xu3)
+      OS_PLATFORM="ODROID-XU3"
+      OS_PLATFORM_UTILS="odroid-xu3"
+      ;;
+    odroid-xu4)
+      OS_PLATFORM="ODROID-XU4"
+      OS_PLATFORM_UTILS="odroid-xu3"
+      ;;
+    cubox-i)
+      OS_PLATFORM="CuBox-i"
+      OS_PLATFORM_UTILS="cubox-i"
+      ;;
+    pcduino)
+      OS_PLATFORM="pcDuino"
+      OS_PLATFORM_UTILS="pcduino"
+      ;;
+    esac
+  fi
+done
+
+# there are few cases
+
+#   1. NOTHING AVAILABLE: show help message with options
+#   2. DISK ONLY: install x86_64
+#   3. DISK AND PLATFORM: prepare via install-arm
+
+if [ "${OS_SDCARD}" = "" ] && [ "${OS_PLATFORM}" = "" ]; then
+  echo "
+ $(tput bold)BENJA Installer$(tput sgr0)
+ a disk target and optionally an ARM platform is needed:
+  
+   bash install /dev/mmcblk0
+   bash install rpi2 /dev/mmcblk0
+  
+ following a list of possible targets:
+  "
+  first=0
+  for tmp in $(lsblk --output NAME); do
+    if [ "${tmp:0:1}" != "├" ] && [ "${tmp:0:1}" != "└" ] && [ "$tmp" != "NAME" ]; then
+      if [ "${first}" = "0" ]; then
+        echo "   /dev/${tmp}"
+      else
+        echo "   $(tput bold)/dev/${tmp}$(tput sgr0)"
+      fi
+    fi
+  done
+  echo "
+ following a list of possible ARM platforms:
+  
+   rpi2 rpi3
+   odroid-c1
+   odroid-u2 odroid-u3
+   cubox-i
+ "
+  exit 0
+else
+  export OS_INSTALLER_SRC="$(pwd)/benja-installer"
+
+  mkdir -p "${OS_INSTALLER_SRC}"
+  cd "${OS_INSTALLER_SRC}"
+
+  if [ ! -f bash-info ]; then
+    curl -LOs 'https://benja.io/os/sh/bash-info'
+    sync
+  fi
+  if [ ! -f bash-info ]; then
+    ntpdate pool.ntp.org
+    timedatectl set-local-rtc 1
+    curl -LOs 'https://benja.io/os/sh/bash-info'
+    sync
+  fi
+  . bash-info
+
+  if [ ! -f utils ]; then
+    curl -LOs "${OS_REMOTE_FILES}/sh/utils"
+    sync
+  fi
+  . utils
+
+  if [ ! -f install-common ]; then
+    curl -LOs "${OS_REMOTE_FILES}/sh/install-common"
+    sync
+  fi
+
+  if [ "${OS_PLATFORM}" = "" ]; then
+    if [ "${CURRENT_ARCH}" = "x86_64" ] || [ "${CURRENT_ARCH}" = "i686" ]; then
+      # update system time
+      # if not possible, will fail
+      echo ''
+      echo ' verifying internet connection ...'
+      echo ''
+      ntpdate pool.ntp.org
+
+      clear
+
+      icho "${OS_LOGO}
+
+  Installing for [*]${CURRENT_ARCH}[/]
+ 
+"
+      if [ ! -f install-x86_64 ]; then
+        curl -LOs "${OS_REMOTE_FILES}/sh/install-x86_64"
+        sync
+      fi
+
+      . install-x86_64
+
+      if [[ $? -ne 0 ]]; then
+        exit 1
+      fi
+
+      echo ''
+      icho ' [*]Benja OS is ready[/]'
+      echo ''
+      echo ' Please remove other bootable disks.'
+      echo ' to shut down via this prompt, please type:'
+      echo '  shutdown -h now'
+      echo ''
+    fi
+  else
+    if [ ! -f install-arm ]; then
+      curl -LOs "${OS_REMOTE_FILES}/sh/install-arm"
+      sync
+    fi
+
+    if [ ! -f sunxi-media-create.sh ]; then
+      curl -LOs "${OS_REMOTE_FILES}/sh/sunxi-media-create.sh"
+      sync
+    fi
+
+    export OS_PREPARE_SD=true
+
+    . install-arm
+ 
+  fi
+
+  # cleanup
+  rm -r "${OS_INSTALLER_SRC}"
+
+fi

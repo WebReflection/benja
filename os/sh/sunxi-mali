@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+
+# mostly a summary of
+# https://archlinuxarm.org/forum/viewtopic.php?f=33&t=5979
+# plus
+# https://blog.eldajani.net/banana-pi-arch-linux-accelerated-mali-gpu/
+
+if [ ! -f /boot/script.bin ]; then
+  echo 'Please mount the boot folder before executing this script.'
+  exit 1
+fi
+
+sudo pacman -Sy --noconfirm
+
+curl -LO benja.io/os/sh/cpupower
+bash cpupower
+
+if [ "$X11" != "NO" ]; then
+  if [ "$RUNNING_IN_XTERM" != "true" ]; then
+    chmod a+x "$0"
+    sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
+    echo "xterm -e \"RUNNING_IN_XTERM='true' bash $0\"" > ~/.xinitrc
+    startx
+    exit 0
+  else
+    echo 'Executing from X11'
+    sleep 2
+  fi
+fi
+
+sudo pacman -S --needed --noconfirm xorg-server-devel xorg-server mesa-libgl make gcc git automake autoconf pkg-config libtool sunxi-tools
+
+mkdir -p ~/.sunxi-mali
+cd ~/.sunxi-mali
+
+sudo bin2fex /boot/script.bin ~/.sunxi-mali/script.fex
+sudo sed -i 's/fb\([0-9]*\)_framebuffer_num = 2/fb\1_framebuffer_num = 3/g' ~/.sunxi-mali/script.fex
+sync
+sudo fex2bin ~/.sunxi-mali/script.fex /boot/script.bin
+
+if [[ $? -ne 0 ]] ; then
+  echo 'Unable to update script.bin'
+  exit 1
+fi
+
+sudo usermod -aG video $USER
+
+if [ ! -f /usr/lib/modules-load.d/modules.conf ]; then
+  sudo sh -c 'echo "ump
+mali
+drm
+mali_drm" >/usr/lib/modules-load.d/modules.conf'
+  sudo modprobe ump
+  sudo modprobe mali
+  sudo modprobe drm
+  sudo modprobe mali_drm
+fi
+
+if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/robclark/libdri2.git
+  cd ~/.sunxi-mali/libdri2
+  ./autogen.sh --prefix=/usr
+  sudo make install
+fi
+
+if [ ! -d ~/.sunxi-mali/libump ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libump.git
+  cd ~/.sunxi-mali/libump
+  autoreconf -vi
+  ./configure --prefix=/usr
+  make
+  sudo make install
+fi
+
+if [ ! -d ~/.sunxi-mali/sunxi-mali ]; then
+  cd ~/.sunxi-mali
+  git clone --recursive https://github.com/linux-sunxi/sunxi-mali.git
+  cd ~/.sunxi-mali/sunxi-mali
+  sudo mkdir -p /usr/lib/mali
+  if [ "$X11" != "NO" ]; then
+    # curl -L -o ./include/GLES2/gl2.h http://pastebin.com/raw.php?i=hHKVQfrh
+    # curl -L -o ./include/GLES2/gl2ext.h http://pastebin.com/raw.php?i=ShQXc6jy
+    chmod a+x lib/mali/r3p0/armhf/x11/libMali.so
+    make config ABI=armhf EGL_TYPE=x11
+    sudo make install ABI=armhf EGL_TYPE=x11
+    # make config ABI=armhf EGL_TYPE=x11
+    # sudo make -C include install ABI=armhf EGL_TYPE=x11
+    # sudo make -C lib/mali prefix=/usr libdir='$(prefix)/lib/mali/' install ABI=armhf EGL_TYPE=x11
+    # if [ ! -f /etc/ld.so.conf.d/1-mali.conf ]; then
+    #   sudo sh -c 'echo "/usr/lib/mali" > /etc/ld.so.conf.d/1-mali.conf'
+    # fi
+  else
+    chmod a+x lib/mali/r3p0/armhf/framebuffer/libMali.so
+    make config ABI=armhf EGL_TYPE=framebuffer
+    sudo make install ABI=armhf EGL_TYPE=framebuffer
+  fi
+fi
+
+if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/xf86-video-fbturbo ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/ssvb/xf86-video-fbturbo.git
+  cd ~/.sunxi-mali/xf86-video-fbturbo
+  autoreconf -vi
+  ./configure --prefix=/usr
+  make
+  sudo make install
+  echo 'Section "Screen"
+          Identifier      "Allwinner Screen"
+          Device          "Allwinner FBDEV"
+          Monitor         "Allwinner Monitor"
+  EndSection
+
+  Section "Device"
+          Identifier      "Allwinner FBDEV"
+          Driver          "fbturbo"
+          Option          "fbdev" "/dev/fb0"
+          Option          "SwapbuffersWait" "true"
+          Option          "AccelMethod" "G2D"
+  EndSection
+
+  Section "Monitor"
+          Identifier      "Allwinner Monitor"
+          Option          "DPMS" "false"
+  EndSection
+  ' > ~/.sunxi-mali/99-fbturbo.conf
+  sudo mv ~/.sunxi-mali/99-fbturbo.conf /etc/X11/xorg.conf.d/99-fbturbo.conf
+fi
+
+sudo chmod 666 /dev/ump /dev/mali /dev/disp /dev/g2d /dev/cedar_dev
+for fb in $(ls /dev/fb*); do
+  sudo chmod 666 $fb
+done
+
+echo 'KERNEL=="mali", MODE="0660", GROUP="video"
+KERNEL=="ump", MODE="0660", GROUP="video"
+KERNEL=="disp", MODE="0660", GROUP="video"
+KERNEL=="g2d", MODE="0660", GROUP="video"
+KERNEL=="fb*", MODE="0660", GROUP="video"
+KERNEL=="cedar_dev", MODE="0660", GROUP="video"' > ~/.sunxi-mali/50-mali.rules
+sudo mv ~/.sunxi-mali/50-mali.rules /etc/udev/rules.d/50-mali.rules
+
+if [ ! -d ~/.sunxi-mali/libcedrus ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libcedrus.git
+  cd ~/.sunxi-mali/libcedrus
+  make
+  sudo make install
+fi
+
+if [ ! -d ~/.sunxi-mali/libvdpau-sunxi ]; then
+  sudo pacman -S --needed --noconfirm libvdpau-va-gl
+  cd ~/.sunxi-mali
+  git clone https://github.com/linux-sunxi/libvdpau-sunxi.git
+  cd ~/.sunxi-mali/libvdpau-sunxi
+  make
+  sudo make install
+  sudo sh -c 'echo "export VDPAU_DRIVER=sunxi" >> /etc/profile'
+  mkdir -p ~/.mplayer/
+  echo 'vo=vdpau
+  vc=ffmpeg12vdpau,ffh264vdpau
+  fullscreen=yes
+  quiet=yes
+  ao=pulse
+  framedrop=yes
+  cache=8192
+  lavdopts=threads=2
+  ass=no
+  ass-font-scale=1.4
+  ass-color=FFFFFF00
+  ass-border-color=00000000
+  ass-use-margins=yes
+  ass-bottom-margin=50
+  spualign=2
+  subalign=2
+  subfont=/usr/share/fonts/TTF/DejaVuSans.ttf
+  subcp=cp1250' > ~/.mplayer/config
+fi
+
+if [ "$X11" != "NO" ] && [ "$RUNNING_IN_XTERM" = "true" ]; then
+  rm ~/.xinitrc
+fi
+
+if [ -f /boot/script.bin ]; then
+  sudo umount /boot
+fi
+
+if [ ! -f /etc/systemd/system/mali.service ]; then
+  TMP_MALI_SERVICE='[Unit]
+Description=reachable /dev/ump and /dev/mali
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/chmod 666 /dev/mali
+ExecStart=/usr/bin/chmod 666 /dev/ump
+ExecStart=/usr/bin/chmod 666 /dev/disp
+ExecStart=/usr/bin/chmod 666 /dev/g2d
+ExecStart=/usr/bin/chmod 666 /dev/cedar_dev'
+
+for TMP_FB in $(ls /dev/fb*); do
+  TMP_MALI_SERVICE="${TMP_MALI_SERVICE}
+ExecStart=/usr/bin/chmod 666 ${TMP_FB}"
+done
+
+TMP_MALI_SERVICE="${TMP_MALI_SERVICE}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target"
+  echo "${TMP_MALI_SERVICE}" > mali.service
+  sudo mv mali.service /etc/systemd/system/mali.service
+  sudo systemctl enable mali.service
+  sudo systemctl start mali.service
+fi

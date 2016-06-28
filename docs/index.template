@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,300,700" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/atelier-cave-dark.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/css/docs.css" media="screen">
+    <!--[if lt IE 9]>
+    <script defer src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Benja OS</title>
+  </head>
+  <body>
+    <header>
+      <a href="/" title="Home Page"><img class="no-us" alt="BENJA" src="/img/benja-dark.svg" onerror="this.src=this.src.replace('.svg','.png')" height="128px"></a>
+      <h1>
+        Documentation
+      </h1>
+      <h2>
+        <strong>B</strong><span>ootable</span>
+        <strong>E</strong><span>lectron</span>
+        <strong>N</strong><span>ode</span>
+        <strong>J</strong><span>S</span>
+        <strong>A</strong><span>pplication</span>
+      </h2>
+    </header>
+    <main></main>
+    <footer>
+      <h6>&copy; 2016 WebReflection Ltd</h6>
+    </footer>
+  </body>
+</html>

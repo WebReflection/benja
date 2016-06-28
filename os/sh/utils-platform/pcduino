@@ -1,0 +1,131 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+export OS_KERNEL='linux-armv7'
+export OS_HEADERS='linux-armv7-headers'
+export OS_ARCHIVE='ArchLinuxARM-armv7-latest.tar.gz'
+export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=fbdev-backend.so
+export OS_HWPACK='pcduino'
+
+# partition_sd /dev/mmblk0 3200M
+partition_sd() {
+  local DISK=$1
+  local ROOT_SIZE=$2
+  local ARCHIVE=$3
+  local HW_PACK=output/${OS_HWPACK}_hwpack.tar.xz
+  local PARTITIONS=
+  if [ ! -d ${OS_INSTALLER_SRC}/../builds/sunxi-bsp ]; then
+    mkdir -p ${OS_INSTALLER_SRC}/../builds
+    cd ${OS_INSTALLER_SRC}/../builds
+    git clone --recursive https://github.com/linux-sunxi/sunxi-bsp.git
+  fi
+  cd ${OS_INSTALLER_SRC}/../builds/sunxi-bsp
+  if [ ! -f ./${HW_PACK} ]; then
+    make clean
+    git submodule foreach git fetch
+    ./configure ${OS_HWPACK}
+    make
+  fi
+  sync
+  cd ${OS_INSTALLER_SRC}
+  yes y | sudo bash sunxi-media-create.sh ${DISK} ../builds/sunxi-bsp/${HW_PACK} ${ARCHIVE}
+  cd ${OS_INSTALLER_SRC}
+  sync
+}
+
+# returns ordered partitions
+get_partitions() {
+  local DISK=$1
+  local POSSIBLEDISKS=$(ls ${DISK}*)
+  local BOOT=""
+  local ROOT=""
+  local WWW=""
+  local CHOICE=""
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$BOOT" = "" ]; then
+        BOOT="$CHOICE"
+      else
+        if [ "$ROOT" = "" ]; then
+          ROOT="$CHOICE"
+        else
+          WWW="$CHOICE"
+        fi
+      fi
+    fi
+  done
+  echo "${BOOT} ${ROOT} ${WWW}"
+}
+
+# format_sd /dev/mmblk0
+format_sd() {
+  local DISK=$1
+  local BOOT=$2
+  local ROOT=$3
+  local WWW=$4
+  sudo mkfs.vfat "$WWW"
+  sudo dosfslabel "$WWW" BENJA-APP
+  echo 'OK'
+}
+
+# install_os /dev/mmblk0 Archive.gz
+install_os() {
+  local ARCHIVE="$1"
+  local DISK=$2
+  local BOOT=$3
+  local ROOT=$4
+  mkdir -p boot
+  mkdir -p root
+  sudo mount "$BOOT" boot
+  sudo mount "$ROOT" root
+}
+
+# finalize installation
+unmount_os() {
+  local BOOT=$1
+  local ROOT=$2
+  sudo umount $BOOT
+  sudo umount $ROOT
+}
+
+# install and configure the platform and its graphic environment
+configure_before() {
+  # sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/boot.ini
+  pacman -S --needed --noconfirm xf86-video-fbdev xorg-server xorg-xinit xorg-xset xterm
+}
+
+# patch the system after everything else has been installed
+configure_after() {
+  systemctl disable weston-compositor
+  rm /etc/systemd/system/weston-compositor.service
+  sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/sunxi-mali"
+  mount /dev/mmcblk0p1 /boot
+  sudo -H -u ${OS_USER} bash -c "bash sunxi-mali"
+  sync && sleep 2
+  sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
+  sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/startx"
+  sudo -H -u ${OS_USER} bash -c "cat startx >> ${OS_USER_DIR}/.bashrc"
+  sudo -H -u ${OS_USER} bash -c "rm startx && sync"
+  sudo -H -u ${OS_USER} bash -c "rm sunxi-mali ; rm cpupower"
+  pacman -S --needed --noconfirm i2c-tools lm_sensors
+}

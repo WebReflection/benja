@@ -1,0 +1,144 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+export OS_KERNEL='linux-raspberrypi'
+export OS_HEADERS='linux-raspberrypi-headers'
+export OS_ARCHIVE='ArchLinuxARM-rpi-2-latest.tar.gz'
+
+# partition_sd /dev/mmblk0 3200M
+partition_sd() {
+  local DISK=$1
+  local ROOT_SIZE=$2
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    sudo parted --script $DISK mklabel msdos
+    sudo parted --script --align optimal $DISK mkpart primary fat32 2048s 100M
+    sudo parted --script --align optimal $DISK mkpart primary ext4 100M $ROOT_SIZE
+    sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+
+    # most likely unnecessary anyway ...
+    sudo parted --script $DISK set 1 boot on
+    sudo parted --script $DISK set 2 hidden
+  fi
+  echo 'OK'
+}
+
+# returns ordered partitions
+get_partitions() {
+  local DISK=$1
+  local POSSIBLEDISKS=$(ls ${DISK}*)
+  local BOOT=""
+  local ROOT=""
+  local WWW=""
+  local CHOICE=""
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$BOOT" = "" ]; then
+        BOOT="$CHOICE"
+      else
+        if [ "$ROOT" = "" ]; then
+          ROOT="$CHOICE"
+        else
+          WWW="$CHOICE"
+        fi
+      fi
+    fi
+  done
+
+  echo "${BOOT} ${ROOT} ${WWW}"
+}
+
+# format_sd /dev/mmblk0
+format_sd() {
+  local DISK=$1
+  local BOOT=$2
+  local ROOT=$3
+  local WWW=$4
+
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    sudo mkfs.vfat "$BOOT"
+    yes | sudo mkfs.ext4 "$ROOT"
+    sudo mkfs.vfat "$WWW"
+    sudo dosfslabel "$WWW" BENJA-APP
+  fi
+
+  echo 'OK'
+
+}
+
+# install_os /dev/mmblk0 Archive.gz
+install_os() {
+  local ARCHIVE="$1"
+  local DISK=$2
+  local BOOT=$3
+  local ROOT=$4
+
+  mkdir -p boot
+  mkdir -p root
+  sudo mount "$BOOT" boot
+  sudo mount "$ROOT" root
+  sudo bsdtar -xpf "$ARCHIVE" -C root
+  sync
+  sudo mv root/boot/* boot
+  sync
+}
+
+# finalize installation
+unmount_os() {
+  local BOOT=$1
+  local ROOT=$2
+  sudo umount $BOOT
+  sudo umount $ROOT
+}
+
+# install and configure the platform
+configure_before() {
+  # use 128MB of Display Memory on Raspberry Pi
+  if [ "$(contains '/boot/config.txt' 'dispmanx_offline=1')" = "false" ]; then
+    echo ' updating /boot/config.txt'
+    echo 'gpu_mem=128' >/boot/config.txt
+    echo 'dispmanx_offline=1' >>/boot/config.txt
+    echo '' >>/boot/config.txt
+    echo '# if you are not on HD TV or you do not see a thing'
+    echo '# try to comment the following' >>/boot/config.txt
+    echo 'hdmi_mode=4' >>/boot/config.txt
+    echo 'hdmi_group=1' >>/boot/config.txt
+    echo '' >>/boot/config.txt
+    echo '# if those borders disturb you' >>/boot/config.txt
+    echo '# feel free to comment the following line' >>/boot/config.txt
+    echo '# disable_overscan=1' >>/boot/config.txt
+  fi
+  # silent boot
+  sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
+  pacman -S --needed --noconfirm weston-rpi gst-omx-rpi libcec-rpi mesa mesa-libgl
+}
+
+# once everything is already installed
+configure_after() {
+  pacman -S --needed --noconfirm wiringpi i2c-tools lm_sensors
+  echo 'i2c-dev' >> /etc/modules-load.d/raspberrypi.conf
+}

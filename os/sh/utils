@@ -1,0 +1,260 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+# check a generic file or string content
+# - - - - - - - - - - - - - -
+#        by Andrea Giammarchi
+# if [ "$(contains 'file.txt' 'string')" = "false" ]; then
+contains() {
+  local s=$1
+  local b=''
+  local a=''
+  if [ -f $s ]; then
+    b=$(cat $s)
+    a=$(cat $s | sed -e "s/${2}//")
+  else
+    b="${s}"
+    a=$(echo "${s}" | sed -e "s/${2}//")
+  fi
+  if [ "$b" = "$a" ]; then
+    echo "false"
+  else
+    echo "true"
+  fi
+}
+
+# slightly enriched echo
+# - - - - - - - - - - - - - -
+#        by Andrea Giammarchi
+# https://gist.github.com/WebReflection/02cdcb6d4ce0dfa38fac
+icho() {
+
+  # [*][g]✔[/] [*][r]x[/] [*][y]![/]
+
+  # resets
+  local reset_all=$(tput sgr0)        # [/] usable as reset for each style
+  local reset_color=$(tput setaf 9)   # [/(d|r|g|y|b|m|c|w)]
+  local reset_bgcolor=$(tput setab 9) # [/(bd|br|bg|by|bb|bm|bc|bw)]
+  local reset_underline=$(tput rmul)  # [/_]
+  local reset_stand_out=$(tput rmso)  # [/o]
+
+  # colors
+  local black=$(tput setaf 0)         # [d]dark[/d]
+  local red=$(tput setaf 1)           # [r]red[/r]
+  local green=$(tput setaf 2)         # [g]green[/g]
+  local yellow=$(tput setaf 3)        # [y]yellow[/y]
+  local blue=$(tput setaf 4)          # [b]blue[/b]
+  local magenta=$(tput setaf 5)       # [m]magenta[/m]
+  local cyan=$(tput setaf 6)          # [c]cyan[/c]
+  local white=$(tput setaf 7)         # [w]white[/w]
+
+  # background colors
+  local bgblack=$(tput setab 0)       # [bd]bg dark[/bd]
+  local bgred=$(tput setab 1)         # [br]bg red[/br]
+  local bggreen=$(tput setab 2)       # [bg]bg green[/bg]
+  local bgyellow=$(tput setab 3)      # [by]bg yellow[/by]
+  local bgblue=$(tput setab 4)        # [bb]bg blue[/bb]
+  local bgmagenta=$(tput setab 5)     # [bm]bg magenta[/bm]
+  local bgcyan=$(tput setab 6)        # [bc]bg cyan[/bc]
+  local bgwhite=$(tput setab 7)       # [bw]bg white[/bw]
+
+  # styles
+  local start_stand_out=$(tput smso)  # [o]
+  local start_under=$(tput smul)      # [_][/_]
+  local start_bold=$(tput bold)       # [*][/*]
+  local start_light=$(tput dim)       # [l]light dim[/l]
+                                      # [*][/]
+
+  # not implemented
+  # rev Start reverse video
+  # blink Start blinking text
+  # invis Start invisible text
+
+  # phrase replacement
+  local phrase=$(echo "${1}" |
+    sed -e "s/\[o\]/\\${start_stand_out}/g" | sed -e "s/\[\/o\]/\\${reset_stand_out}/g" |
+    sed -e "s/\[l\]/\\${start_light}/g" | sed -e "s/\[\/l\]/\\${reset_all}/g" |
+    sed -e "s/\[\*\]/\\${start_bold}/g" | sed -e "s/\[\/\*\]/\\${reset_all}/g" |
+    sed -e "s/\[_\]/\\${start_under}/g" | sed -e "s/\[\/_\]/\\${reset_underline}/g" |
+    sed -e "s/\[d\]/\\${black}/g" | sed -e "s/\[\/d\]/\\${reset_color}/g" |
+    sed -e "s/\[r\]/\\${red}/g" | sed -e "s/\[\/r\]/\\${reset_color}/g" |
+    sed -e "s/\[g\]/\\${green}/g" | sed -e "s/\[\/g\]/\\${reset_color}/g" |
+    sed -e "s/\[y\]/\\${yellow}/g" | sed -e "s/\[\/y\]/\\${reset_color}/g" |
+    sed -e "s/\[b\]/\\${blue}/g" | sed -e "s/\[\/b\]/\\${reset_color}/g" |
+    sed -e "s/\[m\]/\\${magenta}/g" | sed -e "s/\[\/m\]/\\${reset_color}/g" |
+    sed -e "s/\[c\]/\\${cyan}/g" | sed -e "s/\[\/c\]/\\${reset_color}/g" |
+    sed -e "s/\[w\]/\\${white}/g" | sed -e "s/\[\/w\]/\\${reset_color}/g" |
+    sed -e "s/\[bd\]/\\${bgblack}/g" | sed -e "s/\[\/bd\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[br\]/\\${bgred}/g" | sed -e "s/\[\/br\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bg\]/\\${bggreen}/g" | sed -e "s/\[\/bg\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[by\]/\\${bgyellow}/g" | sed -e "s/\[\/by\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bb\]/\\${bgblue}/g" | sed -e "s/\[\/bb\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bm\]/\\${bgmagenta}/g" | sed -e "s/\[\/bm\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bc\]/\\${bgcyan}/g" | sed -e "s/\[\/bc\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[bw\]/\\${bgwhite}/g" | sed -e "s/\[\/bw\]/\\${reset_bgcolor}/g" |
+    sed -e "s/\[\/\]/\\${reset_all}/g"
+  )
+  echo -e "${phrase}${reset_all}"
+}
+
+# verify that sudo password is known
+user_is_authorized() {
+  local secret=$(date +%s | sha256sum | base64 | head -c 32)
+  local authorized=$(sudo sh -c "echo '${secret}'")
+  if [ $? -ne 0 ] || [ "${authorized}" != "${secret}" ]; then
+    exit 1
+  fi
+  echo 'OK'
+}
+
+umount_sd() {
+
+  local CHOICE=
+  local DISK="${1}"
+  local POSSIBLEDISKS="$(get_drives $DISK)"
+
+  if [ "$POSSIBLEDISKS" = "" ]; then
+    POSSIBLEDISKS="$DISK"
+  fi
+
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$(df | grep $CHOICE)" != "" ]; then
+      sudo umount $CHOICE
+      if [[ $? -ne 0 ]] ; then
+        exit 1
+      fi
+    fi
+  done
+
+  echo 'OK'
+}
+
+get_drives() {
+  local out=""
+  local d=
+  local p=
+  local l=0
+  for d in $(lsblk --output NAME $1 | sed -e 's/[├─└─]//g'); do
+    if [ $l -eq 0 ]; then l=${#d}; fi
+    if [ "${d:0:$l}" = "$p" ]; then
+      out="${out} /dev/${d}"
+    else
+      p="$d"
+      l=${#d}
+    fi
+  done
+  echo "$out" | sed -e 's/^[[:space:]]*//'
+}
+
+get_fstype() {
+  local t=0
+  local c="$(echo "$1" | sed -e 's/^\/dev\///')"
+  local d=
+  for d in $(lsblk --output NAME,FSTYPE "$1"); do
+    if [ "$c" = "$d" ]; then
+      t=1
+    else
+      if [ "$t" = "1" ]; then
+        echo "$d"
+        break
+      fi
+    fi
+  done
+}
+
+
+# get_partid 'vfat' /dev/sdb1
+# get_partid 'swap' /dev/sdb2
+get_partid() {
+  local kind="$1"
+  local part="$2"
+  local p=
+  local d=
+  for d in $(blkid -o value "$part"); do
+    if [ "$d" = "$kind" ]; then
+      echo "$p"
+      break
+    fi
+    p="$d"
+  done
+}
+
+# TOBEREMOVED
+get_uuid() {
+  local t=0
+  local c="$(echo "$1" | sed -e 's/^\/dev\///')"
+  local d=
+  for d in $(lsblk --output NAME,UUID "$1"); do
+    if [ "$c" = "$d" ]; then
+      t=1
+    else
+      if [ "$t" = "1" ]; then
+        echo "$d"
+        break
+      fi
+    fi
+  done
+}
+
+# TOBEREMOVED
+get_fatid() {
+  local p=
+  local d=
+  for d in $(blkid -o value "$1"); do
+    if [ "$d" = "vfat" ]; then
+      echo "$p"
+      break
+    fi
+    p="$d"
+  done
+}
+
+clean_efibootmgr() {
+  local which="$1"
+  local prev=
+  for entry in $(efibootmgr); do
+    if [ "$entry" = "$which" ]; then
+      efibootmgr -b "${prev:4:-1}" -B
+    fi
+    prev="$entry"
+  done
+}
+
+installFromAUR() {
+  local user="$1"
+  local name="$2"
+  mkdir -p "/tmp/${name}"
+  cd "/tmp/${name}"
+  curl -L -O "https://aur.archlinux.org/cgit/aur.git/snapshot/${name}.tar.gz"
+  tar -xzf "${name}.tar.gz"
+  cd "${name}"
+  sudo -H -u "${user}" makepkg -Asc --needed --noconfirm
+  sudo pacman -U --needed --noconfirm ${name}*.pkg.tar.xz
+  cd -
+  rm -rf "/tmp/${name}"
+  if [[ $? -ne 0 ]] ; then
+    icho " [*][r]x[/] the package [*]${name}[/] was [*]not installed[/]"
+    exit 1
+  else
+    icho " [*][g]✔[/] [*]${name}[/] successfully [*]installed[/]"
+  fi
+}

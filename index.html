@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,300,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" media="screen">
+    <!--[if lt IE 9]>
+    <script defer src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.4.1/ie8.js"></script>
+    <![endif]-->
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/dom4/1.8.3/dom4.js"></script>
+    <script defer src="js/main.js"></script>
+    <title>Benja OS</title>
+  </head>
+  <body>
+    <header>
+      <img class="no-us" alt="BENJA" src="/img/benja-dark.svg" onerror="this.src=this.src.replace('.svg','.png')" height="128px">
+      <h1>
+        <strong>B</strong><span>ootable</span>
+        <strong>E</strong><span>lectron</span>
+        <strong>N</strong><span>ode</span>
+        <strong>J</strong><span>S</span>
+        <strong>A</strong><span>pplication</span>
+      </h1>
+      <h2>
+        An <abbr title="HardWare">HW</abbr> Accelerated <abbr title="Internet of Things">IoT</abbr> oriented Web <a href="https://en.wikipedia.org/wiki/Kiosk_software">Kiosk</a> for Makers
+      </h2>
+    </header>
+    <main>
+      <div id="carousel">
+        <div class="board no-us" data-name="rpi2">
+          <strong>Raspberry Pi 3 &amp; 2</strong>
+          <p>
+            Fully HW Accelerated, the Raspberry Pi can manage its I/O via johnny-five and raspi-io directly from an Electron instance.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-rpi2.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="odroid-c1">
+          <strong>Odroid C1</strong>
+          <p>
+            HW Accelerated and compatible with Raspberry Pi I/O, the Odroid C1 has johnny-five preinstalled and runs on a XWayland session.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-odroid-c1.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="minnowboard-max">
+          <strong>MinnowBoard Max &amp; Turbot</strong>
+          <p>
+            Fully HW Accelerated, 30+ FPS WebGL on Full HD, these Intel powered boards go beyond basic sensors monitor applications.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-minnowboard-max.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="gizmo-2">
+          <strong>Gizmo 2</strong>
+          <p>
+            AMD CPU and Radeon GPU for an hacker friendly board full of potentials.
+            The Gizmo 2 can handle heavy tasks without a glitch.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-gizmo-2.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="odroid-u2">
+          <strong>Odroid U3 &amp; U2</strong>
+          <p>
+            A powerful quad core Exynos4412 Prime based board. Fallbacks to Xorg server but it works like a charm.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-odroid-u2.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="odroid-xu3">
+          <strong>Odroid XU4 &amp; XU3</strong>
+          <p>
+            Xorg based fbturbo Mali drivers at full steam! This octa-core board could drive an antire Web based Operating System without a glitch.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-odroid-xu3.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="cubox-i">
+          <strong>Cubox-i</strong>
+          <p>
+            HW Accelerated Vivante GPU, the Cubox-i has enough horses power to grant perfomance and more advanced Web interactions.
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-cubox-i.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+        <div class="board no-us" data-name="pcduino">
+          <strong>pcDuino</strong>
+          <p>
+            The first version of the AllWinner 10 based board, with Xorg Server DRI2 compiled FBTurbo Mali drivers. Oldie but goldie!
+            <a class="t-all" href="/docs/">(Read Documentation)</a>
+          </p>
+          <a class="t-all" href="https://s3.amazonaws.com/benja.io/iso/benja-pcduino.zip">Download ISO</a>
+          <a class="t-all disabled" title="Coming Soon">Buy MicroSD</a>
+        </div>
+      </div>
+      <!--iframe id="carousel" width="560" height="315" src="https://www.youtube.com/embed/AsVvoy2K8d8" allowfullscreen frameborder="0"></iframe-->
+      <section id="simplified-web-kiosk">
+        <h3 class="no-us">A Web Kiosk Bootstrap</h3>
+        <p>
+          B.E.N.J.A. is an installer that makes you focus on what matters: developing amazing projects!<br>
+          You don't need to know much about Linux, it's already prepared for you.<br>
+          You don't need to configure drivers or UI: it's a <quote>Plug &amp; Make</quote> micro SD card.<br>
+          You can edit a project remotely, or directly on your computer and can make it portable simply copying it around.
+        </p>
+      </section>
+      <section id="internet-of-things">
+        <h3 class="no-us">An Inter-Web of Things</h3>
+        <p>
+          Differently from every other platform,
+          B.E.N.J.A. provides a way for makers to create via Web interface.<br>
+          Switch on the light, check humidity, temperature,
+          make the coffee, spy your cat, and show him your face on TV,
+          there's no limit in what you could do through a privileged Web view!
+        </p>
+      </section>
+      <section id="beyond-the-web">
+        <h3 class="no-us">Beyond the Web</h3>
+        <p>
+          The B.E.N.J.A. environment doesn't have usual Web constrains:
+          you have full Hardware access as well as all Operating System features!<br>
+          It's NodeJS on top of Linux, delivered through an Electron instance
+          that runs on the lightweight, <a href="https://wayland.freedesktop.org/">Wayland</a> driven, <a href="https://wayland.freedesktop.org/building.html">Weston</a> compositor,
+          falling back to a bare minimum accelerated Xorg.
+        </p>
+      </section>
+    </main>
+    <div id="powered-by">
+      <h4>POWERED BY</h4>
+      <ul class="no-us">
+        <li><img alt="Arch Linux" src="/img/archlinux.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
+        <li><img alt="Node JS" src="/img/nodejs.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
+        <li><img alt="Electron" src="/img/electron.svg" onerror="this.src=this.src.replace('.svg','.png')"></li>
+      </ul>
+      <div class="description">
+        <p>
+          Open Source centric and community driven, <a href="https://www.archlinux.org/">Arch Linux</a> is one of the most
+          popular and well documented Linux distributions out there.
+          <br>
+          Simple, lightweight, and always up-to-date,
+          its <a href="https://archlinuxarm.org/">ARM</a> counterpart
+          has been working on hacker-friendly boards long time before others and
+          it can bootstrap in just a few seconds.
+        </p>
+        <p>
+          Based on <a href="https://developers.google.com/v8/">Chrome's V8 JavaScript engine</a>,
+          <a href="https://nodejs.org/">NodeJS</a> is the powerful JavaScript runtime used by backend developers as well as system administrators.
+          <br>
+          Thanks to <a href="https://www.npmjs.com/">npm</a> modules such <a href="https://www.npmjs.com/package/serialport">serialport</a>
+          or <a href="https://www.npmjs.com/package/johnny-five">johnny-five</a>,
+          NodeJS can be used to drive Arduino, Raspberry Pi, and many other <abbr title="Internet of Things">IoT</abbr> oriented boards.
+        </p>
+        <p>
+          Electron is an <a href="https://github.com/electron/electron">open source project maintained by GitHub</a> with an active community of contributors.
+          <br>
+          It uses Chromium and NodeJS, providing the ability to build any kind of app using the HTML, CSS and JavaScript Web stack.
+          <br>
+          B.E.N.J.A. uses it to create a restrictions-free Web full of potentials.
+        </p>
+      </div>
+    </div>
+    <footer>
+      <h6>&copy; 2016 WebReflection Ltd</h6>
+    </footer>
+  </body>
+</html>

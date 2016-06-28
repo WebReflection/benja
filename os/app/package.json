@@ -1,0 +1,16 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "basic app example",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron index.js"
+  },
+  "author": "Andrea Giammarchi",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "electron-prebuilt": "latest",
+    "tiny-cdn": "latest"
+  }
+}

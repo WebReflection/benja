@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+# install jsgtk for Weston based JS GTK tasks
+echo ${OS_USER} | sudo -S ls
+yaourt -S --needed --noconfirm jsgtk
+
+cd ~/
+
+# configure files and folders
+touch ~/.hushlogin
+mkdir -p ~/.config
+mkdir -p ~/app/node_modules
+mkdir -p ~/.npm-packages/bin
+npm config set prefix '~/.npm-packages'
+
+# initial Weston configuration
+if [ ! -f ~/.config/weston.ini ]; then
+  echo ' creating ~/.config/weston.ini'
+  WESTON_INI="[core]
+idle-time=0"
+  if [ "${OS_BOOTINTO}" = "electron" ]; then
+    WESTON_INI="$WESTON_INI
+modules=xwayland.so"
+  fi
+  if [ "${OS_BACKEND}" != "" ]; then
+    WESTON_INI="$WESTON_INI
+backend=${OS_BACKEND}"
+  fi
+  echo "${WESTON_INI}
+
+[shell]
+client=/home/${OS_USER}/${OS_APP_LAUNCHER}
+animation=none
+close-animation=none
+startup-animation=none
+locking=false
+" >~/.config/weston.ini
+fi
+
+# prepare app launcher
+if [ ! -f ${OS_APP_LAUNCHER} ]; then
+  echo ' installing launcher'
+  curl -Ls -o ${OS_APP_LAUNCHER} "${OS_REMOTE_FILES}/sh/launcher"
+  chmod a+x ${OS_APP_LAUNCHER}
+fi
+
+# OS Bootstrap
+echo ' updating ~/.bashrc'
+OS_LOGO=$(cat ${OS_NAME}-logo)
+echo "
+# ${OS_NAME} OS
+
+# logo
+OS_LOGO=\"${OS_LOGO}"\" >>~/.bashrc
+
+echo '
+# print a welcome message
+echo -e "${OS_LOGO}
+ "
+
+# in case this is the first boot
+if [ -f ~/need-wifi ]; then
+  echo "$(tput bold)WiFi Configuration$(tput sgr0)"
+  rm ~/need-wifi
+  sudo wifi-setup
+  sudo systemctl enable weston-compositor
+  sudo reboot
+fi
+
+' >>~/.bashrc
+
+cd ~/app
+if [ "${OS_BOOTINTO}" = "electron" ]; then
+  echo ' installing electron app'
+  curl -LOs "${OS_REMOTE_FILES}/app/index.js"
+  curl -LOs "${OS_REMOTE_FILES}/app/index.html"
+  curl -LOs "${OS_REMOTE_FILES}/app/package.json"
+  npm install --production
+else
+  echo ' installing jsgtk app'
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/index.js"
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/package.json"
+  curl -LOs "${OS_REMOTE_FILES}/jsgtk/browse"
+  chmod a+x browse
+fi
+echo ' downloading logo'
+curl -LOs "${OS_REMOTE_FILES}/app/logo-dark.svg"
+curl -LOs "${OS_REMOTE_FILES}/app/logo-light.svg"
+touch reload
+
+# configure benja global npm modules
+npm install -g tiny-cdn
+npm install -g node-gyp
+npm install -g node-pre-gyp
+npm install -g electron-prebuilt
+
+# avoid bin-links
+# npm config set bin-links false
+
+cd -

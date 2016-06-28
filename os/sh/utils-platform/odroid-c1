@@ -1,0 +1,123 @@
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+export OS_KERNEL='linux-odroid-c1'
+export OS_HEADERS='linux-odroid-c1-headers'
+export OS_ARCHIVE='ArchLinuxARM-odroid-c1-latest.tar.gz'
+export OS_MAX_RESOLUTION=1280x720
+export OS_BACKEND=fbdev-backend.so
+
+# partition_sd /dev/mmblk0 3200M
+partition_sd() {
+  local DISK=$1
+  local ROOT_SIZE=$2
+  sudo dd if=/dev/zero of=$DISK bs=1024 count=8
+  sync
+  sleep 2
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    sudo parted --script $DISK mklabel msdos
+    sudo parted --script --align optimal $DISK mkpart primary ext4 2048s $ROOT_SIZE
+    sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+  fi
+  echo 'OK'
+}
+
+# returns ordered partitions
+get_partitions() {
+  local DISK=$1
+  local POSSIBLEDISKS=$(ls ${DISK}*)
+  local ROOT=""
+  local WWW=""
+  local CHOICE=""
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$ROOT" = "" ]; then
+        ROOT="$CHOICE"
+      else
+        WWW="$CHOICE"
+      fi
+    fi
+  done
+
+  echo "${ROOT} ${WWW}"
+}
+
+# format_sd /dev/mmblk0
+format_sd() {
+  local DISK=$1
+  local ROOT=$2
+  local WWW=$3
+
+  if [ "$(uname)" = "Darwin" ]; then
+    echo 'I HAVE NO IDEA WHAT TO DO'
+    exit 1
+  else
+    yes | sudo mkfs.ext4 "$ROOT"
+    sudo mkfs.vfat "$WWW"
+    sudo dosfslabel "$WWW" BENJA-APP
+  fi
+
+  echo 'OK'
+
+}
+
+# install_os /dev/mmblk0 Archive.gz
+install_os() {
+  local ARCHIVE="$1"
+  local DISK=$2
+  local ROOT=$3
+
+  mkdir -p root
+  sudo mount $ROOT root
+  sudo bsdtar -xpf "$ARCHIVE" -C root
+  sync
+  cd root/boot
+  sudo sed -i 's/^setenv m "1080p"/# setenv m "1080p"/' boot.ini
+  sync
+  sudo sed -i 's/^# setenv m "720p"/setenv m "720p"/' boot.ini
+  sync
+  sudo sh sd_fusing.sh $DISK
+  sync
+  sleep 2
+  cd ../..
+}
+
+# finalize installation
+unmount_os() {
+  local ROOT=$1
+  sudo umount $ROOT
+}
+
+# install and configure the platform and its graphic environment
+configure_before() {
+  sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/boot.ini
+  pacman -S --needed --noconfirm weston odroid-c1-libgl-fb odroid-c1-libgl-headers aml-libs-c1
+}
+
+# patch the system after everything else has been installed
+configure_after() {
+  pacman -S --needed --noconfirm wiringc1 i2c-tools lm_sensors
+  echo 'i2c-dev' >> /etc/modules-load.d/odroidc1.conf
+}

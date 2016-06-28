@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+# some exported default
+if [ "$OS_BOOTINTO" = "" ]; then
+  export OS_BOOTINTO="electron"
+fi
+
+# common configuration
+export LANG=en_US.UTF-8
+export CURRENT_PLATFORM="$(uname)"
+export CURRENT_ARCH="$(uname -m)"
+export OS_INSTALLER="0.2.0"
+export OS_VERSION="0.3.0"
+export OS_NAME="BENJA"
+export OS_WEBSITE="https://benja.io"
+export OS_USER="benja"
+export OS_LOGO=" 
+ [d]┌────────────────┐[/]
+ [d]│[/] [*][b]╔╗ ╔═╗╔╗╔ ╦╔═╗[/] [d]│[/] [l]Bootable[/]
+ [d]│[/] [*][c]╠╩╗║╣ ║║║ ║╠═╣[/] [d]│[/] [l]Electron[/]
+ [d]│[/] [*][m]╚═╝╚═╝╝╚╝╚╝╩ ╩[/] [d]│[/] [l]Node JS App[/]
+ [d]└────────────────┘[/]
+  [l]${OS_WEBSITE}[/l]"
+
+export OS_INSTALLER_LOGO="
+  [*]installer ${OS_INSTALLER}[/]${OS_LOGO}"
+
+export OS_REMOTE_FILES="${OS_WEBSITE}/os"
+export OS_USER_DIR="/home/${OS_USER}"
+export OS_APP_LAUNCHER='.app-launcher'

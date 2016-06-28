@@ -1,0 +1,435 @@
+#!/usr/bin/env bash
+
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
+localectl set-locale LANG=$LANG
+export LC_TIME=$LANG
+
+# disk checks
+if [ "$DISK" = "" ]; then
+  if [ "$1" = "" ]; then
+    icho '  [*][r][WARNING][/] no DISK has been specified'
+    echo ''
+    echo '  please specify a DISK target:'
+    echo '    ./install /dev/mmcblk0'
+    echo '    DISK=/dev/mmcblk0 ./install'
+    echo '  (use lsblk or fdisk -l to know which one could be OK)'
+    exit 1
+  else
+    DISK="$1"
+    echo ''
+    icho " [*][r][WARNING][/]"
+    icho "  disk [o]${DISK}[/] will be completely [*]erased[/]"
+    echo "  and every data in it will be lost."
+    echo ''
+    read -n1 -r -p "$(icho "  prepare [*]${OS_PLATFORM}[/] and erase [*]${DISK}[/]? [y/N]")" CHOICE
+
+    if [[ $? -ne 0 ]] || [ "$CHOICE" != "y" ]; then
+      echo ''
+      echo '  bye bye'
+      echo ''
+      exit 1
+    fi
+  fi
+fi
+
+# video card checks
+if [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep Intel)" != "" ]; then
+  GPU='Intel'
+  GPU_DRIVERS='xf86-video-intel libva-intel-driver'
+elif [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep NVIDIA)" != "" ]; then
+  GPU='nVidia'
+  GPU_DRIVERS='xf86-video-nouveau mesa-libgl'
+elif [ "$(lspci -v -s `lspci | awk '/VGA/{print $1}'` | grep AMD)" != "" ]; then
+  GPU='Radeon'
+  GPU_DRIVERS='xf86-video-ati libva-mesa-driver'
+fi
+
+export OS_FULL_LOGO=" 
+  [*]${GPU} on $(uname -m)[/]${OS_LOGO}  ${OS_VERSION}
+"
+
+# swap checks
+if [ "$SWAP" = "" ]; then
+  SWAP=0
+fi
+
+# EDD needed in some board
+if [ "$EDD" = "NO" ] || [ "$EDD" = "OFF" ] || [ "$EDD" = "0" ] || [ "$EDD" = "false" ]; then
+  EDD=off
+fi
+
+PASSWD="$(cat /dev/urandom | head | tail | sha256sum | sed -e 's/  -//')"
+USER="$OS_USER"
+UPASSWD="$USER"
+LABEL="$USER"
+
+# UEFI architecture check
+if [ "$UEFI" != "" ]; then
+  if [ "$UEFI" != "NO" ]; then
+    if [ "$UEFI" != "efi64" ]; then
+      if [ "$UEFI" != "efi32" ]; then
+        echo "valid UEFI are efi64 or efi32, not $UEFI"
+        exit 1
+      fi
+    fi
+  fi
+else
+  if [ "$CURRENT_ARCH" = "x86_64" ]; then
+    UEFI=efi64
+  else
+    UEFI=efi32
+  fi
+fi
+
+if [ "$UEFI" = "NO" ]; then
+  SYSLINUX_BOOT='/boot'
+  SYSLINUX_ROOT='/boot'
+else
+  SYSLINUX_BOOT=''
+  SYSLINUX_ROOT='/boot'
+  clean_efibootmgr "$LABEL"
+fi
+
+pacman -Sy
+pacman-db-upgrade
+pacman-key --init
+pacman-key --populate archlinux
+pacman -S --needed --noconfirm fbset
+
+echo "verifying $DISK"
+POSSIBLEDISKS=($(get_drives $DISK))
+
+if [[ $? -ne 0 ]] ; then
+  echo " ${DISK} is not valid"
+  exit 1
+fi
+
+for CHOICE in $POSSIBLEDISKS; do
+  if [ "$(df | grep $CHOICE)" != "" ]; then
+    echo "unmounting $CHOICE"
+    umount $CHOICE
+    if [[ $? -ne 0 ]] ; then
+      icho "  [*][r][WARNING][/] unable to install in ${CHOICE}"
+      exit 1
+    fi
+  fi
+done
+
+
+dd if=/dev/zero of=$DISK bs=1 count=2048
+
+sync
+sleep 2
+
+# verify and format the SD card
+TMP_SD_SIZE=$(fdisk -s $DISK)
+TMP_ROOT_SIZE="6000000"
+
+if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
+  TMP_ROOT_SIZE="3800M"
+else
+  TMP_ROOT_SIZE="6000M"
+fi
+
+if [ "$UEFI" = "NO" ]; then
+  PARTED_START_AT="2048s"
+  parted --script $DISK mklabel msdos
+else
+  PARTED_START_AT="100M"
+  parted --script $DISK mklabel gpt
+  parted --script --align optimal $DISK mkpart primary fat16 2048s $PARTED_START_AT
+  parted $DISK set 1 boot on
+fi
+
+if [ "$SWAP" = "0" ]; then
+  parted --script --align optimal $DISK mkpart primary ext4 $PARTED_START_AT $TMP_ROOT_SIZE
+else
+  parted --script --align optimal $DISK mkpart primary linux-swap $PARTED_START_AT $SWAP
+  parted --script --align optimal $DISK mkpart primary ext4 $SWAP $TMP_ROOT_SIZE
+fi
+parted --script --align optimal $DISK mkpart primary fat32 $TMP_ROOT_SIZE 100%
+
+sync
+sleep 1
+
+POSSIBLEDISKS=($(get_drives $DISK))
+
+if [[ $? -ne 0 ]] ; then
+  icho "  [*][r][WARNING][/] unable to install in ${POSSIBLEDISKS[*]}"
+  exit 1
+fi
+
+EFI=
+ROOT=
+APP=
+
+if [ "$UEFI" = "NO" ]; then
+  if [ "$SWAP" != "0" ]; then
+    SWAP="${POSSIBLEDISKS[0]}"
+    ROOT="${POSSIBLEDISKS[1]}"
+    APP="${POSSIBLEDISKS[2]}"
+  else
+    ROOT="${POSSIBLEDISKS[0]}"
+    APP="${POSSIBLEDISKS[1]}"
+  fi
+else
+  EFI="${POSSIBLEDISKS[0]}"
+  if [ "$SWAP" != "0" ]; then
+    SWAP="${POSSIBLEDISKS[1]}"
+    ROOT="${POSSIBLEDISKS[2]}"
+    APP="${POSSIBLEDISKS[3]}"
+  else
+    ROOT="${POSSIBLEDISKS[1]}"
+    APP="${POSSIBLEDISKS[2]}"
+  fi
+fi
+
+if [ "$SWAP" != "0" ]; then
+  mkswap $SWAP
+  swapon $SWAP
+fi
+
+sync
+
+if [ "$UEFI" != "NO" ]; then
+  mkfs.vfat $EFI
+  # dosfslabel $APP BENJA-BOOT
+fi
+yes | mkfs.ext4 $ROOT
+sync
+ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+# tune2fs -L BENJA-ROOT $ROOT
+tune2fs -U $ROOT_UUID $ROOT
+sync
+mkfs.vfat $APP
+sync
+dosfslabel $APP BENJA-APP
+sleep 2
+
+# print out info
+echo "GPU:             ${GPU}"
+
+if [ "$UEFI" != "NO" ]; then
+  EFI_UUID="$(get_partid 'vfat' $EFI)"
+  echo "EFI:             ${EFI} ${EFI_UUID}"
+fi
+
+if [ "$SWAP" != "0" ]; then
+  SWAP_UUID="$(get_partid 'swap' $SWAP)"
+  echo "SWAP:            $SWAP"
+fi
+
+echo "ROOT:            ${ROOT} ${ROOT_UUID}"
+
+APP_UUID="$(get_partid 'vfat' $APP)"
+echo "APP:             ${APP} ${APP_UUID}"
+
+echo ''
+
+sleep 5
+
+if [ "$UEFI" != "NO" ]; then
+  if [ "$EFI_UUID" = "" ]; then
+    icho "  [*][r][WARNING][/] unable to retrieve UUID for ${EFI}"
+    exit 1
+  fi
+fi
+if [ "$ROOT_UUID" = "" ]; then
+  icho "  [*][r][WARNING][/] unable to retrieve UUID for ${ROOT}"
+  exit 1
+fi
+
+mkdir -p benja
+
+# preparing chroot env
+if [ "$EXP_USE_EMMC" != "" ]; then
+  mount $EXP_USE_EMMC benja
+  mkdir -p "benja${SYSLINUX_ROOT}"
+  mount $ROOT "benja${SYSLINUX_ROOT}"
+  SYSLINUX_BOOT=''
+else
+  mount $ROOT benja
+  if [ "$UEFI" != "NO" ]; then
+    mkdir -p "benja${SYSLINUX_ROOT}"
+    mount $EFI "benja${SYSLINUX_ROOT}"
+  fi
+fi
+sync
+sleep 1
+
+TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode linux-headers dialog wpa_supplicant iw"
+if [ "$UEFI" != "NO" ]; then
+  TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
+fi
+
+pacstrap benja $TOPACKSTRAP
+sync
+
+icho "${OS_FULL_LOGO}">"benja/${OS_NAME}-logo"
+
+# create fstab for reliable boot sequence
+echo "
+# root
+UUID=$ROOT_UUID	/         	ext4      	rw,relatime,discard,data=ordered	0 1
+" > benja.fstab
+if [ "$UEFI" != "NO" ]; then
+echo "
+# boot
+UUID=$EFI_UUID      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro	0 2
+" >> benja.fstab
+fi
+if [ "$SWAP" != "0" ]; then
+echo "
+# swap
+UUID=$SWAP_UUID      	none     	swap      	defaults	0 0
+" >> benja.fstab
+fi
+mv benja.fstab benja/etc/fstab
+
+APPEND="APPEND root=UUID=$ROOT_UUID rw quiet splash loglevel=0 console=tty2"
+if [ "$EDD" != "" ]; then
+  APPEND="$APPEND edd=$EDD"
+fi
+
+echo "#!/usr/bin/env bash
+
+. /bash-info
+. /utils
+
+clear
+icho '[*]Preparing Benja OS[/]'
+sleep 3
+
+export APP_UUID='${APP_UUID}'
+
+# utils to make first wifi-setup straight forward
+curl -LOs '${OS_REMOTE_FILES}/sh/wifi-setup'
+
+# verify chroot works as expected
+if [ ! -f wifi-setup ]; then
+  icho '[*][r]WARNING[/]: there is no network!'
+  exit 1
+fi
+chmod a+x wifi-setup
+mv wifi-setup /usr/bin
+
+if [ '$(uname -m)' = 'x86_64' ]; then
+  echo '
+[multilib]
+Include = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
+  sync
+fi
+
+pacman -Syu --noconfirm
+pacman-db-upgrade
+pacman -Syu --needed --noconfirm ntp weston $GPU_DRIVERS xorg-server-xwayland
+
+syslinux-install_update -ia
+
+if [ '$UEFI' != 'NO' ]; then
+  mkdir -p $SYSLINUX_ROOT/syslinux
+  if [ '$CURRENT_ARCH' = 'x86_64' ]; then
+    cp -r /usr/lib/syslinux/efi64/* $SYSLINUX_ROOT/syslinux
+  else
+    cp -r /usr/lib/syslinux/efi32/* $SYSLINUX_ROOT/syslinux
+  fi
+  cp -r /usr/lib/syslinux/$UEFI/syslinux.efi $SYSLINUX_ROOT/syslinux
+fi
+
+echo 'TIMEOUT 0
+PROMPT 0
+DEFAULT arch
+
+LABEL arch
+      LINUX $SYSLINUX_BOOT/vmlinuz-linux
+      INITRD $SYSLINUX_BOOT/intel-ucode.img,$SYSLINUX_BOOT/initramfs-linux.img
+      $APPEND
+
+'> $SYSLINUX_ROOT/syslinux/syslinux.cfg
+
+if [ '$UEFI' != 'NO' ]; then
+  if [ -d /usr/share/efitools/efi/ ]; then
+    cp /usr/share/efitools/efi/{PreLoader,HashTool}.efi /boot/syslinux/
+    cp /boot/syslinux/syslinux.efi /boot/syslinux/loader.efi
+    efibootmgr -c -d $DISK -l /syslinux/PreLoader.efi -L '$LABEL'
+  else
+    if [ -d /usr/lib/prebootloader ]; then
+      cp /usr/lib/prebootloader/{PreLoader,HashTool}.efi /boot/syslinux/
+      cp /boot/syslinux/syslinux.efi /boot/syslinux/loader.efi
+      efibootmgr -c -d $DISK -l /syslinux/PreLoader.efi -L '$LABEL'
+    else
+      efibootmgr -c -d $DISK -l /syslinux/syslinux.efi -L '$LABEL'
+    fi
+  fi
+  sync
+fi
+
+mkinitcpio -p linux
+sync
+sleep 3
+
+cd /
+curl -LOs '${OS_REMOTE_FILES}/sh/install-common'
+if [ ! -f install-common ]; then
+  icho '[*][r]WARNING[/]: the network dropped during the process!'
+  exit 1
+fi
+. ./install-common
+
+systemctl enable ntpd.service
+
+rm /install-common
+rm /bash-info
+rm /utils
+rm /${OS_NAME}-logo
+rm \$0
+
+sync
+umount $APP
+
+exit
+">>benja.bash
+
+mv benja.bash benja/benja
+chmod a+x benja/benja
+cp bash-info benja/bash-info
+cp utils benja/utils
+
+sync && sleep 2
+
+arch-chroot benja /benja
+
+if [[ $? -ne 0 ]]; then
+  exit 1
+fi
+
+echo ' user configured'
+sync
+sleep 5
+
+if [ "$UEFI" != "NO" ]; then
+  umount $EFI
+fi
+
+umount $ROOT

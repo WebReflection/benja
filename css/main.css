@@ -1,0 +1,380 @@
+/*!
+ * Copyright (c) 2016 Andrea Giammarchi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+quote {
+  font-style: italic;
+  margin-right: 2px;
+}
+quote:before {
+  content: '\201c';
+}
+quote:after {
+  content: '\201d';
+}
+
+html, body {
+  color: #aaaeb2;
+  background-color: #2b353e;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+}
+
+.hidden {
+  display: none;
+}
+
+.no-us {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.t-all {
+  -webkit-transition: all .35s ease-in-out;
+  -moz-transition: all .35s ease-in-out;
+  -ms-transition: all .35s ease-in-out;
+  transition: all .35s ease-in-out;
+}
+
+html, body, header, main, footer, h1, h2, h3, h4, h5, h6, #powered-by, #powered-by *, #carousel .slider * {
+  margin: 0;
+  padding: 0;
+}
+
+header, h1, h2, h4, h6, main, #powered-by li {
+  text-align: center;
+}
+
+header {
+  background-color: #34414a;
+  min-height: 514px;
+  background-image: url(/img/benja-pattern.png);
+}
+
+header > img {
+  margin: 42px auto;
+}
+
+header, main, #powered-by {
+  border-bottom: 1px solid #1b2228;
+}
+
+h1 {
+  font-size: 32px;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+h1 strong {
+  font-weight: 400;
+}
+
+h1 span {
+  font-weight: 300;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 18px;
+  margin-top: 12px;
+  color: #aeb3b7;
+}
+
+h2 abbr[title] {
+  text-decoration: none;
+  border-bottom: 1px dotted #2b353e;
+  cursor: help;
+}
+
+a, a:visited, a:hover {
+  text-decoration: none;
+  color: #6a9eb6;
+}
+
+main > section {
+  margin: 42px auto auto auto;
+  text-align: left;
+}
+
+main {
+  padding: 0 28px 42px 28px;
+}
+
+main > section,
+#powered-by ul {
+  max-width: 942px;
+}
+
+main > section > p,
+#powered-by .description,
+#carousel .board {
+  font-weight: 400;
+  line-height: 28px;
+}
+
+footer {
+  background-color: #2a343d;
+}
+
+#carousel .slider {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100px;
+  background: #3c454f;
+}
+
+#carousel .slider * {
+  display: inline-block;
+  height: 100px;
+  overflow: hidden;
+}
+
+#carousel .slider > * {
+  position: absolute;
+}
+
+#carousel .slider > a {
+  font-size: 48px;
+  line-height: 100px;
+  color: white;
+  width: 60px;
+  cursor: pointer;
+}
+
+#carousel .slider > a:first-child {
+  left: 0;
+}
+
+#carousel .slider > a:last-child {
+  right: 0;
+}
+
+#carousel .slider > ul {
+  left: 60px;
+  right: 60px;
+  list-style: none;
+  white-space: nowrap;
+}
+
+#carousel .slider li {
+  padding: 0 12px;
+  margin: 0;
+  cursor: pointer;
+}
+
+#carousel .slider li > img {
+  height: 80%;
+  margin-top: 8%;
+}
+
+#carousel .slider li + li {
+  padding-left: 0;
+}
+
+#carousel {
+  position: relative;
+  margin: -160px auto auto auto;
+  max-width: 780px;
+  min-height: 360px;
+  background-color: #434e5a;
+  border-radius: 4px;
+  -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.5);
+}
+
+#carousel .board {
+  padding: 28px 28px 0 35%;
+  background-image: url(/img/boards/rpi2.png);
+  background-repeat: no-repeat;
+  background-position: 19px center;
+  background-size: 30% auto;
+  text-align: left;
+  color: #aeb3b7;
+}
+
+#carousel .board strong {
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  display: block;
+}
+
+#carousel .board p a,
+#carousel .board p a:visited {
+  color: #d5d7d8;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#carousel .board > a {
+  display: inline-block;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  padding: 8px;
+  margin-top: 8px;
+  background-color: #798089;
+  color: white;
+  border-radius: 4px;
+  width: 40%;
+}
+
+#carousel .board > a + a {
+  margin-left: 8%;
+}
+
+#carousel .board > a:hover {
+  background-color: #2b353e;
+}
+
+#carousel .board > a.disabled,
+#carousel .board > a.disabled:hover {
+  opacity: .5;
+  background-color: #798089;
+}
+
+#powered-by {
+  background-color: #212a31;
+  padding: 28px 0;
+}
+
+#powered-by ul,
+#powered-by li {
+  list-style: none;
+}
+
+#powered-by ul {
+  margin: 28px auto;
+}
+
+#powered-by li {
+  width: 32%;
+  display: inline-block;
+}
+
+#powered-by img {
+  margin: auto;
+  width: 75%;
+  border: 0;
+}
+
+#powered-by .description {
+  background: #313e47;
+  margin: 0 auto;
+  max-width: 842px;
+  border-radius: 4px;
+  padding: 28px;
+  position: relative;
+}
+
+#powered-by .description .arrow {
+  position: absolute;
+  top: -10px;
+  margin-left: -17px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #313e47;
+}
+
+h3 {
+  color: #d5d7d8;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+h4 {
+  color: #646a6f;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+h6 {
+  line-height: 50px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 639px) {
+  #carousel .slider {
+    top: 0;
+    bottom: auto;
+  }
+  #carousel .board {
+    padding: 118px 28px 14px 28px;
+    background-image: none !important;
+  }
+  #carousel .board a {
+    display: block;
+    width: auto;
+  }
+  #carousel .board a + a {
+    margin-left: auto;
+    margin-bottom: 16px;
+  }
+  header {
+    min-height: 400px;
+  }
+  header > img {
+    margin: 28px auto 16px auto;
+    height: 92px;
+  }
+  h1 strong:after {
+    content: '.';
+    font-weight: 300;
+  }
+  h1 span {
+    display: none;
+  }
+  h1:after {
+    content: 'Bootable Electron Node JS Application';
+    display: block;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  h2 {
+    display: none;
+  }
+}

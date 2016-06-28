@@ -1,0 +1,61 @@
+section > ul,
+section > p {
+  margin: 4px;
+}
+
+section p > img {
+  max-width: 100%;
+}
+
+section > ul {
+  line-height: 28px;
+}
+
+p > strong {
+  color: #d5d7d8;
+}
+
+h3, h4 {
+  margin-top: 40px;
+}
+
+h4 {
+  text-align: left;
+  font-size: 20px;
+  color: #d5d7d8;
+}
+
+pre {
+  padding: 8px;
+  background-color: #212a31;
+}
+
+header {
+  min-height: 340px;
+}
+
+header > a {
+  display: inline-block;
+  margin: 42px auto;
+}
+
+header > a > img {
+  margin: 0;
+  cursor: pointer !important;
+}
+
+code:not(.hljs) {
+  color: #d5d7d8;
+}
+
+@media (max-width: 639px) {
+  header {
+    min-height: 250px;
+  }
+  header > a {
+    margin: 28px auto 16px auto;
+  }
+  header > a > img {
+    height: 92px;
+  }
+}
