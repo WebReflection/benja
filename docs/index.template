@@ -30,7 +30,7 @@
     </header>
     <main></main>
     <footer>
-      <h6>&copy; 2016 WebReflection Ltd</h6>
+      <h6>&copy; 2016 <a href="https://www.webreflection.co.uk/">WebReflection</a> Ltd - <a href="https://github.com/WebReflection/benja/">Benja on GitHub</a></h6>
     </footer>
   </body>
 </html>
