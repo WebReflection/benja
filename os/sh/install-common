@@ -83,7 +83,10 @@ fi
 
 
 # configure automatic login
-if [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+  echo " preparing ${OS_USER} automatic login"
+  sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -a ${OS_USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
+elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
   echo " preparing ${OS_USER} automatic login"
   mkdir -p /etc/systemd/system/getty@tty1.service.d
   echo "[Service]
