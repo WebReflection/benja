@@ -1,7 +1,8 @@
 // to have access to local or global scripts
-require('module').globalPaths.push(
-  process.cwd() + '/node_modules',
-  process.env.NODE_PATH
+[].push.apply(
+  require('module').globalPaths,
+  [process.cwd() + '/node_modules']
+  .concat(process.env.NODE_PATH.split(':'))
 );
 
 // simple server example
