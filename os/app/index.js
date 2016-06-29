@@ -2,7 +2,7 @@
 [].push.apply(
   require('module').globalPaths,
   [process.cwd() + '/node_modules']
-  .concat(process.env.NODE_PATH.split(':'))
+  .concat(process.env.NODE_PATH.split(':').filter(p => 0 < p.length))
 );
 
 // simple server example
