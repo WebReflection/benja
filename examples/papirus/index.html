@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Benja O'Clock</title>
+  </head>
+  <body>
+    <canvas width="264" height="176" bgcolor="white" color="black"></canvas>
+    <script>
+    const
+      // easily distinguish between your PC and the RPi
+      IS_ARM = require('os').arch() === 'arm',
+      // used to invoke papirus operations
+      exec = require('child_process').exec,
+      // Using HTML5 Canvas to draw the Papirus image
+      canvas = document.querySelector('canvas'),
+      context = canvas.getContext('2d'),
+      bgcolor = canvas.getAttribute('bgcolor'),
+      color = canvas.getAttribute('color'),
+      width = parseFloat(canvas.getAttribute('width')),
+      height = parseFloat(canvas.getAttribute('height')),
+      // pixelFont dimension
+      fontWidth = 3,
+      // margin between squares in pixels
+      margin = 2,
+      // size per each square
+      size = (width / 19) - (margin / 2),
+      // draw time in the middle
+      y = (height / 2) - (size * 2.5) - (margin * 4),
+      // quickly generated 3x5 pixel font
+      // using tool available via http://devpro.it/pixelfont/
+      font = {
+        '0': '301235689bcde',
+        '1': '31258be',
+        '2': '301256789cde',
+        '3': '3012578bcde',
+        '4': '303689abe',
+        '5': '30123678bcde',
+        '6': '301236789bcde',
+        '7': '3012579c',
+        '8': '3012356789bcde',
+        '9': '301235678bcde',
+        ':': '34a'
+      },
+      // draw a single Pixel Font char at x,y position
+      drawPF = (c, x, y) => {
+        const v = font[c], w = parseInt(v[0], 36);
+        for (let i = 1; i < v.length; i++) {
+          let
+            pos = parseInt(v[i], 36),
+            subx = (pos % fontWidth),
+            suby = Math.floor(pos / fontWidth)
+          ;
+          subx = (subx * size) + (subx * margin) + margin * 2;
+          suby = (suby * size) + (suby * margin) + margin * 2;
+          context.fillRect(subx + x, suby + y, size, size);
+        }
+      }
+    ;
+
+    // center canvas on the screen
+    canvas.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-top: -${height/2}px;
+      margin-left: -${width/2}px;
+    `;
+
+    // the function that draws the time
+    (function benjaOClock() {
+
+      const
+        // grab current time
+        date = new Date,
+        // get current hours and minutes strings
+        hours = ('0' + date.getHours()).slice(-2).split(''),
+        minutes = ('0' + date.getMinutes()).slice(-2).split('')
+      ;
+
+      // clear the canvas
+      context.clearRect(0, 0, width, height);
+      // draw the background
+      context.fillStyle = bgcolor;
+      context.fillRect(0, 0, width, height);
+
+      // draw as pixel font the current time
+      context.fillStyle = color;
+      // draw HH:MM
+      drawPF(hours[0], margin + size, y);
+      drawPF(hours[1], margin + size * 5, y);
+      drawPF(':', margin + size * 8, y);
+      drawPF(minutes[0], margin + size * 11, y);
+      drawPF(minutes[1], margin + size * 15, y);
+
+      // only if it's actual Raspberry Pi, do the following:
+      if (IS_ARM) {
+        // retrieve base64 data from the canvas, removing initial info
+        const b64 = canvas.toDataURL().split('base64,').pop();
+        // decode such base64 string as clock.png image
+        exec(`echo '${b64}' | base64 --decode > clock.png`, () => {
+          // invoke `papirus-draw clock.png -t resize` to update the screen
+          exec('papirus-draw clock.png -t resize', () => {
+            // call the same function in a minute
+            setTimeout(benjaOClock, 60000);
+          });
+        });
+      }
+    }());
+
+    </script>
+  </body>
+</html>
