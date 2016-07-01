@@ -4,7 +4,7 @@ In order to use Papirus you need to remotely log into your RPi and write the fol
 
 ```bash
 # install dependencies
-sudo pacman -Syu --needed --noconfirm python-imaging fuse bc git i2c-tools ttf-freefont
+sudo pacman -Syu --needed --noconfirm python-imaging fuse bc git i2c-tools ttf-freefont ntp
 
 # make python2 the default python executable
 sudo ln -s /usr/bin/python2 /usr/bin/python
@@ -18,6 +18,8 @@ sudo papirus-setup
 # enable SPI on boot
 sudo sh -c 'echo "device_tree_param=spi=on" >> /boot/config.txt'
 
+# retrieve current time on boot via network
+sudo systemctl enable ntpd.service
 ```
 
 After a **reboot** you can test that everything is OK by writing this on console:
