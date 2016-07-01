@@ -35,7 +35,7 @@ sudo papirus-set [1.44 | 1.9 | 2.0 | 2.6 | 2.7 ]
 If something goes wrong, please refer to the [official repository](https://github.com/PiSupply/PaPiRus).
 
 ### How to test pixel-clock example
-The [./index.html] file can be used as replacement for the `~/app/index.html` default file you'll find in Benja OS.
+The [./index.html](./index.html) file can be used as replacement for the `~/app/index.html` default file you'll find in Benja OS.
 
 The only extra setup you need to be aware of, is your current timezone.
 
