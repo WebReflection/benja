@@ -216,6 +216,24 @@ and install those requiring builds and node-gyp as global module (also due the f
 
 
 
+### How to include node modules
+Due some limitation with current Electron paths, your application might need to include the [benja module](https://www.npmjs.com/package/benja) on top.
+```js
+// on top of index.js or index.html
+// to have access to both local and global modules
+require(process.cwd() + '/node_modules/benja').paths();
+```
+In alternative, you need to specify manually paths via:
+```js
+[].push.apply(
+  require('module').globalPaths,
+  [process.cwd() + '/node_modules']
+  .concat(process.env.NODE_PATH.split(':').filter(p => 0 < p.length))
+);
+```
+
+
+
 ### How to Update Benja OS
 Bening simply a specially configured Arch Linux OS,
 all you need to update the system is the following:

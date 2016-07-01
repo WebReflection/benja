@@ -38,7 +38,7 @@ function stringValue(s) {
   return 0 < s.length;
 }
 
-this.enrich = function enrich(require) {
+this.paths = function paths() {
   [
     // should be the same as '/home/benja/app/node_modules'
     process.cwd() + '/node_modules',
@@ -51,5 +51,4 @@ this.enrich = function enrich(require) {
     append,
     require('module').globalPaths
   );
-  return require;
 };

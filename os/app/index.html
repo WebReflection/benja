@@ -3,11 +3,7 @@
   <head>
     <!-- to have access to local or global scripts -->
     <script>
-    [].push.apply(
-      require('module').globalPaths,
-      [process.cwd() + '/node_modules']
-      .concat(process.env.NODE_PATH.split(':').filter(p => 0 < p.length))
-    );
+    require(process.cwd() + '/node_modules/benja').paths();
     </script>
     <!-- for debugging purpose -->
     <script>document.documentElement.ondblclick=()=>location.reload();</script>

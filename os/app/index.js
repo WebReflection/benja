@@ -1,9 +1,5 @@
 // to have access to local or global scripts
-[].push.apply(
-  require('module').globalPaths,
-  [process.cwd() + '/node_modules']
-  .concat(process.env.NODE_PATH.split(':').filter(p => 0 < p.length))
-);
+require(process.cwd() + '/node_modules/benja').paths();
 
 // simple server example
 require('http')

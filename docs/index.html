@@ -151,7 +151,16 @@ or you could remove it or rename it differently, like <code>~/app/package.nope</
 <p>This is handy if you have one project that might have dependencies that might conflict with those your computer architecture might encounter.</p>
 <p>In general though, it is strongly suggested to use dependencies that are cross platform friendly,
 and install those requiring builds and node-gyp as global module (also due the fact exacutables are not installed through a runtime mounted folder).</p>
-<h3 id="how-to-update-b-e-n-j-a-os">How to Update Benja OS</h3>
+<h3 id="how-to-include-node-modules">How to include node modules</h3>
+<p>Due some limitation with current Electron paths, your application might need to include the <a href="https://www.npmjs.com/package/benja">benja module</a> on top.</p>
+<pre><code class="lang-js hljs js"><span class="line"><span class="hljs-comment">// on top of index.js or index.html</span></span>
+<span class="line"><span class="hljs-comment">// to have access to both local and global modules</span></span>
+<span class="line"><span class="hljs-built_in">require</span>(process.cwd() + <span class="hljs-string">'/node_modules/benja'</span>).paths();</span></code></pre><p>In alternative, you need to specify manually paths via:</p>
+<pre><code class="lang-js hljs js"><span class="line">[].push.apply(</span>
+<span class="line"><i> </i><i> </i><span class="hljs-built_in">require</span>(<span class="hljs-string">'module'</span>).globalPaths,</span>
+<span class="line"><i> </i><i> </i>[process.cwd() + <span class="hljs-string">'/node_modules'</span>]</span>
+<span class="line"><i> </i><i> </i>.concat(process.env.NODE_PATH.split(<span class="hljs-string">':'</span>).filter(p =&gt; <span class="hljs-number">0</span> &lt; p.length))</span>
+<span class="line">);</span></code></pre><h3 id="how-to-update-b-e-n-j-a-os">How to Update Benja OS</h3>
 <p>Bening simply a specially configured Arch Linux OS,
 all you need to update the system is the following:</p>
 <pre><code class="lang-sh hljs sh"><span class="line"><span class="hljs-comment"># updates ArchLinux to the latest</span></span>
