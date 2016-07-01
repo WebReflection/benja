@@ -50,7 +50,7 @@ be sure you also extract its content somewhere on your Hard Drive.</p>
 <p>Both <strong>Linux</strong> and <strong>MacOS</strong> have a simple way to burn images on SD cards, it’s called <a href="https://en.wikipedia.org/wiki/Dd_(Unix">dd</a>).</p>
 <p>However, if you have any software capable of burning ISO images to CDs or DVDs, you might just use that to burn this image into your Micro SD card.</p>
 <p>If not, be sure you find the right path for your card, once inserted.</p>
-<pre><code class="lang-bash hljs bash"><span class="line">$ lsblk</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ lsblk</span>
 <span class="line">NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span>
 <span class="line">sda           8:0    0  477G  0 disk </span>
 <span class="line">├─sda1        8:1    0   60M  0 part /boot</span>
@@ -90,7 +90,7 @@ it might take up to 5 minutes to burn the entire image.</p>
 However, if you’d like to help this project, making it compatible with new boards,
 or you’d like to customize the installation in a convenient way for your needs,
 all you need to do is to write the following in console:</p>
-<pre><code class="lang-bash hljs bash"><span class="line">$ curl -LO benja.io/os/install</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.io/os/install</span>
 <span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
 <span class="line"></span>
 <span class="line"><span class="hljs-comment"># to prepare, as example, odroid-c1 image</span></span>
@@ -102,7 +102,7 @@ all you need to do is to write the following in console:</p>
 <p>In case you’d like to install Benja OS on an i686 or x86_64 compatible hardware,
 you need to start such machine via a recently burned <a href="https://www.archlinux.org/download/">ArchLinux ISO</a>.</p>
 <p>Once you’ll login, feel free to use <code>lsblk</code> to read where is your SD card, and write the following on console:</p>
-<pre><code class="lang-bash hljs bash"><span class="line">$ curl -LO benja.io/os/install</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.io/os/install</span>
 <span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
 <span class="line"></span>
 <span class="line"><span class="hljs-comment"># erase the SD card and install Benja OS</span></span>
@@ -110,21 +110,37 @@ you need to start such machine via a recently burned <a href="https://www.archli
 in case of doubts, it’s worth trying that iso out before starting a whole new process.</p>
 <h3 id="how-to-develop">How to Develop</h3>
 <p>Creating applications is as easy as writing the following from the <code>BENJA-APP</code> disk folder:</p>
-<pre><code class="lang-bash hljs bash"><span class="line">$ npm start</span></code></pre><p>This is indeed exactly what gets executed once Benja OS starts.
+<pre><code class="lang-sh hljs sh"><span class="line">$ npm start</span></code></pre><p>This is indeed exactly what gets executed once Benja OS starts.
 If your computer works, the target board will work too!</p>
 <p>But how about editing remotely so you don’t have to keep removing and putting back the SD card?</p>
 <p>As simple as writing:</p>
-<pre><code class="lang-bash hljs bash"><span class="line">$ ssh benja@192.168.1.17</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ ssh benja@192.168.1.17</span>
 <span class="line">password: benja</span></code></pre><p>At this point you can use <code>nano ~/app/idnex.js</code> to edit that file or, if your IDE supports it, you can use <a href="https://github.com/textmate/rmate#rmate">rmate</a> which is already available in Benja OS.</p>
 <p>This gives you the ability to also test directly GPIO related operations through the board.</p>
-<h3 id="how-to-update-b-e-n-j-a-os">How to Update Benja OS</h3>
-<p>Bening simply a specially configured Arch Linux OS,
-all you need to update the system is the following:</p>
-<pre><code class="lang-bash hljs bash"><span class="line"><span class="hljs-comment"># updates ArchLinux to the latest</span></span>
-<span class="line">sudo pacman -Syu</span>
-<span class="line"></span>
-<span class="line"><span class="hljs-comment"># update Electron and global modules to the latest</span></span>
-<span class="line">npm update -g</span></code></pre><h3 id="how-to-not-boot-the-app">How to not boot the App</h3>
+<h3 id="how-to-reload-the-app">How to reload the App</h3>
+<p>There are at least a couple of ways to do it: remotely and directly through the app.
+The default app example uses a watcher on its main <code>index.js</code> file:</p>
+<pre><code class="lang-js hljs js"><span class="line"><span class="hljs-comment">// for debugging purpose, it might be handy to be able</span></span>
+<span class="line"><span class="hljs-comment">// to reload the window simply via `touch ~/app/reload`</span></span>
+<span class="line"><span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>).watch(<span class="hljs-string">'reload'</span>, () =&gt; app.quit());</span></code></pre><p>Once logged in via <code>ssh</code> all you need to do is to write the following:</p>
+<pre><code class="lang-sh hljs sh"><span class="line">touch ~/app/reload</span></code></pre><p>This will quit the app and thanks to BenjaOS configuration it will also restart it.
+Alternatively you could put a simple script on the page such:</p>
+<pre><code class="lang-html hljs html"><span class="line"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript"></span>
+<span class="line"><span class="hljs-comment">// set double click handler and reload the page if triggered</span></span>
+<span class="line"><span class="hljs-built_in">document</span>.documentElement.ondblclick = () =&gt; location.reload();</span>
+<span class="line"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span></code></pre><p>It could be any sort of event, or a combination of keys, a gesture, a button.
+Bear in mind you could even <code>spawn</code> a <code>reboot</code> via <em>bash</em> or shell, or even invoke a <code>shutdown -h now</code>: you have full control.</p>
+<h3 id="how-to-reload-last-index-html">How to reload last index.html</h3>
+<p>The preinstalled demo app uses <a href="https://github.com/WebReflection/tiny-cdn">tiny-cdn</a> which might try to force caching.
+If you are unable to see changes in your <code>index.html</code>, be sure you load a fresh new one each time.</p>
+<pre><code class="lang-js hljs js"><span class="line"><span class="hljs-comment">// index.js loads the index.html</span></span>
+<span class="line"><span class="hljs-comment">// add the ?_ + random() bit</span></span>
+<span class="line">.loadURL(<span class="hljs-string">'http://localhost:8080/?_='</span> + <span class="hljs-built_in">Math</span>.random());</span></code></pre><h3 id="how-to-load-the-app-remotely">How to load the app remotely</h3>
+<p>By default, BenjaOS redirects to port <code>8080</code> all calls to port <code>80</code>, making it simple to use from your browser the same <code>index.html</code>.
+Write <code>http://192.168.1.7</code> on your browser, being sure the it is the one assigned to your board, and verify everything is OK.</p>
+<p>However, if you plug the SD card into your laptop, you can simply run <code>npm start</code> on <em>BENJA-APP</em> folder and develop directly in there.
+<code>Ctrl + Shift + I</code> to eventually bring up the console and debug like any other HTML page.</p>
+<h3 id="how-to-not-boot-the-app">How to not boot the App</h3>
 <p>If you’d like to play around with Arch Linux instead
 of booting the app, you can either rename <code>~/app/package.json</code>
 into <code>~/app/package.jsno</code> or <code>~/app/package.jsoff</code>,
@@ -135,6 +151,19 @@ or you could remove it or rename it differently, like <code>~/app/package.nope</
 <p>This is handy if you have one project that might have dependencies that might conflict with those your computer architecture might encounter.</p>
 <p>In general though, it is strongly suggested to use dependencies that are cross platform friendly,
 and install those requiring builds and node-gyp as global module (also due the fact exacutables are not installed through a runtime mounted folder).</p>
+<h3 id="how-to-update-b-e-n-j-a-os">How to Update Benja OS</h3>
+<p>Bening simply a specially configured Arch Linux OS,
+all you need to update the system is the following:</p>
+<pre><code class="lang-sh hljs sh"><span class="line"><span class="hljs-comment"># updates ArchLinux to the latest</span></span>
+<span class="line">sudo pacman -Syu</span>
+<span class="line"></span>
+<span class="line"><span class="hljs-comment"># update Electron and global modules to the latest</span></span>
+<span class="line">npm update -g</span></code></pre><h3 id="led-and-papirus-video-demonstartion">Led and Papirus Video Demonstartion</h3>
+<p>This video shows some potential and the simplified workflow BenjaOS is capable of.
+Following you can read used <a href="https://github.com/WebReflection/benja/tree/gh-pages/examples/papirus">Papirus instructions and demo page</a>.</p>
+<div class="video">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/POSrH_TWkfg" frameborder="0" allowfullscreen></iframe>
+</div>
 </section></main>
     <footer>
       <h6>&copy; 2016 <a href="https://www.webreflection.co.uk/">WebReflection</a> Ltd - <a href="https://github.com/WebReflection/benja/">Benja on GitHub</a></h6>

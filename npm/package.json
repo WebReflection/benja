@@ -1,7 +1,7 @@
 {
   "name": "benja",
-  "version": "0.0.8",
-  "description": "Bootable Electron Node JS Application",
+  "version": "0.0.9",
+  "description": "Bootable Electron Node JS Application helper.",
   "main": "./benja.js",
   "repository": {
     "type": "git",

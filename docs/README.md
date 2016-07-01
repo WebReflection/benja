@@ -32,7 +32,7 @@ However, if you have any software capable of burning ISO images to CDs or DVDs, 
 
 If not, be sure you find the right path for your card, once inserted.
 
-```bash
+```sh
 $ lsblk
 NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sda           8:0    0  477G  0 disk 
@@ -95,7 +95,7 @@ However, if you'd like to help this project, making it compatible with new board
 or you'd like to customize the installation in a convenient way for your needs,
 all you need to do is to write the following in console:
 
-```bash
+```sh
 $ curl -LO benja.io/os/install
 $ bash install # to read how to use it
 
@@ -117,7 +117,7 @@ In case you'd like to install Benja OS on an i686 or x86_64 compatible hardware,
 you need to start such machine via a recently burned [ArchLinux ISO](https://www.archlinux.org/download/).
 
 Once you'll login, feel free to use `lsblk` to read where is your SD card, and write the following on console:
-```bash
+```sh
 $ curl -LO benja.io/os/install
 $ bash install # to read how to use it
 
@@ -131,7 +131,7 @@ in case of doubts, it's worth trying that iso out before starting a whole new pr
 
 ### How to Develop
 Creating applications is as easy as writing the following from the `BENJA-APP` disk folder:
-```bash
+```sh
 $ npm start
 ```
 This is indeed exactly what gets executed once Benja OS starts.
@@ -140,7 +140,7 @@ If your computer works, the target board will work too!
 But how about editing remotely so you don't have to keep removing and putting back the SD card?
 
 As simple as writing:
-```bash
+```sh
 $ ssh benja@192.168.1.17
 password: benja
 ```
@@ -151,17 +151,48 @@ This gives you the ability to also test directly GPIO related operations through
 
 
 
-### How to Update Benja OS
-Bening simply a specially configured Arch Linux OS,
-all you need to update the system is the following:
+### How to reload the App
+There are at least a couple of ways to do it: remotely and directly through the app.
+The default app example uses a watcher on its main `index.js` file:
 
-```bash
-# updates ArchLinux to the latest
-sudo pacman -Syu
-
-# update Electron and global modules to the latest
-npm update -g
+```js
+// for debugging purpose, it might be handy to be able
+// to reload the window simply via `touch ~/app/reload`
+require('fs').watch('reload', () => app.quit());
 ```
+Once logged in via `ssh` all you need to do is to write the following:
+```sh
+touch ~/app/reload
+```
+This will quit the app and thanks to BenjaOS configuration it will also restart it.
+Alternatively you could put a simple script on the page such:
+```html
+<script>
+// set double click handler and reload the page if triggered
+document.documentElement.ondblclick = () => location.reload();
+</script>
+```
+It could be any sort of event, or a combination of keys, a gesture, a button.
+Bear in mind you could even `spawn` a `reboot` via _bash_ or shell, or even invoke a `shutdown -h now`: you have full control.
+
+
+
+### How to reload last index.html
+The preinstalled demo app uses [tiny-cdn](https://github.com/WebReflection/tiny-cdn) which might try to force caching.
+If you are unable to see changes in your `index.html`, be sure you load a fresh new one each time.
+```js
+// index.js loads the index.html
+// add the ?_ + random() bit
+.loadURL('http://localhost:8080/?_=' + Math.random());
+```
+
+
+### How to load the app remotely
+By default, BenjaOS redirects to port `8080` all calls to port `80`, making it simple to use from your browser the same `index.html`.
+Write `http://192.168.1.7` on your browser, being sure the it is the one assigned to your board, and verify everything is OK.
+
+However, if you plug the SD card into your laptop, you can simply run `npm start` on *BENJA-APP* folder and develop directly in there.
+`Ctrl + Shift + I` to eventually bring up the console and debug like any other HTML page.
 
 
 
@@ -184,3 +215,23 @@ In general though, it is strongly suggested to use dependencies that are cross p
 and install those requiring builds and node-gyp as global module (also due the fact exacutables are not installed through a runtime mounted folder).
 
 
+
+### How to Update Benja OS
+Bening simply a specially configured Arch Linux OS,
+all you need to update the system is the following:
+
+```sh
+# updates ArchLinux to the latest
+sudo pacman -Syu
+
+# update Electron and global modules to the latest
+npm update -g
+```
+
+
+### Led and Papirus Video Demonstartion
+This video shows some potential and the simplified workflow BenjaOS is capable of.
+Following you can read used [Papirus instructions and demo page](https://github.com/WebReflection/benja/tree/gh-pages/examples/papirus).
+<div class="video">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/POSrH_TWkfg" frameborder="0" allowfullscreen></iframe>
+</div>

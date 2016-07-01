@@ -48,6 +48,42 @@ code:not(.hljs) {
   color: #d5d7d8;
 }
 
+pre > code {
+  line-height: 1.5em;
+  counter-reset: line-numbering;
+}
+
+.video {
+  text-align: center;
+}
+
+.video > iframe {
+  margin: auto;
+  width: 100%;
+  max-width: 560px;
+}
+
+.javascript span.line:before,
+.js span.line:before,
+.css span.line:before,
+.html span.line:before,
+.bash span.line:before {
+  display: inline-block;
+  width: 3em;
+  margin-left: -0.5em;
+  padding-right: 4px;
+  content: counter(line-numbering);
+  counter-increment: line-numbering;
+  margin-right: 1em;
+  text-align: right;
+  color: #212a31;
+  border-right: 4px solid #212a31;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 @media (max-width: 639px) {
   header {
     min-height: 250px;
