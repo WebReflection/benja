@@ -253,3 +253,10 @@ Following you can read used [Papirus instructions and demo page](https://github.
 <div class="video">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/POSrH_TWkfg" frameborder="0" allowfullscreen></iframe>
 </div>
+
+
+
+### Known Issues
+In Weston based ISO images (RPi 2/3 + others) you might need to attach a mouse or a keyboard, or any other kind of input device, otherwise you won't be able to boot into BENJA-APP.
+This might be fixed soon simply doing `sudo pacman -Syu` within the session, via `ssh`.
+
