@@ -5,6 +5,28 @@
 # plus
 # https://blog.eldajani.net/banana-pi-arch-linux-accelerated-mali-gpu/
 
+##
+# Copyright (c) 2016 Andrea Giammarchi
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom
+# the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##
+
 if [ ! -f /boot/script.bin ]; then
   echo 'Please mount the boot folder before executing this script.'
   exit 1
@@ -19,6 +41,9 @@ if [ "$X11" != "NO" ]; then
   if [ "$RUNNING_IN_XTERM" != "true" ]; then
     chmod a+x "$0"
     sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm
+    if [ -f ~/.xinitrc ]; then
+      mv ~/.xinitrc ~/.xinitrc-backup
+    fi
     echo "xterm -e \"RUNNING_IN_XTERM='true' bash $0\"" > ~/.xinitrc
     startx
     exit 0
@@ -133,6 +158,7 @@ for fb in $(ls /dev/fb*); do
   sudo chmod 666 $fb
 done
 
+# TODO: is this redundant since there is a service file?
 echo 'KERNEL=="mali", MODE="0660", GROUP="video"
 KERNEL=="ump", MODE="0660", GROUP="video"
 KERNEL=="disp", MODE="0660", GROUP="video"
@@ -180,6 +206,9 @@ fi
 
 if [ "$X11" != "NO" ] && [ "$RUNNING_IN_XTERM" = "true" ]; then
   rm ~/.xinitrc
+  if [ -f ~/.xinitrc-backup ]; then
+    mv ~/.xinitrc-backup ~/.xinitrc
+  fi
 fi
 
 if [ -f /boot/script.bin ]; then
