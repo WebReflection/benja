@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+cd /tmp
+
+sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm xorg-xset xorg-xrandr
+
+echo 'Section "Device"
+  Identifier "Benja IO SPI FBDEV"
+  Driver "fbdev"
+  Option "fbdev" "/dev/fb1"
+  Option "SwapbuffersWait" "true"
+EndSection' > ./99-fbdev.conf
+sudo mv ./99-fbdev.conf /usr/share/X11/xorg.conf.d/99-fbdev.conf
+
+echo 'Section "InputClass"
+  Identifier "calibration"
+  MatchProduct "ADS7846 Touchscreen"
+  Option "Calibration" "3932 300 294 3801"
+  Option "SwapAxes" "1"
+EndSection' > ./99-calibration.conf
+sudo mv ./99-calibration.conf /etc/X11/xorg.conf.d/99-calibration.conf
+
+echo "dwc_otg.lpm_enable=0 $(cat /boot/cmdline.txt) fbcon=map:10 fbcon=font:ProFont6x11 logo.nologo" > ./cmdline.txt
+sudo mv ./cmdline.txt /boot/cmdline.txt
+
+curl -LO https://benja.io/os/bin/waveshare35a.dtbo
+sudo mv waveshare35a.dtbo /boot/overlays/waveshare35a.dtbo
+
+cat /boot/config.txt > ./config.txt
+echo '
+dtparam=audio=on
+dtparam=spi=on
+dtoverlay=ads7846,penirq=25,penirq_pull=2,xohms=150,swapxy=1,xmin=300,ymin=700,xmax=3800,ymax=3400,pmax=255
+dtoverlay=waveshare35a' >> config.txt
+sudo mv ./config.txt /boot/config.txt
+
+mv ~/.app-launcher ~/.xinitrc
+curl -LO https://benja.io/os/sh/startx
+cat startx >> ~/.bashrc
+rm startx && sync
