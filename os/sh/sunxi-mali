@@ -81,14 +81,6 @@ mali_drm" >/usr/lib/modules-load.d/modules.conf'
   sudo modprobe mali_drm
 fi
 
-if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
-  cd ~/.sunxi-mali
-  git clone https://github.com/robclark/libdri2.git
-  cd ~/.sunxi-mali/libdri2
-  ./autogen.sh --prefix=/usr
-  sudo make install
-fi
-
 if [ ! -d ~/.sunxi-mali/libump ]; then
   cd ~/.sunxi-mali
   git clone https://github.com/linux-sunxi/libump.git
@@ -96,6 +88,14 @@ if [ ! -d ~/.sunxi-mali/libump ]; then
   autoreconf -vi
   ./configure --prefix=/usr
   make
+  sudo make install
+fi
+
+if [ "$X11" != "NO" ] && [ ! -d ~/.sunxi-mali/libdri2 ]; then
+  cd ~/.sunxi-mali
+  git clone https://github.com/robclark/libdri2.git
+  cd ~/.sunxi-mali/libdri2
+  ./autogen.sh --prefix=/usr
   sudo make install
 fi
 
