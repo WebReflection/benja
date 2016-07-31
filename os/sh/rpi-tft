@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-cd /tmp
-
-sudo pacman -S --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm xorg-xset xorg-xrandr
+sudo pacman -Syu --needed --noconfirm xorg-server xorg-xinit xf86-video-fbdev xterm xorg-xset xorg-xrandr unclutter
 
 echo 'Section "Device"
   Identifier "Benja IO SPI FBDEV"
@@ -37,4 +35,8 @@ sudo mv ./config.txt /boot/config.txt
 mv ~/.app-launcher ~/.xinitrc
 curl -LO https://benja.io/os/sh/startx
 cat startx >> ~/.bashrc
-rm startx && sync
+rm startx
+
+sudo systemctl disable weston-compositor
+
+sync

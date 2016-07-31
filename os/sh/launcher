@@ -39,7 +39,11 @@ if [ -f ~/app/package.json ]; then
     npm install --production
   fi
   # launch the app via npm
-  sudo npm start
+  if [ -f /usr/bin/unclutter ]; then
+    unclutter -idle 0 & sudo npm start
+  else
+    sudo npm start
+  fi
   # NOTE: npm is unfortunately very slow in some case.
   #       It adds ~2 extra seconds to the bootstrap time.
 else
