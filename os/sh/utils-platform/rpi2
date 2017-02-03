@@ -119,13 +119,9 @@ configure_before() {
   # use 128MB of Display Memory on Raspberry Pi
   if [ "$(contains '/boot/config.txt' 'dispmanx_offline=1')" = "false" ]; then
     echo ' updating /boot/config.txt'
-    echo 'gpu_mem=128' >/boot/config.txt
+    echo 'gpu_mem=256' >/boot/config.txt
     echo 'dispmanx_offline=1' >>/boot/config.txt
-    echo '' >>/boot/config.txt
-    echo '# if you are not on HD TV or you do not see a thing'
-    echo '# try to comment the following' >>/boot/config.txt
-    echo 'hdmi_mode=4' >>/boot/config.txt
-    echo 'hdmi_group=1' >>/boot/config.txt
+    echo 'dtoverlay=vc4-kms-v3d' >>/boot/config.txt
     echo '' >>/boot/config.txt
     echo '# if those borders disturb you' >>/boot/config.txt
     echo '# feel free to comment the following line' >>/boot/config.txt
@@ -133,7 +129,7 @@ configure_before() {
   fi
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
-  pacman -S --needed --noconfirm weston-rpi gst-omx-rpi libcec-rpi mesa mesa-libgl
+  pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl
 }
 
 # once everything is already installed
