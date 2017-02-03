@@ -12,7 +12,7 @@
     "benja": "latest"
   },
   "devDependencies": {
-    "electron-prebuilt": "latest",
+    "electron": "latest",
     "tiny-cdn": "latest"
   }
 }

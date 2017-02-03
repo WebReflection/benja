@@ -114,7 +114,7 @@ touch reload
 npm install -g tiny-cdn
 npm install -g node-gyp
 npm install -g node-pre-gyp
-npm install -g electron-prebuilt
+npm install -g electron
 
 # avoid bin-links
 # npm config set bin-links false
