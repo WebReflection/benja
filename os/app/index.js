@@ -47,7 +47,7 @@ app.once('ready', () => {
     // test WebGL
  // .loadURL('http://get.webgl.org/');
     // stress WebGL
- // .loadURL('http://webglsamples.org/aquarium/aquarium.html');
+ // .loadURL('https://threejs.org/examples/webgl_geometry_cube.html');
 
 
   // for debugging purpose, it might be handy to be able
