@@ -129,7 +129,7 @@ configure_before() {
   fi
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
-  pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset xterm
+  pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset xterm unclutter
 }
 
 # once everything is already installed
