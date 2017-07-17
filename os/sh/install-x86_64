@@ -278,7 +278,7 @@ fi
 sync
 sleep 1
 
-TOPACKSTRAP="base sudo syslinux gptfdisk arch-install-scripts intel-ucode linux-headers dialog wpa_supplicant iw"
+TOPACKSTRAP="base sed sudo syslinux gptfdisk arch-install-scripts intel-ucode linux-headers dialog wpa_supplicant iw"
 if [ "$UEFI" != "NO" ]; then
   TOPACKSTRAP="$TOPACKSTRAP efibootmgr efitools"
 fi
