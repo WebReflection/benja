@@ -122,6 +122,7 @@ configure_before() {
     echo 'gpu_mem=256' >/boot/config.txt
     echo 'dispmanx_offline=1' >>/boot/config.txt
     echo 'dtoverlay=vc4-kms-v3d' >>/boot/config.txt
+    echo 'initramfs initramfs-linux.img followkernel' >>/boot/config.txt
     echo '' >>/boot/config.txt
     echo '# if those borders disturb you' >>/boot/config.txt
     echo '# feel free to comment the following line' >>/boot/config.txt
