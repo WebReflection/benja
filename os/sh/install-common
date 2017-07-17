@@ -261,7 +261,7 @@ fi
 echo "
 PATH=$PATH:${OS_USER_DIR}/.npm-packages/bin
 export PATH
-" >>/etc/profile
+" >>/etc/bash.bashrc
 
 
 
