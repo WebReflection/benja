@@ -66,6 +66,8 @@ if [ "${OS_PREPARE_SD}" = "true" ]; then
     exit 1
   fi
 
+  pacman -S --needed --noconfirm sudo
+
   # umount sd card, exit if there are problems
   if [ "$(umount_sd "$OS_SDCARD")" != "OK" ]; then
     echo ''
