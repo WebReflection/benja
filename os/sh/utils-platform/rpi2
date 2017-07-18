@@ -131,7 +131,7 @@ configure_before() {
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
   sync
-  pacman -Rs cpupower
+  # pacman -Rs --noconfirm cpupower
   pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset xterm unclutter
 }
 
