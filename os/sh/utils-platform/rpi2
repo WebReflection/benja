@@ -121,7 +121,7 @@ configure_before() {
     echo ' updating /boot/config.txt'
     echo 'gpu_mem=256' >/boot/config.txt
     echo 'dispmanx_offline=1' >>/boot/config.txt
-    echo 'dtoverlay=vc4-kms-v3d' >>/boot/config.txt
+    echo 'dtoverlay=vc4-fkms-v3d' >>/boot/config.txt
     echo 'dtparam=audio=on' >>/boot/config.txt
     echo '# initramfs initramfs-linux.img followkernel' >>/boot/config.txt
     echo '' >>/boot/config.txt
@@ -140,6 +140,18 @@ configure_before() {
 configure_after() {
   pacman -S --needed --noconfirm wiringpi i2c-tools lm_sensors
   echo 'i2c-dev' >> /etc/modules-load.d/raspberrypi.conf
+
+  # Netatalk
+  # sudo -H -u ${OS_USER} bash -c "yaourt -S --needed --noconfirm netatalk"
+  # systemctl enable netatalk
+  #echo '[Global]
+#uam list = uams_guest.so
+#
+#[Benja]
+#path = /home/benja/app
+#rwlist = nobody
+#'>/etc/afp.conf
+
   # systemctl disable weston-compositor
   # rm /etc/systemd/system/weston-compositor.service
   # sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"

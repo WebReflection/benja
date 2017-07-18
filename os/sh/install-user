@@ -43,7 +43,7 @@ idle-time=0
 require-input=false"
   if [ "${OS_BOOTINTO}" = "electron" ]; then
     WESTON_INI="$WESTON_INI
-modules=xwayland.so"
+xwayland=true"
   fi
   if [ "${OS_BACKEND}" != "" ]; then
     WESTON_INI="$WESTON_INI
