@@ -131,6 +131,7 @@ configure_before() {
   # silent boot
   sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
   sync
+  pacman -Rs cpupower
   pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset xterm unclutter
 }
 
@@ -138,10 +139,10 @@ configure_before() {
 configure_after() {
   pacman -S --needed --noconfirm wiringpi i2c-tools lm_sensors
   echo 'i2c-dev' >> /etc/modules-load.d/raspberrypi.conf
-  systemctl disable weston-compositor
-  rm /etc/systemd/system/weston-compositor.service
-  sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
-  sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/startx"
-  sudo -H -u ${OS_USER} bash -c "cat startx >> ${OS_USER_DIR}/.bashrc"
-  sudo -H -u ${OS_USER} bash -c "rm startx && sync"
+  # systemctl disable weston-compositor
+  # rm /etc/systemd/system/weston-compositor.service
+  # sudo -H -u ${OS_USER} bash -c "mv ${OS_USER_DIR}/.app-launcher ${OS_USER_DIR}/.xinitrc"
+  # sudo -H -u ${OS_USER} bash -c "curl -LO ${OS_REMOTE_FILES}/sh/startx"
+  # sudo -H -u ${OS_USER} bash -c "cat startx >> ${OS_USER_DIR}/.bashrc"
+  # sudo -H -u ${OS_USER} bash -c "rm startx && sync"
 }

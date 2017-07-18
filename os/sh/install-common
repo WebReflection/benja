@@ -83,23 +83,24 @@ fi
 
 
 # configure automatic login
-if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
-  echo " preparing ${OS_USER} automatic login"
-  sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -n -i -a ${OS_USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
-elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
-  echo " preparing ${OS_USER} automatic login"
-  mkdir -p /etc/systemd/system/getty@tty1.service.d
-  echo "[Service]
-ExecStart=
-ExecStart=-/usr/sbin/agetty -n -i -a ${OS_USER} %I
-" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
-  # avoid login welcome message
-  if [ -f /etc/motd ]; then
-    rm /etc/motd
+if [ "false" = "" ]; then
+  if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+    echo " preparing ${OS_USER} automatic login"
+    sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -nia ${OS_USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
+  elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+    echo " preparing ${OS_USER} automatic login"
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+    echo "[Service]
+  ExecStart=
+  ExecStart=-/usr/sbin/agetty -nia ${OS_USER} %I
+  " >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+    # avoid login welcome message
+    if [ -f /etc/motd ]; then
+      rm /etc/motd
+    fi
+    sync && sleep 1
   fi
-  sync && sleep 1
 fi
-
 
 
 # configure app folder
