@@ -39,7 +39,8 @@ npm config set prefix '~/.npm-packages'
 if [ ! -f ~/.config/weston.ini ]; then
   echo ' creating ~/.config/weston.ini'
   WESTON_INI="[core]
-idle-time=0"
+idle-time=0
+require-input=false"
   if [ "${OS_BOOTINTO}" = "electron" ]; then
     WESTON_INI="$WESTON_INI
 modules=xwayland.so"
