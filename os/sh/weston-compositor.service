@@ -1,7 +1,8 @@
 [Unit]
 Description=Weston Compositor
-Conflicts=getty@tty1.service
-After=getty@tty1.service systemd-user-sessions.service
+After=systemd-user-sessions.service
+#Conflicts=getty@tty1.service
+#After=getty@tty1.service systemd-user-sessions.service
 
 [Service]
 User=benja

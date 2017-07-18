@@ -122,17 +122,18 @@ configure_before() {
     echo 'gpu_mem=256' >/boot/config.txt
     echo 'dispmanx_offline=1' >>/boot/config.txt
     echo 'dtoverlay=vc4-kms-v3d' >>/boot/config.txt
-    echo 'initramfs initramfs-linux.img followkernel' >>/boot/config.txt
+    echo 'dtparam=audio=on' >>/boot/config.txt
+    echo '# initramfs initramfs-linux.img followkernel' >>/boot/config.txt
     echo '' >>/boot/config.txt
     echo '# if those borders disturb you' >>/boot/config.txt
     echo '# feel free to comment the following line' >>/boot/config.txt
     echo '# disable_overscan=1' >>/boot/config.txt
   fi
   # silent boot
-  sed -i "s/rootwait/rootwait quiet splash loglevel=0/" /boot/cmdline.txt
+  sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
   sync
   # pacman -Rs --noconfirm cpupower
-  pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset xterm unclutter
+  pacman -S --needed --noconfirm weston gst-omx-rpi libcec-rpi mesa mesa-libgl xorg-server xorg-xinit xorg-xset # xterm unclutter
 }
 
 # once everything is already installed

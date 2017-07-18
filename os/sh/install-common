@@ -248,6 +248,7 @@ CLUTTER_BACKEND=wayland
 QT_QPA_PLATFORM=wayland
 SDL_VIDEODRIVER=wayland
 GTK_THEME='Adwaita:dark'
+PATH=$PATH:${OS_USER_DIR}/.npm-packages/bin
 " >>/etc/environment
 
 if [ "${OS_LD_LIBRARY_PATH}" = "" ]; then
@@ -255,7 +256,6 @@ if [ "${OS_LD_LIBRARY_PATH}" = "" ]; then
 else
   echo "LD_LIBRARY_PATH=/usr/lib:${OS_LD_LIBRARY_PATH}" >>/etc/environment
 fi
-
 
 
 # make every profile aware of benja global modules

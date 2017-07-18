@@ -61,7 +61,10 @@
   </head>
   <body>
     <header>
-      <img src="logo-dark.svg">
+      <img
+        src="logo-dark.svg"
+        onclick="this.src='logo-'+(~this.src.indexOf('dark')?'light':'dark')+'.svg'"
+      >
       <h1>B.E.N.J.A.</h1>
       <h2>Bootable Electron Node JS Application</h2>
     </header>
