@@ -17,7 +17,7 @@ const app = require('@webreflection/node-worker')(
       ],
       {stdio: 'inherit'}
     );
-    gjs.on('exit', () => process.exit(0));
+    gjs.on('exit', (code) => process.exit(code || 0));
   }
 );
 
