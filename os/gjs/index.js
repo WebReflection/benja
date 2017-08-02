@@ -15,7 +15,7 @@ const app = require('@webreflection/node-worker')(
           process.argv[2] ||
           `http://localhost:${address.port}/`
       ],
-      { stdio: 'inherit' }
+      {stdio: 'inherit'}
     );
     gjs.on('exit', () => process.exit(0));
   }
