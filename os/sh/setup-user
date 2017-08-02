@@ -23,7 +23,7 @@ if [ -f ~/app/package.json ]; then
   cd ~/app
   if [ ! -d node_modules ]; then
     mkdir node_modules
-    npm install --production
+    npm install --production --no-bin-links
   fi
   npm start
 else
@@ -79,4 +79,4 @@ if [ ! -f workers/utils.js ]; then
   curl -LOs "https://benja.io/os/gjs/workers/utils.js"
   cd ..
 fi
-npm install --production
+npm install --production --no-bin-links
