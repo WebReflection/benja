@@ -1,5 +1,7 @@
 #!/usr/bin/env gjs
 
+/*! (C) 2017 Andrea Giammarchi */
+  
 (function (Gtk, Gdk, WebKit2) {'use strict';
   Gtk.init(null);
 
@@ -16,20 +18,23 @@
     gtkSettings = Gtk.Settings.get_default();
   ;
 
+  [
+    'allow-file-access-from-file-urls',
+    'enable-webgl',
+    'enable-webaudio',
+    'enable-accelerated-2d-canvas',
+    'enable-write-console-messages-to-stdout'
+  ].forEach(function (key) {
+    wvSettings.set_property(key, true);
+  });
+
+  webView.connect('context-menu', () => true);
+  webView.load_uri(ARGV[0] || 'http://localhost:8080/');
+
   window.set_default_size(
     Screen.get_width(),
     Screen.get_height()
   );
-
-  [
-    'enable_webgl',
-    'enable_webaudio',
-    'enable_accelerated_compositing'
-  ].forEach(function (key) {
-    wvSettings[key] = true;
-  });
-
-  webView.load_uri(ARGV[0] || 'http://localhost:8080/');
   window.connect('show', () => {
     window.fullscreen();
     Gtk.main();

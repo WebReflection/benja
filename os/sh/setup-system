@@ -114,7 +114,7 @@ dtoverlay=vc4-fkms-v3d
 dtparam=audio=on
 '>>config.txt
     sudo mv config.txt /boot/config.txt
-    sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
   fi
   rm -rf config.txt
 fi
