@@ -45,7 +45,8 @@ fi
 
 # setup ~/app folder
 cd ~/app
-touch reloadif [ ! -f logo-dark.svg ]; then
+touch reload
+if [ ! -f logo-dark.svg ]; then
   curl -LOs "https://benja.io/os/gjs/logo-dark.svg"
 fi
 if [ ! -f logo-light.svg ]; then

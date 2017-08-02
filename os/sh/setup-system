@@ -9,7 +9,7 @@ if [ "$(which sudo 2> /dev/null)" = "" ]; then
 fi
 
 echo " $(tput bold)system update + install dependencies$(tput sgr0)"
-sudo pacman -Syu --needed weston webkit2gtk gjs nodejs npm
+sudo pacman -Syu --needed weston webkit2gtk gjs nodejs npm openssh
 
 echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
 npm config set prefix '~/.npm-packages'
