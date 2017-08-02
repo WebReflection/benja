@@ -11,7 +11,8 @@ fi
 
 echo " $(tput bold)system update + install dependencies$(tput sgr0)"
 sudo pacman -Syu --needed --noconfirm \
-  weston webkit2gtk gjs nodejs npm openssh
+  weston openssh nodejs npm \
+  gjs webkit2gtk gst-plugins-base gst-plugins-good gst-libav
 
 echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
 npm config set prefix '~/.npm-packages'
