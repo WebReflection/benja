@@ -1,0 +1,71 @@
+# setup ~/
+cd ~/
+touch .hushlogin
+mkdir -p .config
+mkdir -p .npm-packages/bin
+mkdir -p app/node_modules
+mkdir -p app/workers
+
+# create .app-launcher
+if [ ! -f ~/.app-launcher ]; then
+  echo "#!/usr/bin/env bash
+
+if [ -f ~/app/package.json ]; then
+  cd ~/app
+  if [ ! -d node_modules ]; then
+    mkdir node_modules
+    npm install --production
+  fi
+  npm start
+else
+  cd ~/
+  if [ -f ~/app/package.jsno ]; then
+    mv ~/app/package.jsno ~/app/package.json
+  elif [ -f ~/app/package.jsoff ]; then
+    mv ~/app/package.jsoff ~/app/package.json
+  fi
+  weston-terminal --fullscreen
+fi" >~/.app-launcher
+fi
+
+# create weston.ini
+if [ ! -f ~/.config/weston.ini ]; then
+  echo "[core]
+idle-time=0
+require-input=false
+
+[shell]
+client=/home/${USER}/.app-launcher
+animation=none
+close-animation=none
+startup-animation=none
+locking=false
+" >~/.config/weston.ini
+fi
+
+# setup ~/app folder
+cd ~/app
+touch reloadif [ ! -f logo-dark.svg ]; then
+  curl -LOs "https://benja.io/os/gjs/logo-dark.svg"
+fi
+if [ ! -f logo-light.svg ]; then
+  curl -LOs "https://benja.io/os/gjs/logo-light.svg"
+fi
+if [ ! -f index.html ]; then
+  curl -LOs "https://benja.io/os/gjs/index.html"
+fi
+if [ ! -f index.js ]; then
+  curl -LOs "https://benja.io/os/gjs/index.js"
+fi
+if [ ! -f package.json ]; then
+  curl -LOs "https://benja.io/os/gjs/package.json"
+fi
+if [ ! -f browse ]; then
+  curl -LOs "https://benja.io/os/gjs/browse"
+fi
+if [ ! -f workers/utils.js ]; then
+  cd workers
+  curl -LOs "https://benja.io/os/gjs/workers/utils.js"
+  cd ..
+fi
+npm install --production

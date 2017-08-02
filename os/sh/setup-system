@@ -1,0 +1,101 @@
+if [ "${USER}" = "root" ]; then
+  echo " $(tput bold)root$(tput sgr0) user $(tput smul)cannot$(tput rmul) setup the system"
+  exit 1
+fi
+
+# sudo
+if [ "$(which sudo 2> /dev/null)" = "" ]; then
+  bash <(curl -s https://archibold.io/install/sudo)
+fi
+
+echo " $(tput bold)system update + install dependencies$(tput sgr0)"
+sudo pacman -Syu --needed weston webkit2gtk gjs nodejs npm
+
+echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
+npm config set prefix '~/.npm-packages'
+npm install -g node-gyp node-pre-gyp
+
+# weston service
+if [ ! -f /etc/systemd/system/weston-compositor.service ]; then
+  echo " $(tput bold)weston-compositor.service$(tput sgr0)"
+  echo "[Unit]
+Description=Weston Compositor
+Conflicts=getty@tty1.service
+After=getty@tty1.service systemd-user-sessions.service
+
+[Service]
+User=${USER}
+Restart=always
+RestartSec=2
+TimeoutSec=2
+EnvironmentFile=/etc/environment
+ExecStart=/usr/bin/weston-launch
+IgnoreSIGPIPE=no
+StandardOutput=syslog
+StandardError=inherit
+StandardInput=tty
+TTYPath=/dev/tty1
+
+[Install]
+Alias=display-manager.service" > weston-compositor.service
+  sudp mv weston-compositor.service /etc/systemd/system
+  sudo systemctl enable weston-compositor
+fi
+
+# weston-launch
+if [ -f /usr/bin/weston-launch ]; then
+  echo " $(tput bold)weston-launch$(tput sgr0)"
+  sudo groupadd weston-launch
+  sudo usermod -aG weston-launch ${USER}
+  sudo chown root /usr/bin/weston-launch
+  sudo chmod +s /usr/bin/weston-launch
+fi
+
+# configure 8080 to 80 redirect
+if [ ! -f /etc/systemd/system/localhost-80to8080.service ]; then
+  echo " $(tput bold)localhost-80to8080.service(tput sgr0)"
+  echo "[Unit]
+Description=localhost 80 to 8080 service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+
+[Install]
+WantedBy=multi-user.target
+" >localhost-80to8080.service
+  sudo mv localhost-80to8080.service /etc/systemd/system/localhost-80to8080.service
+  sudo systemctl enable localhost-80to8080.service
+fi
+
+# configure environment
+cat /etc/environment > environment
+if [ "$(cat environment | grep GDK_BACKEND)" = "" ]; then
+  echo " $(tput bold)/etc/environment(tput sgr0)"
+  echo "
+XDG_RUNTIME_DIR=/tmp
+XDG_CONFIG_HOME=${HOME}/.config
+NODE_PATH=${HOME}/.npm-packages/lib/node_modules
+GDK_BACKEND=wayland
+CLUTTER_BACKEND=wayland
+QT_QPA_PLATFORM=wayland
+SDL_VIDEODRIVER=wayland
+GTK_THEME='Adwaita:dark'
+PATH=$PATH:${HOME}/.npm-packages/bin
+" >>environment
+  sudo mv environment /etc/environment
+fi
+rm environment
+
+if [ "$(cat /etc/bash.bashrc | grep npm-packages/bin)" = "" ]; then
+  echo " $(tput bold)/etc/bash.bashrc(tput sgr0)"
+echo "
+PATH=$PATH:${HOME}/.npm-packages/bin
+export PATH
+" >bash.bashrc
+  cat /etc/bash.bashrc >>bash.bashrc
+  sudo mv bash.bashrc /etc/
+  rm bash.bashrc
+fi
