@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+OS_SDCARD=""
+OS_ARCHIVE=""
+
+echo ""
+for tmp in $@; do
+  if [ "${tmp:${#tmp}-7}" = ".tar.gz" ] && [ -f "$tmp" ]; then
+    OS_ARCHIVE="$tmp"
+  elif [ "${tmp:0:1}" = "/" ] && [ "$(lsblk $tmp)" != "" ]; then
+    OS_SDCARD="$tmp"
+  fi
+done
+
+if [ "$OS_SDCARD" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
+  echo "$(tput bold)WARNING$(tput sgr0) unknown OS file or SD card"
+  exit 1
+fi
+
+echo "$(tput bold)Preparing $OS_SDCARD$(tput sgr0)"
+sudo umount $OS_SDCARD*
+
+TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
+TMP_ROOT_SIZE="6000000"
+if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
+  TMP_ROOT_SIZE="3800M"
+else
+  TMP_ROOT_SIZE="6000M"
+fi
+
+echo ""
+echo "$(tput bold)SD Card info$(tput sgr0)"
+echo "SD card total space: $TMP_SD_SIZE"
+echo "creating a root partition of $TMP_ROOT_SIZE"
+
+echo ""
+echo "$(tput bold)WARNING$(tput sgr0)"
+echo " disk $(tput bold)${OS_SDCARD}$(tput sgr0) will be completely $(tput bold)erased$(tput sgr0)"
+echo " and every data in it will be lost."
+echo ''
+read -n1 -r -p "$(echo " erase $(tput bold)${OS_SDCARD}$(tput sgr0)? [y/N]")" CHOICE
+
+if [[ $? -ne 0 ]] || [ "$CHOICE" != "y" ]; then
+  echo ""
+  echo "$(tput bold)bye bye$(tput sgr0)"
+  exit 1
+fi
+
+partition_sd() {
+  local DISK=$1
+  local ROOT_SIZE=$2
+  sudo parted --script $DISK mklabel msdos
+  sudo parted --script --align optimal $DISK mkpart primary fat32 2048s 100M
+  sudo parted --script --align optimal $DISK mkpart primary ext4 100M $ROOT_SIZE
+  sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
+  sudo parted --script $DISK set 1 boot on
+  sudo parted --script $DISK set 2 hidden
+}
+
+# returns ordered partitions
+get_partitions() {
+  local DISK=$1
+  local POSSIBLEDISKS=$(ls ${DISK}*)
+  local BOOT=""
+  local ROOT=""
+  local WWW=""
+  local CHOICE=""
+  for CHOICE in $POSSIBLEDISKS; do
+    if [ "$CHOICE" != "$DISK" ]; then
+      if [ "$BOOT" = "" ]; then
+        BOOT="$CHOICE"
+      else
+        if [ "$ROOT" = "" ]; then
+          ROOT="$CHOICE"
+        else
+          WWW="$CHOICE"
+        fi
+      fi
+    fi
+  done
+  echo "${BOOT} ${ROOT} ${WWW}"
+}
+
+format_sd() {
+  local DISK=$1
+  local BOOT=$2
+  local ROOT=$3
+  local WWW=$4
+
+  sudo mkfs.vfat "$BOOT"
+  yes | sudo mkfs.ext4 "$ROOT"
+  sudo mkfs.vfat "$WWW"
+  sudo dosfslabel "$WWW" BOOT2WK
+}
+
+install_os() {
+  local ARCHIVE="$1"
+  local DISK=$2
+  local BOOT=$3
+  local ROOT=$4
+
+  mkdir -p boot
+  mkdir -p root
+  sudo mount "$BOOT" boot
+  sudo mount "$ROOT" root
+  sudo bsdtar -xpf "$ARCHIVE" -C root
+  sync
+  sudo mv root/boot/* boot
+  sync
+}
+
+echo ""
+echo ""
+echo "$(tput bold)Partitioning$(tput sgr0)"
+partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE
+echo "Done"
+
+echo ""
+echo "$(tput bold)Formatting$(tput sgr0)"
+OS_SDCARD_PARTITIONS=($(get_partitions $OS_SDCARD))
+format_sd "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]}
+
+echo ""
+echo "$(tput bold)Extracting the OS$(tput sgr0)"
+echo "it might take a while"
+mkdir -p ~/tmp-mounting-point
+cd ~/tmp-mounting-point
+install_os "$OS_ARCHIVE" "$OS_SDCARD" ${OS_SDCARD_PARTITIONS[*]}
+cd -
+
+echo ""
+echo "$(tput bold)Cleaning up$(tput sgr0)"
+sleep 1
+sync
+sudo umount $OS_SDCARD*
+rm -rf ~/tmp-mounting-point
+
+echo ""
+echo "$(tput bold)Completed$(tput sgr0)"
+echo "Plugin the SD card into the Raspberry Pi"
+echo ""
+echo " root:root"
+echo " alarm:alarm"
+echo ""
