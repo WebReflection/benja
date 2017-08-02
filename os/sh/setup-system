@@ -87,7 +87,7 @@ PATH=$PATH:${HOME}/.npm-packages/bin
 " >>environment
   sudo mv environment /etc/environment
 fi
-rm environment
+rm -rf environment
 
 if [ "$(cat /etc/bash.bashrc | grep npm-packages/bin)" = "" ]; then
   echo " $(tput bold)/etc/bash.bashrc(tput sgr0)"
@@ -97,5 +97,21 @@ export PATH
 " >bash.bashrc
   cat /etc/bash.bashrc >>bash.bashrc
   sudo mv bash.bashrc /etc/
-  rm bash.bashrc
+  rm -rf bash.bashrc
+fi
+
+if [ -f /boot/config.txt ]; then
+  cat /boot/config.txt > config.txt
+  if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
+    echo " $(tput bold)/boot/config.txt(tput sgr0)"
+    echo '
+gpu_mem=128
+dispmanx_offline=1
+dtoverlay=vc4-fkms-v3d
+dtparam=audio=on
+'>>config.txt
+    sudo mv config.txt /boot/config.txt
+    sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+  fi
+  rm -rf config.txt
 fi
