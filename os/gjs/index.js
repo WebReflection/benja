@@ -10,11 +10,13 @@ const app = require('@webreflection/node-worker')(
     const address = app.address();
     const gjs = require('child_process').spawn(
       'gjs',
-      ['browse', `http://localhost:${address.port}/`],
+      [
+        'browse',
+          process.argv[2] ||
+          `http://localhost:${address.port}/`
+      ],
       { stdio: 'inherit' }
     );
-    //gjs.stdout.pipe(process.stdout);
-    //gjs.stderr.pipe(process.stderr);
     gjs.on('exit', () => process.exit(0));
   }
 );
