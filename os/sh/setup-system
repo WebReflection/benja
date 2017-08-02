@@ -118,3 +118,7 @@ dtparam=audio=on
   fi
   rm -rf config.txt
 fi
+
+if [ -f setup-user ]; then
+  bash setup-user
+fi
