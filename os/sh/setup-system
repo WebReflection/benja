@@ -12,7 +12,8 @@ fi
 echo " $(tput bold)system update + install dependencies$(tput sgr0)"
 sudo pacman -Syu --needed --noconfirm \
   weston openssh nodejs npm \
-  gjs webkit2gtk gst-plugins-base gst-plugins-good gst-libav
+  gjs webkit2gtk gst-plugins-base gst-plugins-good gst-libav \
+  libva-vdpau-driver libvdpau-va-gl
 
 echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
 npm config set prefix '~/.npm-packages'
@@ -114,7 +115,9 @@ dtoverlay=vc4-fkms-v3d
 dtparam=audio=on
 '>>config.txt
     sudo mv config.txt /boot/config.txt
-    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+    if [ - /boot/cmdline.txt ]; then
+      sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+    fi
   fi
   rm -rf config.txt
 fi
