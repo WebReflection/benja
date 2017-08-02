@@ -131,9 +131,11 @@ ExecStart=/usr/bin/mount /dev/mmcblk0p3 ${HOME}/app -o uid=${USER},gid=users,uma
 [Install]
 WantedBy=multi-user.target
 ">BOOT2WK-disk.service
-sudo mv BOOT2WK-disk.service /etc/systemd/system/BOOT2WK-disk.service
-suco systemctl enable BOOT2WK-disk.service
-suco systemctl start BOOT2WK-disk.service
+  sudo mv BOOT2WK-disk.service /etc/systemd/system/BOOT2WK-disk.service
+  mkdir ${HOME}/app
+  sync
+  sudo systemctl enable BOOT2WK-disk.service
+  sudo systemctl start BOOT2WK-disk.service
 fi
 
 sudo systemctl enable sshd
