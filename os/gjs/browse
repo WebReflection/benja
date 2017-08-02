@@ -1,0 +1,45 @@
+#!/usr/bin/env gjs
+
+(function (Gtk, Gdk, WebKit2) {'use strict';
+  Gtk.init(null);
+
+  const
+    Screen = Gdk.Screen.get_default(),
+    window = new Gtk.Window({
+      title: 'Benja GTK+',
+      type : Gtk.WindowType.TOPLEVEL,
+      decorated: false,
+      window_position: Gtk.WindowPosition.CENTER
+    }),
+    webView = new WebKit2.WebView(),
+    wvSettings = webView.get_settings(),
+    gtkSettings = Gtk.Settings.get_default();
+  ;
+
+  window.set_default_size(
+    Screen.get_width(),
+    Screen.get_height()
+  );
+
+  [
+    'enable_webgl',
+    'enable_webaudio',
+    'enable_accelerated_compositing'
+  ].forEach(function (key) {
+    wvSettings[key] = true;
+  });
+
+  webView.load_uri(ARGV[0] || 'http://localhost:8080/');
+  window.connect('show', () => {
+    window.fullscreen();
+    Gtk.main();
+  });
+  window.connect('destroy', () => Gtk.main_quit());
+  window.connect('delete_event', () => false);
+  window.add(webView);
+  window.show_all();
+}(
+  imports.gi.Gtk,
+  imports.gi.Gdk,
+  imports.gi.WebKit2
+));

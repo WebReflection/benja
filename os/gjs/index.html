@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- mandatory -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/node-worker.js"></script>
+    <!-- for testing sake -->
+    <script>document.documentElement.ondblclick=()=>location.reload();</script>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+
+      html {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+
+      body {
+        background: #292929;
+        color: #eeeeec;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100vh;
+        padding: 0;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        color: #ffffff;
+      }
+
+      h2 {
+        font-weight: lighter;
+        font-size: 1.2rem;
+        color: #8c8c8b;
+        margin-bottom: 0;
+      }
+
+      p:first-child {
+        font-weight: bold;
+      }
+
+      img {
+        width: 15vh;
+        height: 15vh;
+      }
+
+    </style>
+    <title>Benja OS</title>
+  </head>
+  <body>
+    <header>
+      <img
+        src="logo-dark.svg"
+        onclick="this.src='logo-'+(~this.src.indexOf('dark')?'light':'dark')+'.svg'"
+      >
+      <h1>B.E.N.J.A.</h1>
+      <h2>Bootable Electron Node JS Application</h2>
+    </header>
+    <main></main>
+    <script>
+    const main = document.querySelector('main');
+    const nw = new NodeWorker('utils.js');
+    nw.onmessage = (e) => {
+      e.data.forEach(ip => {
+        main.appendChild(
+          document.createElement('p')
+        ).textContent = ip;
+      });
+      main.appendChild(
+        document.createElement('p')
+      ).textContent = [
+        document.documentElement.clientWidth,
+        document.documentElement.clientHeight
+      ].join('x');
+    };
+    nw.postMessage({name: 'ipv4'});
+
+    </script>
+  </body>
+</html>
