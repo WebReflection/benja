@@ -13,7 +13,7 @@ echo " $(tput bold)system update + install dependencies$(tput sgr0)"
 sudo pacman -Syu --needed --noconfirm \
   weston openssh nodejs npm \
   gjs webkit2gtk gst-plugins-base gst-plugins-good gst-libav \
-  libva-vdpau-driver libvdpau-va-gl
+  mesa-vdpau libva-mesa-driver libva-vdpau-driver libvdpau-va-gl
 
 echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
 npm config set prefix '~/.npm-packages'
