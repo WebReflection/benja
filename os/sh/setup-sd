@@ -17,9 +17,6 @@ if [ "$OS_SDCARD" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
   exit 1
 fi
 
-echo "$(tput bold)Preparing $OS_SDCARD$(tput sgr0)"
-sudo umount $OS_SDCARD*
-
 TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
 TMP_ROOT_SIZE="6000000"
 if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
@@ -28,10 +25,11 @@ else
   TMP_ROOT_SIZE="6000M"
 fi
 
+clear
 echo ""
 echo "$(tput bold)SD Card info$(tput sgr0)"
 echo "SD card total space: $TMP_SD_SIZE"
-echo "creating a root partition of $TMP_ROOT_SIZE"
+echo "creating a root partition of $(tput bold)$TMP_ROOT_SIZE$(tput sgr0)"
 
 echo ""
 echo "$(tput bold)WARNING$(tput sgr0)"
@@ -88,9 +86,9 @@ format_sd() {
   local WWW=$4
 
   sudo mkfs.vfat "$BOOT"
-  yes | sudo mkfs.ext4 "$ROOT"
   sudo mkfs.vfat "$WWW"
-  sudo dosfslabel "$WWW" BOOT2WK
+  sudo dosfslabel "$WWW" APP
+  yes | sudo mkfs.ext4 "$ROOT"
 }
 
 install_os() {
@@ -111,9 +109,15 @@ install_os() {
 
 echo ""
 echo ""
+echo "$(tput bold)Preparing $OS_SDCARD$(tput sgr0)"
+sudo umount $OS_SDCARD*
+sleep 1
+
+echo ""
 echo "$(tput bold)Partitioning$(tput sgr0)"
 partition_sd "$OS_SDCARD" $TMP_ROOT_SIZE
 echo "Done"
+sleep 1
 
 echo ""
 echo "$(tput bold)Formatting$(tput sgr0)"
@@ -134,6 +138,7 @@ sleep 1
 sync
 sudo umount $OS_SDCARD*
 rm -rf ~/tmp-mounting-point
+sleep 1
 
 echo ""
 echo "$(tput bold)Completed$(tput sgr0)"
