@@ -3,22 +3,33 @@ if [ "${USER}" = "root" ]; then
   exit 1
 fi
 
+echo " $(tput bold)updating system$(tput sgr0)"
+sudo pacman -Sy --needed --noconfirm
+
 # sudo
 if [ "$(which sudo 2> /dev/null)" = "" ]; then
   echo " $(tput bold)installing sudo$(tput sgr0)"
   bash <(curl -s https://archibold.io/install/sudo)
 fi
 
-echo " $(tput bold)system update + install dependencies$(tput sgr0)"
-sudo pacman -Syu --needed --noconfirm \
-  cpupower upower openssh nodejs npm \
+if [ "$(which yaourt 2> /dev/null)" = "" ]; then
+  echo " $(tput bold)installing yaourt$(tput sgr0)"
+  bash <(curl -s archibold.io/install/yaourt)
+
+  echo " $(tput bold)installing pigpio$(tput sgr0)"
+  yaourt -S --needed --noconfirm python-pigpio-git
+  sudo cp /usr/local/lib/libpigpio* /usr/lib/
+fi
+
+echo " $(tput bold)installing dependencies$(tput sgr0)"
+sudo pacman -S --needed --noconfirm \
+  cpupower upower openssh nodejs npm git python2 \
   xorg-server xorg-xinit xorg-xrandr xorg-xset xterm \
-  qt5-quickcontrols qt5-webengine \
   noto-fonts noto-fonts-emoji
 
-echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
-npm config set prefix '~/.npm-packages'
-npm install -g node-gyp node-pre-gyp
+echo " $(tput bold)installing Qt$(tput sgr0)"
+sudo pacman -S --needed --noconfirm \
+  qt5-quickcontrols qt5-webengine
 
 # configure 8080 to 80 redirect
 if [ ! -f /etc/systemd/system/localhost-80to8080.service ]; then
@@ -95,6 +106,18 @@ fi
 if [ -f /etc/motd ]; then
   echo " $(tput bold)drop welcome message$(tput sgr0)"
   sudo rm -rf /etc/motd
+fi
+
+if [ ! -d ~/.npm-packages ]; then
+  echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
+  npm config set prefix '~/.npm-packages'
+  npm install -g node-gyp node-pre-gyp @webreflection/node-worker
+
+  npm install -g  raspi-io johnny-five
+
+  echo "${USER} ALL=NOPASSWD: $(which npm)"> sudoers
+  sudo bash -c 'cat sudoers >>/etc/sudoers'
+  rm sudoers
 fi
 
 if [ -f setup-user ]; then

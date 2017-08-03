@@ -27,7 +27,7 @@ if [ -f ~/app/package.json ]; then
     mkdir node_modules
     npm install --production --no-bin-links
   fi
-  npm start
+  sudo npm start
 else
   cd ~/
   if [ -f ~/app/package.jsno ]; then

@@ -9,7 +9,9 @@
   "author": "Andrea Giammarchi",
   "license": "MIT",
   "dependencies": {
-    "@webreflection/node-worker": "^0.1.2",
     "tiny-cdn": "^0.7.0"
+  },
+  "devDependencies": {
+    "@webreflection/node-worker": "^0.1.2"
   }
 }
