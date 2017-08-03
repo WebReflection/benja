@@ -42,6 +42,7 @@ fi
 if [ -f /boot/config.txt ]; then
   cat /boot/config.txt > config.txt
   if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
+    sudo sed -i -e "s/gpu_mem=.*//" /boot/config.txt
     echo " $(tput bold)/boot/config.txt$(tput sgr0)"
     echo '
 gpu_mem=192
@@ -82,17 +83,18 @@ sudo systemctl enable dhcpcd
 echo " $(tput bold)automatic login$(tput sgr0)"
 if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
   echo 'using getty@tty1.service'
-  sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -nia ${USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
+  sudo sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -nia ${USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
 elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
   echo 'using autologin.conf'
-  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
   echo "[Service]
 ExecStart=
 ExecStart=-/usr/sbin/agetty -nia ${USER} %I
-" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+"> autologin.conf
+  sudo mv autologin.conf /etc/systemd/system/getty@tty1.service.d/
   # avoid login welcome message
   if [ -f /etc/motd ]; then
-    rm /etc/motd
+    sudo rm /etc/motd
   fi
   sync && sleep 1
 fi
