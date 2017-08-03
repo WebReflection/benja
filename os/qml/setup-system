@@ -11,7 +11,7 @@ fi
 
 echo " $(tput bold)system update + install dependencies$(tput sgr0)"
 sudo pacman -Syu --needed --noconfirm \
-  openssh nodejs npm \
+  upower openssh nodejs npm \
   xorg-server xorg-xinit xorg-xrandr xorg-xset xterm \
   qt5-quickcontrols qt5-webengine \
   noto-fonts noto-fonts-emoji
