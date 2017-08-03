@@ -3,14 +3,14 @@ if [ "${USER}" = "root" ]; then
   exit 1
 fi
 
-echo " $(tput bold)updating system$(tput sgr0)"
-sudo pacman -Sy --needed --noconfirm
-
 # sudo
 if [ "$(which sudo 2> /dev/null)" = "" ]; then
   echo " $(tput bold)installing sudo$(tput sgr0)"
   bash <(curl -s https://archibold.io/install/sudo)
 fi
+
+echo " $(tput bold)updating system$(tput sgr0)"
+sudo pacman -Sy --needed --noconfirm
 
 if [ "$(which yaourt 2> /dev/null)" = "" ]; then
   echo " $(tput bold)installing yaourt$(tput sgr0)"
