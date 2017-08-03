@@ -10,7 +10,7 @@ if [ "$(which sudo 2> /dev/null)" = "" ]; then
 fi
 
 echo " $(tput bold)updating system$(tput sgr0)"
-sudo pacman -Sy --needed --noconfirm
+sudo pacman -Syu --needed --noconfirm
 
 if [ "$(which yaourt 2> /dev/null)" = "" ]; then
   echo " $(tput bold)installing yaourt$(tput sgr0)"
