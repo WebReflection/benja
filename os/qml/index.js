@@ -11,8 +11,10 @@ const app = require('@webreflection/node-worker')(
     const qml = require('child_process').spawn(
       'qml',
       [
+        '-platform',
+        'eglfs',
         'browse',
-          process.argv[2] ||
+          process.argv[process.argv.length - 1] ||
           `http://localhost:${address.port}/`
       ],
       {stdio: 'inherit'}

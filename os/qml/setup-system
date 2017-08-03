@@ -1,0 +1,102 @@
+if [ "${USER}" = "root" ]; then
+  echo " $(tput bold)root$(tput sgr0) user $(tput smul)cannot$(tput rmul) setup the system"
+  exit 1
+fi
+
+# sudo
+if [ "$(which sudo 2> /dev/null)" = "" ]; then
+  echo " $(tput bold)installing sudo$(tput sgr0)"
+  bash <(curl -s https://archibold.io/install/sudo)
+fi
+
+echo " $(tput bold)system update + install dependencies$(tput sgr0)"
+sudo pacman -Syu --needed --noconfirm \
+  openssh nodejs npm \
+  xorg-server xorg-xinit xorg-xrandr xorg-xset xterm \
+  qt5-quickcontrols qt5-webengine \
+  noto-fonts noto-fonts-emoji
+
+echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
+npm config set prefix '~/.npm-packages'
+npm install -g node-gyp node-pre-gyp
+
+# configure 8080 to 80 redirect
+if [ ! -f /etc/systemd/system/localhost-80to8080.service ]; then
+  echo " $(tput bold)localhost-80to8080.service$(tput sgr0)"
+  echo "[Unit]
+Description=localhost 80 to 8080 service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+ExecStart=/usr/bin/iptables -t nat -I OUTPUT -p tcp -o lo --dport 80 -j REDIRECT --to-port 8080
+
+[Install]
+WantedBy=multi-user.target
+" >localhost-80to8080.service
+  sudo mv localhost-80to8080.service /etc/systemd/system/localhost-80to8080.service
+  sudo systemctl enable localhost-80to8080.service
+fi
+
+if [ -f /boot/config.txt ]; then
+  cat /boot/config.txt > config.txt
+  if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
+    echo " $(tput bold)/boot/config.txt$(tput sgr0)"
+    echo '
+gpu_mem=192
+dispmanx_offline=1
+dtoverlay=vc4-fkms-v3d
+dtparam=audio=on
+'>>config.txt
+    sudo mv config.txt /boot/config.txt
+    if [ -f /boot/cmdline.txt ]; then
+      sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+    fi
+  fi
+  rm -rf config.txt
+fi
+
+if [ ! -f /etc/systemd/system/application-disk.service ]; then
+echo "[Unit]
+Description=application ${HOME}/app disk
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount /dev/mmcblk0p3 ${HOME}/app -o uid=${USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">application-disk.service
+  sudo mv application-disk.service /etc/systemd/system/application-disk.service
+  mkdir ${HOME}/app
+  sync
+  sudo systemctl enable application-disk.service
+  sudo systemctl start application-disk.service
+fi
+
+sudo systemctl enable sshd
+sudo systemctl enable dhcpcd
+
+echo " $(tput bold)automatic login$(tput sgr0)"
+if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
+  echo 'using getty@tty1.service'
+  sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -nia ${USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
+elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
+  echo 'using autologin.conf'
+  mkdir -p /etc/systemd/system/getty@tty1.service.d
+  echo "[Service]
+ExecStart=
+ExecStart=-/usr/sbin/agetty -nia ${USER} %I
+" >/etc/systemd/system/getty@tty1.service.d/autologin.conf
+  # avoid login welcome message
+  if [ -f /etc/motd ]; then
+    rm /etc/motd
+  fi
+  sync && sleep 1
+fi
+
+if [ -f setup-user ]; then
+  bash setup-user
+fi

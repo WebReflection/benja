@@ -3,7 +3,7 @@ import QtQuick.Window 2.2
 import QtWebEngine 1.5
 
 Window {
-  Component.onCompleted: { /* for debugging purpose */ }
+  // Component.onCompleted: { /* for debugging purpose */ }
   modality: Qt.ApplicationModal
   visible: true
   visibility: Window.FullScreen
@@ -17,7 +17,18 @@ Window {
     onNewViewRequested: function(request) {
       request.openIn(webView);
     }
-    url: Qt.application.arguments[2] || ''
+    settings.accelerated2dCanvasEnabled: true
+    settings.allowGeolocationOnInsecureOrigins: true
+    settings.allowRunningInsecureContent: true
+    settings.autoLoadIconsForPage: false
+    settings.fullScreenSupportEnabled: true
+    settings.javascriptCanAccessClipboard: true
+    settings.javascriptCanOpenWindows: false
+    settings.localContentCanAccessFileUrls: true
+    settings.localContentCanAccessRemoteUrls: true
+    settings.webGLEnabled: true
+    url: Qt.application.arguments.pop()
+    // my improvised way to scale
     zoomFactor: Math.max(1, Screen.pixelDensity / 5)
   }
 }
