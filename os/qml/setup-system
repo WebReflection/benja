@@ -89,11 +89,12 @@ ExecStart=
 ExecStart=-/usr/sbin/agetty -nia ${USER} %I
 "> override.conf
   sudo mv override.conf /etc/systemd/system/getty@tty1.service.d/
-  # avoid login welcome message
-  if [ -f /etc/motd ]; then
-    sudo rm /etc/motd
-  fi
   sync && sleep 1
+fi
+
+if [ -f /etc/motd ]; then
+  echo " $(tput bold)drop welcome message$(tput sgr0)"
+  sudo rm -rf /etc/motd
 fi
 
 if [ -f setup-user ]; then
