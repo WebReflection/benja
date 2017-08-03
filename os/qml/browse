@@ -1,0 +1,23 @@
+import QtQuick 2.7
+import QtQuick.Window 2.2
+import QtWebEngine 1.5
+
+Window {
+  Component.onCompleted: { /* for debugging purpose */ }
+  modality: Qt.ApplicationModal
+  visible: true
+  visibility: Window.FullScreen
+  WebEngineView {
+    id: webView
+    anchors.fill: parent
+    focus: true
+    onFullScreenRequested: {
+      request.accept();
+    }
+    onNewViewRequested: function(request) {
+      request.openIn(webView);
+    }
+    url: Qt.application.arguments[2] || ''
+    zoomFactor: Math.max(1, Screen.pixelDensity / 5)
+  }
+}
