@@ -81,17 +81,14 @@ sudo systemctl enable sshd
 sudo systemctl enable dhcpcd
 
 echo " $(tput bold)automatic login$(tput sgr0)"
-if [ -f /etc/systemd/system/getty.target.wants/getty@tty1.service ]; then
-  echo 'using getty@tty1.service'
-  sudo sed -i -e "s/ExecStart=-\/sbin\/agetty.*/ExecStart=-\/sbin\/agetty -nia ${USER} %I \$TERM/" /etc/systemd/system/getty.target.wants/getty@tty1.service
-elif [ ! -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]; then
-  echo 'using autologin.conf'
+if [ ! -f /etc/systemd/system/getty@tty1.service.d/override.conf ]; then
+  echo 'using override.conf'
   sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
   echo "[Service]
 ExecStart=
 ExecStart=-/usr/sbin/agetty -nia ${USER} %I
-"> autologin.conf
-  sudo mv autologin.conf /etc/systemd/system/getty@tty1.service.d/
+"> override.conf
+  sudo mv override.conf /etc/systemd/system/getty@tty1.service.d/
   # avoid login welcome message
   if [ -f /etc/motd ]; then
     sudo rm /etc/motd
