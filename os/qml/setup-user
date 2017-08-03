@@ -59,24 +59,31 @@ echo " $(tput bold)~/app$(tput sgr0)"
 cd ~/app
 touch reload
 if [ ! -f logo-dark.svg ]; then
+  echo ' logo-dark.svg'
   curl -LOs "https://benja.io/os/qml/logo-dark.svg"
 fi
 if [ ! -f logo-light.svg ]; then
+  echo ' logo-light.svg'
   curl -LOs "https://benja.io/os/qml/logo-light.svg"
 fi
 if [ ! -f index.html ]; then
+  echo ' index.html'
   curl -LOs "https://benja.io/os/qml/index.html"
 fi
 if [ ! -f index.js ]; then
+  echo ' index.js'
   curl -LOs "https://benja.io/os/qml/index.js"
 fi
 if [ ! -f package.json ]; then
+  echo ' package.json'
   curl -LOs "https://benja.io/os/qml/package.json"
 fi
 if [ ! -f browse ]; then
+  echo ' browse'
   curl -LOs "https://benja.io/os/qml/browse"
 fi
 if [ ! -f workers/utils.js ]; then
+  echo ' workers/utils.js'
   cd workers
   curl -LOs "https://benja.io/os/qml/workers/utils.js"
   cd ..
