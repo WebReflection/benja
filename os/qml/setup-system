@@ -12,15 +12,6 @@ fi
 echo " $(tput bold)updating system$(tput sgr0)"
 sudo pacman -Syu --needed --noconfirm
 
-if [ "$(which yaourt 2> /dev/null)" = "" ]; then
-  echo " $(tput bold)installing yaourt$(tput sgr0)"
-  bash <(curl -s archibold.io/install/yaourt)
-
-  echo " $(tput bold)installing pigpio$(tput sgr0)"
-  yaourt -S --needed --noconfirm python-pigpio-git
-  sudo cp /usr/local/lib/libpigpio* /usr/lib/
-fi
-
 echo " $(tput bold)installing dependencies$(tput sgr0)"
 sudo pacman -S --needed --noconfirm \
   cpupower upower openssh nodejs npm git python2 \
@@ -106,6 +97,15 @@ fi
 if [ -f /etc/motd ]; then
   echo " $(tput bold)drop welcome message$(tput sgr0)"
   sudo rm -rf /etc/motd
+fi
+
+if [ "$(which yaourt 2> /dev/null)" = "" ]; then
+  echo " $(tput bold)installing yaourt$(tput sgr0)"
+  bash <(curl -s archibold.io/install/yaourt)
+
+  echo " $(tput bold)installing pigpio$(tput sgr0)"
+  yaourt -S --needed --noconfirm python-pigpio-git
+  sudo cp /usr/local/lib/libpigpio* /usr/lib/
 fi
 
 if [ ! -d ~/.npm-packages ]; then
