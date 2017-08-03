@@ -14,7 +14,7 @@ const app = require('@webreflection/node-worker')(
         '-platform',
         'eglfs',
         'browse',
-          process.argv[process.argv.length - 1] ||
+          process.argv[2] ||
           `http://localhost:${address.port}/`
       ],
       {stdio: 'inherit'}
