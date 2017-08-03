@@ -43,8 +43,8 @@ fi
 if [ "$(cat ~/.bashrc | grep NODE_PATH)" = "" ]; then
   echo " $(tput bold)~/.bashrc PATH$(tput sgr0)"
   echo '
-NODE_PATH=${HOME}/.npm-packages/lib/node_modules
-PATH=$PATH:${HOME}/.npm-packages/bin
+export NODE_PATH=${HOME}/.npm-packages/lib/node_modules
+export PATH=$PATH:${HOME}/.npm-packages/bin
 '>> ~/.bashrc
 fi
 
