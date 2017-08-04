@@ -114,14 +114,12 @@ if [ "$(sudo cat /etc/sudoers | grep $(which npm))" = "" ]; then
   rm sudoers
 fi
 
-if [ ! -d /usr/lib/node_modules ]; then
-  sudo mkdir /usr/lib/node_modules
-  sudo chown ${USER}:users /usr/lib/node_modules
-  echo " $(tput bold)nodejs global modules$(tput sgr0)"
-  sudo npm install -g node-gyp node-pre-gyp
-  sudo npm install -g @webreflection/node-worker
-  sudo npm install -g raspi-io johnny-five
-fi
+sudo mkdir -p /usr/lib/node_modules
+sudo chown ${USER}:users /usr/lib/node_modules
+echo " $(tput bold)nodejs global modules$(tput sgr0)"
+sudo npm install -g node-gyp node-pre-gyp
+sudo npm install -g @webreflection/node-worker
+sudo npm install -g raspi-io johnny-five
 
 if [ -f setup-user ]; then
   bash setup-user
