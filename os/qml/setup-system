@@ -114,12 +114,23 @@ if [ "$(sudo cat /etc/sudoers | grep $(which npm))" = "" ]; then
   rm sudoers
 fi
 
-sudo mkdir -p /usr/lib/node_modules
-sudo chown ${USER}:users /usr/lib/node_modules
-echo " $(tput bold)nodejs global modules$(tput sgr0)"
-sudo npm install -g node-gyp node-pre-gyp
-sudo npm install -g @webreflection/node-worker
-sudo npm install -g raspi-io johnny-five
+if [ ! -d ~/.npm-packages ]; then
+  mkdir ~/.npm-packages
+  echo " $(tput bold)nodejs prefix$(tput sgr0)"
+  npm config set prefix '~/.npm-packages'
+  export PATH=$PATH:${HOME}/.npm-packages/bin
+  export NODE_PATH=${NODE_PATH}:${HOME}/.npm-packages/lib/node_modules
+  echo '
+export PATH=$PATH:${HOME}/.npm-packages/bin
+export NODE_PATH=${NODE_PATH}:${HOME}/.npm-packages/lib/node_modules
+'>> ~/.bashrc
+  echo "PATH=${PATH}"
+  echo "NODE_PATH=${NODE_PATH}"
+  echo " $(tput bold)npm global modules$(tput sgr0)"
+  npm install -g node-gyp node-pre-gyp
+  npm install -g raspi-io johnny-five
+  npm install -g @webreflection/node-worker
+fi
 
 if [ -f setup-user ]; then
   bash setup-user
