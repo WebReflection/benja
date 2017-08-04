@@ -9,6 +9,7 @@
   "author": "Andrea Giammarchi",
   "license": "MIT",
   "dependencies": {
+    "broadcast": "^2.0.2",
     "tiny-cdn": "^0.7.0"
   },
   "devDependencies": {

@@ -123,17 +123,19 @@ if [ ! -d ~/.npm-global ]; then
   export NPM_CONFIG_PREFIX=~/.npm-global
   export BIN_PATH=~/.npm-global/bin
   export NODE_PATH=~/.npm-global/lib/node_modules
+  export APP_PATH=~/app/node_modules
   echo "
 export NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}
 export PATH=${BIN_PATH}:\$PATH
 export NODE_PATH=${NODE_PATH}
+export APP_PATH=${APP_PATH}
 ">environment
   sudo bash -c 'cat environment>>/etc/environment'
   rm environment
   export PATH=${BIN_PATH}:${PATH}
   echo "NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}"
   echo "PATH=${PATH}"
-  echo "NODE_PATH=${NODE_PATH}"
+  echo "NODE_PATH=${APP_PATH}:${NODE_PATH}"
   echo " $(tput bold)npm global modules$(tput sgr0)"
   npm install -g node-gyp node-pre-gyp
   npm install -g raspi-io johnny-five
