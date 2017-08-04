@@ -115,8 +115,8 @@ if [ "$(sudo cat /etc/sudoers | grep $(which npm))" = "" ]; then
 fi
 
 echo " $(tput bold)nodejs global modules$(tput sgr0)"
-sudo npm install -g raspi-io johnny-five
-sudo npm install -g node-gyp node-pre-gyp @webreflection/node-worker
+sudo bash -c 'npm install -g node-gyp node-pre-gyp @webreflection/node-worker'
+sudo bash -c 'npm install -g raspi-io johnny-five'
 
 if [ -f setup-user ]; then
   bash setup-user
