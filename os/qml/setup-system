@@ -140,6 +140,13 @@ export NODE_PATH=${NODE_PATH}
   npm install -g @webreflection/node-worker
 fi
 
+echo " $(tput bold)cleaning up and optimizing$(tput sgr0)"
+yaourt -Sc --noconfirm
+while [ "$(yaourt -Qdtq)" != "" ]; do
+  yaourt -R --noconfirm $(yaourt -Qdtq)
+done
+sudo pacman-optimize
+
 if [ -f setup-user ]; then
   bash setup-user
 fi
