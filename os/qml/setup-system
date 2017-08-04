@@ -118,6 +118,7 @@ if [ ! -d ~/.npm-packages ]; then
   mkdir ~/.npm-packages
   echo " $(tput bold)nodejs prefix$(tput sgr0)"
   npm config set prefix '~/.npm-packages'
+  echo "npm prefix: $(npm config get prefix)"
   export PATH=$PATH:${HOME}/.npm-packages/bin
   export NODE_PATH=${NODE_PATH}:${HOME}/.npm-packages/lib/node_modules
   echo '
