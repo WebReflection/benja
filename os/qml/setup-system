@@ -114,17 +114,23 @@ if [ "$(sudo cat /etc/sudoers | grep $(which npm))" = "" ]; then
   rm sudoers
 fi
 
-if [ ! -d ~/.npm-packages ]; then
-  mkdir ~/.npm-packages
+if [ ! -d ~/.npm-global ]; then
+  mkdir ~/.npm-global
   echo " $(tput bold)nodejs prefix$(tput sgr0)"
-  npm config set prefix '~/.npm-packages'
+  npm config set prefix ~/.npm-global
   echo "npm prefix: $(npm config get prefix)"
-  export PATH=$PATH:${HOME}/.npm-packages/bin
-  export NODE_PATH=${NODE_PATH}:${HOME}/.npm-packages/lib/node_modules
+  echo "sudo npm prefix: $(sudo npm config get prefix)"
+  export NPM_CONFIG_PREFIX=~/.npm-global
+  export PATH=~/.npm-global/bin:$PATH
+  export NODE_PATH=~/.npm-global/lib/node_modules
   echo '
-export PATH=$PATH:${HOME}/.npm-packages/bin
-export NODE_PATH=${NODE_PATH}:${HOME}/.npm-packages/lib/node_modules
-'>> ~/.bashrc
+export NPM_CONFIG_PREFIX=~/.npm-global
+export PATH=~/.npm-global/bin:$PATH
+export NODE_PATH=~/.npm-global/lib/node_modules
+'> ~/bash.bashrc
+  sudo cat bash.bashrc >>/etc/bash.bashrc
+  rm bash.bashrc
+  echo "NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}"
   echo "PATH=${PATH}"
   echo "NODE_PATH=${NODE_PATH}"
   echo " $(tput bold)npm global modules$(tput sgr0)"
