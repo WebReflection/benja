@@ -108,17 +108,15 @@ if [ "$(which yaourt 2> /dev/null)" = "" ]; then
   sudo cp /usr/local/lib/libpigpio* /usr/lib/
 fi
 
-if [ ! -d ~/.npm-packages ]; then
-  echo " $(tput bold)npm prefix + nodejs global modules$(tput sgr0)"
-  npm config set prefix '~/.npm-packages'
-  npm install -g node-gyp node-pre-gyp @webreflection/node-worker
-
-  npm install -g  raspi-io johnny-five
-
+if [ "$(sudo cat /etc/sudoers | grep $(which npm))" = "" ]; then
   echo "${USER} ALL=NOPASSWD: $(which npm)"> sudoers
   sudo bash -c 'cat sudoers >>/etc/sudoers'
   rm sudoers
 fi
+
+echo " $(tput bold)nodejs global modules$(tput sgr0)"
+sudo npm install -g raspi-io johnny-five
+sudo npm install -g node-gyp node-pre-gyp @webreflection/node-worker
 
 if [ -f setup-user ]; then
   bash setup-user

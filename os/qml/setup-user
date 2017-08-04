@@ -11,7 +11,6 @@ echo " $(tput bold)preparing ${HOME}$(tput sgr0)"
 cd ~/
 touch .hushlogin
 mkdir -p .config
-mkdir -p .npm-packages/bin
 mkdir -p app/node_modules
 mkdir -p app/workers
 
@@ -38,14 +37,6 @@ else
   xterm
 fi
 "> ~/.xinitrc
-fi
-
-if [ "$(cat ~/.bashrc | grep NODE_PATH)" = "" ]; then
-  echo " $(tput bold)~/.bashrc PATH$(tput sgr0)"
-  echo '
-export NODE_PATH=${HOME}/.npm-packages/lib/node_modules
-export PATH=$PATH:${HOME}/.npm-packages/bin
-'>> ~/.bashrc
 fi
 
 if [ "$(cat ~/.bashrc | grep XDG_VTNR)" = "" ]; then
