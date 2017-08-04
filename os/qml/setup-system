@@ -121,13 +121,13 @@ if [ ! -d ~/.npm-global ]; then
   echo "npm prefix: $(npm config get prefix)"
   echo "sudo npm prefix: $(sudo npm config get prefix)"
   export NPM_CONFIG_PREFIX=~/.npm-global
-  export PATH=~/.npm-global/bin:$PATH
+  export BIN_PATH=~/.npm-global/bin
   export NODE_PATH=~/.npm-global/lib/node_modules
-  echo '
-export NPM_CONFIG_PREFIX=~/.npm-global
-export PATH=~/.npm-global/bin:$PATH
-export NODE_PATH=~/.npm-global/lib/node_modules
-'> ~/bash.bashrc
+  echo "
+export NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}
+export PATH=${BIN_PATH}:\$PATH
+export NODE_PATH=${NODE_PATH}
+"> ~/bash.bashrc
   sudo cat bash.bashrc >>/etc/bash.bashrc
   rm bash.bashrc
   echo "NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}"
