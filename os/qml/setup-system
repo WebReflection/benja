@@ -130,6 +130,7 @@ export NODE_PATH=${NODE_PATH}
 "> ~/bash.bashrc
   sudo cat bash.bashrc >>/etc/bash.bashrc
   rm bash.bashrc
+  export PATH=${BIN_PATH}:${PATH}
   echo "NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}"
   echo "PATH=${PATH}"
   echo "NODE_PATH=${NODE_PATH}"
