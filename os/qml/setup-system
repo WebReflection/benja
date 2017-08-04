@@ -127,9 +127,9 @@ if [ ! -d ~/.npm-global ]; then
 export NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}
 export PATH=${BIN_PATH}:\$PATH
 export NODE_PATH=${NODE_PATH}
-">bash.bashrc
-  sudo bash -c 'cat bash.bashrc>>/etc/bash.bashrc'
-  rm bash.bashrc
+">environment
+  sudo bash -c 'cat environment>>/etc/environment'
+  rm environment
   export PATH=${BIN_PATH}:${PATH}
   echo "NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX}"
   echo "PATH=${PATH}"
