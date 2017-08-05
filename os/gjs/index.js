@@ -8,7 +8,7 @@ const app = require('@webreflection/node-worker')(
   '0.0.0.0',
   () => {
     const address = app.address();
-    const gjs = require('child_process').spawn(
+    const child = require('child_process').spawn(
       'gjs',
       [
         'browse',
@@ -17,7 +17,8 @@ const app = require('@webreflection/node-worker')(
       ],
       {stdio: 'inherit'}
     );
-    gjs.on('exit', (code) => process.exit(code || 0));
+    child.once('exit', (code) => process.exit(code || 0));
+    process.once('exit', () => child.kill());
   }
 );
 

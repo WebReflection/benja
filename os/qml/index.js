@@ -8,7 +8,7 @@ const app = require('@webreflection/node-worker')(
   '0.0.0.0',
   () => {
     const address = app.address();
-    const qml = require('child_process').spawn(
+    const child = require('child_process').spawn(
       'qml',
       [
         '-platform',
@@ -19,7 +19,8 @@ const app = require('@webreflection/node-worker')(
       ],
       {stdio: 'inherit'}
     );
-    qml.on('exit', (code) => process.exit(code || 0));
+    child.once('exit', (code) => process.exit(code || 0));
+    process.once('exit', () => child.kill());
   }
 );
 

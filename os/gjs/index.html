@@ -46,7 +46,7 @@
         margin-bottom: 0;
       }
 
-      p:first-child {
+      p.ip-0 {
         font-weight: bold;
       }
 
@@ -71,21 +71,30 @@
     <script>
     const main = document.querySelector('main');
     const nw = new NodeWorker('utils.js');
+    main.appendChild(
+      document.createElement('p')
+    ).textContent = [
+      document.documentElement.clientWidth,
+      document.documentElement.clientHeight
+    ].join('x');
     nw.onmessage = (e) => {
-      e.data.forEach(ip => {
-        main.appendChild(
-          document.createElement('p')
-        ).textContent = ip;
-      });
-      main.appendChild(
-        document.createElement('p')
-      ).textContent = [
-        document.documentElement.clientWidth,
-        document.documentElement.clientHeight
-      ].join('x');
+      switch (e.data.type) {
+        case 'ipv4':
+          e.data.result.forEach((ip, i) => {
+            const p = document.createElement('p');
+            p.classList.add('ip-' + i);
+            main.appendChild(p).textContent = ip;
+          });
+          break;
+        case 'five':
+          main.appendChild(
+            document.createElement('p')
+          ).textContent = e.data.result;
+          break;
+      } 
     };
     nw.postMessage({name: 'ipv4'});
-
+    nw.postMessage({name: 'five'});
     </script>
   </body>
 </html>

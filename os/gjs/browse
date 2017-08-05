@@ -8,7 +8,7 @@
   const
     Screen = Gdk.Screen.get_default(),
     window = new Gtk.Window({
-      title: 'Benja GTK+',
+      title: 'Benja WebKitGTK+',
       type : Gtk.WindowType.TOPLEVEL,
       decorated: false,
       window_position: Gtk.WindowPosition.CENTER

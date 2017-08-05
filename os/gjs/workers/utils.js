@@ -17,11 +17,30 @@ onmessage = (e) => {
   }
 };
 
+const broadcast = require('broadcast');
+const five = require('johnny-five');
+const Raspi = require('raspi-io');
+let board;
+
 // exposed utilities (just one for demo purpose)
 const utils = {
+  five() {
+    if (!board) {
+      board = new five.Board({
+        io: new Raspi()
+      });
+      board.on('ready', () => {
+        broadcast.that('five-is-ready', {
+          type: 'five',
+          result: 'Ready to Rock!'
+        });
+      });      
+    }
+    return broadcast.when('five-is-ready');
+  },
   ipv4() {
     const ni = require('os').networkInterfaces();
-    return Object.keys(ni).reduce((out, key) => {
+    const result = Object.keys(ni).reduce((out, key) => {
       return ni[key].reduce((out, iface) => {
         if (
           iface.family === 'IPv4' &&
@@ -32,5 +51,6 @@ const utils = {
         return out;
       }, out);
     }, []);
+    return {type: 'ipv4', result: result};
   }
 };

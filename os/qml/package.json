@@ -1,7 +1,7 @@
 {
   "name": "app",
   "version": "1.0.0",
-  "description": "Benja GTK+",
+  "description": "Benja QML",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
