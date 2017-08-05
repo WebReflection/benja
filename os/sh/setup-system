@@ -108,21 +108,21 @@ fi
 
 if [ -f /boot/config.txt ]; then
   cat /boot/config.txt > config.txt
-  if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
-    echo " $(tput bold)/boot/config.txt$(tput sgr0)"
-    echo '
+fi
+if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
+  echo " $(tput bold)/boot/config.txt$(tput sgr0)"
+  echo '
 gpu_mem=128
 dispmanx_offline=1
 dtoverlay=vc4-fkms-v3d
 dtparam=audio=on
 '>>config.txt
-    sudo mv config.txt /boot/config.txt
-    if [ -f /boot/cmdline.txt ]; then
-      sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
-    fi
+  sudo mv config.txt /boot/config.txt
+  if [ -f /boot/cmdline.txt ]; then
+    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
   fi
-  rm -rf config.txt
 fi
+rm -rf config.txt
 
 if [ ! -f /etc/systemd/system/BOOT2WK-disk.service ]; then
 echo "[Unit]
