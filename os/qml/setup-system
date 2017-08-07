@@ -43,9 +43,11 @@ fi
 
 if [ -f /boot/config.txt ]; then
   cat /boot/config.txt > config.txt
+else
+  echo '' > config.txt
 fi
 if [ "$(cat config.txt | grep dispmanx_offline=1)" = "" ]; then
-  sudo sed -i -e "s/gpu_mem=.*//" /boot/config.txt
+  sudo sed -i -e "s/gpu_mem=.*//" config.txt
   sync
   echo " $(tput bold)/boot/config.txt$(tput sgr0)"
   echo '
@@ -57,6 +59,8 @@ dtparam=audio=on
   sudo mv config.txt /boot/config.txt
   if [ -f /boot/cmdline.txt ]; then
     sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
+  elif [ -f /boot/boot.txt ]; then
+    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/boot.txt
   fi
 fi
 rm -rf config.txt
