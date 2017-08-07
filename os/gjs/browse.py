@@ -16,7 +16,7 @@ def onDestroy(widget):
 Screen = Gdk.Screen.get_default()
 
 webView = WebKit2.WebView()
-webView.load_uri('http://google.com/')
+webView.load_uri('https://www.youtube.com/watch?v=IlVtF3dAyxs')
 
 wvSettings = webView.get_settings()
 gtkSettings = Gtk.Settings.get_default()

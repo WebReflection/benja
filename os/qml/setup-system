@@ -59,8 +59,10 @@ dtparam=audio=on
   sudo mv config.txt /boot/config.txt
   if [ -f /boot/cmdline.txt ]; then
     sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/cmdline.txt
-  elif [ -f /boot/boot.txt ]; then
-    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash/" /boot/boot.txt
+  elif [ -f /boot/boot.scr ]; then
+    sudo pacman -S --needed uboot-tools
+    sudo sed -i "s/rootwait/rootwait quiet loglevel=0 splash cma=192MB/" /boot/boot.txt
+    sudo mkimage -T script -C none -n "RPi3 VC4" -d /boot/boot.txt /boot/boot.scr
   fi
 fi
 rm -rf config.txt
@@ -105,7 +107,6 @@ if [ -f /etc/motd ]; then
 fi
 
 if [ "$(which yaourt 2> /dev/null)" = "" ]; then
-  echo " $(tput bold)installing yaourt$(tput sgr0)"
   bash <(curl -s archibold.io/install/yaourt)
 
   echo " $(tput bold)installing pigpio$(tput sgr0)"
