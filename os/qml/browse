@@ -17,6 +17,9 @@ Window {
     onNewViewRequested: function(request) {
       request.openIn(webView);
     }
+    onJavaScriptConsoleMessage: {
+      console.log("[" + sourceID + ":" + lineNumber + "]", message);
+    }
     settings.accelerated2dCanvasEnabled: true
     settings.allowGeolocationOnInsecureOrigins: true
     settings.allowRunningInsecureContent: true
