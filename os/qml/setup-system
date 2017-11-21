@@ -20,7 +20,7 @@ sudo pacman -S --needed --noconfirm \
 
 echo " $(tput bold)installing Qt$(tput sgr0)"
 sudo pacman -S --needed --noconfirm \
-  qt5-quickcontrols qt5-webengine
+  qt5-quickcontrols qt5-quickcontrols2 qt5-webengine
 
 # configure 8080 to 80 redirect
 if [ ! -f /etc/systemd/system/localhost-80to8080.service ]; then
