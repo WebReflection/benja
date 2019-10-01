@@ -25,6 +25,11 @@ app.once('ready', () => {
   // a reference is needed so the GC
   // won't kill the view
   this.window = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      webgl: true
+    },
     backgroundColor: '#000000',
     frame: false,
     // in some case kiosk: true is not working
