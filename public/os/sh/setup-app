@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+if [ "${USER}" = "root" ]; then
+  echo "You cannot be root setup the app folder"
+  exit 1
+fi
+
+if [ ! -f /etc/systemd/system/app-disk.service ]; then
+  mkdir -p ${HOME}/app
+  echo "[Unit]
+Description=app ${HOME}/app disk
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/mount /dev/mmcblk0p3 ${HOME}/app -o uid=${USER},gid=users,umask=0022
+
+[Install]
+WantedBy=multi-user.target
+">${HOME}/app/app-disk.service
+  echo "#!/usr/bin/env bash
+mv ${HOME}/app/app-disk.service /etc/systemd/system/app-disk.service
+systemctl enable app-disk.service
+systemctl start app-disk.service
+rm ${HOME}/app/bash
+">${HOME}/app/bash
+  sync
+  if [ "$(which sudo 2> /dev/null)" = "" ]; then
+    su -c "bash ${HOME}/app/bash"
+  else
+    sudo bash ${HOME}/app/bash
+  fi
+fi

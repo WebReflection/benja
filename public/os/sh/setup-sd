@@ -21,11 +21,11 @@ if [ "$OS_SDCARD" = "" ] || [ "$OS_ARCHIVE" = "" ]; then
 fi
 
 TMP_SD_SIZE=$(sudo fdisk -s $OS_SDCARD)
-TMP_ROOT_SIZE="6000000"
+TMP_ROOT_SIZE="6800000"
 if [ $TMP_ROOT_SIZE \> $TMP_SD_SIZE ]; then
   TMP_ROOT_SIZE="3800M"
 else
-  TMP_ROOT_SIZE="6000M"
+  TMP_ROOT_SIZE="6800M"
 fi
 
 clear
@@ -51,8 +51,8 @@ partition_sd() {
   local DISK=$1
   local ROOT_SIZE=$2
   sudo parted --script $DISK mklabel msdos
-  sudo parted --script --align optimal $DISK mkpart primary fat32 2048s 100M
-  sudo parted --script --align optimal $DISK mkpart primary ext4 100M $ROOT_SIZE
+  sudo parted --script --align optimal $DISK mkpart primary fat32 2048s 200M
+  sudo parted --script --align optimal $DISK mkpart primary ext4 200M $ROOT_SIZE
   sudo parted --script --align optimal $DISK mkpart primary fat32 $ROOT_SIZE 100%
   sudo parted --script $DISK set 1 boot on
   sudo parted --script $DISK set 2 hidden
