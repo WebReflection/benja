@@ -21,7 +21,7 @@ sudo mv ./99-calibration.conf /etc/X11/xorg.conf.d/99-calibration.conf
 echo "dwc_otg.lpm_enable=0 $(cat /boot/cmdline.txt) fbcon=map:10 fbcon=font:ProFont6x11 logo.nologo" > ./cmdline.txt
 sudo mv ./cmdline.txt /boot/cmdline.txt
 
-curl -LO https://benja.io/os/bin/waveshare35a.dtbo
+curl -LO https://benja.andreagiammarchi.now.sh/os/bin/waveshare35a.dtbo
 sudo mv waveshare35a.dtbo /boot/overlays/waveshare35a.dtbo
 
 cat /boot/config.txt > ./config.txt
@@ -33,7 +33,7 @@ dtoverlay=waveshare35a' >> config.txt
 sudo mv ./config.txt /boot/config.txt
 
 mv ~/.app-launcher ~/.xinitrc
-curl -LO https://benja.io/os/sh/startx
+curl -LO https://benja.andreagiammarchi.now.sh/os/sh/startx
 cat startx >> ~/.bashrc
 rm startx
 

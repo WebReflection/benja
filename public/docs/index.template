@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta property="og:title" name="twitter:title" itemprop="name" content="B.E.N.J.A.">
     <meta property="og:description" name="twitter:description" itemprop="description" content="An HW Accelerated IoT oriented Web Kiosk for Makers">
-    <meta property="og:image" name="twitter:image:src" itemprop="image" content="https://benja.io/img/benja-card.png">
+    <meta property="og:image" name="twitter:image:src" itemprop="image" content="https://benja.andreagiammarchi.now.sh/img/benja-card.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@benja_io">
     <meta name="twitter:creator" content="@WebReflection">
-    <meta property="og:url" content="https://benja.io/">
+    <meta property="og:url" content="https://benja.andreagiammarchi.now.sh/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Benja OS">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" rel="stylesheet" type="text/css">

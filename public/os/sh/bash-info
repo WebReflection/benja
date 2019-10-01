@@ -34,7 +34,7 @@ export CURRENT_ARCH="$(uname -m)"
 export OS_INSTALLER="0.2.0"
 export OS_VERSION="0.3.0"
 export OS_NAME="BENJA"
-export OS_WEBSITE="https://benja.io"
+export OS_WEBSITE="https://benja.andreagiammarchi.now.sh"
 export OS_USER="benja"
 export OS_LOGO=" 
  [d]┌────────────────┐[/]

@@ -209,13 +209,13 @@ if [ "$USER" != "root" ]; then
 fi
 
 # check network connection
-curl -LOs benja.io/index.html
+curl -LOs benja.andreagiammarchi.now.sh/index.html
 if [ ! -f index.html ]; then
   if [ "$(ip addr | grep ': eth')" != "" ]; then
     echo ' activating ethernet via dhcpcd ...'
     dhcpcd
     sleep 2
-    curl -LOs benja.io/index.html
+    curl -LOs benja.andreagiammarchi.now.sh/index.html
   fi
   if [ ! -f index.html ]; then
     echo ' a network connection is needed.'
@@ -229,7 +229,7 @@ sleep 2
 
 if [ ! -f bash-info ] || [ ! -f utils ] || [ ! -f utils-platform ] || [ ! -f install-common ]; then
   echo ' something is wrong here.'
-  echo ' please visit https://benja.io/ to know how to install'
+  echo ' please visit https://benja.andreagiammarchi.now.sh/ to know how to install'
   exit 1
 fi
 

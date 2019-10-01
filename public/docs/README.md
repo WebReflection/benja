@@ -7,7 +7,7 @@ hardware acceleration capabilities, or setup.
 
 ### How to create the B.E.N.J.A. environment
 The easiest way to have a B.E.N.J.A. environment is to buy a preinstalled Micro SD card, accordingly with the hacker board you'd like to use.
-The list of boards and relative ISO images or preinstalled SD cards is available via the [benja.io home page](https://benja.io/).
+The list of boards and relative ISO images or preinstalled SD cards is available via the [benja.io home page](https://benja.andreagiammarchi.now.sh/).
 
 There are also other ways to obtain, test, and use a B.E.N.J.A. environment:
 
@@ -22,7 +22,7 @@ This procedure works on **Linux** and **MacOS**, but you can use **Windows** too
 
 **Warning** your SD card will lose its data permanently.
 
-Images are stored as `.zip` files so once you download one from the [benja.io home page](https://benja.io/),
+Images are stored as `.zip` files so once you download one from the [benja.io home page](https://benja.andreagiammarchi.now.sh/),
 using the **DOWNLOAD ISO** link under the right target board,
 be sure you also extract its content somewhere on your Hard Drive.
 
@@ -96,7 +96,7 @@ or you'd like to customize the installation in a convenient way for your needs,
 all you need to do is to write the following in console:
 
 ```sh
-$ curl -LO benja.io/os/install
+$ curl -LO benja.andreagiammarchi.now.sh/os/install
 $ bash install # to read how to use it
 
 # to prepare, as example, odroid-c1 image
@@ -118,13 +118,13 @@ you need to start such machine via a recently burned [ArchLinux ISO](https://www
 
 Once you'll login, feel free to use `lsblk` to read where is your SD card, and write the following on console:
 ```sh
-$ curl -LO benja.io/os/install
+$ curl -LO benja.andreagiammarchi.now.sh/os/install
 $ bash install # to read how to use it
 
 # erase the SD card and install Benja OS
 $ bash install /dev/mmcblk0
 ```
-This is the very same procedure that has been used for the [Minnowboard Max](https://benja.io/#minnowboard-max) so,
+This is the very same procedure that has been used for the [Minnowboard Max](https://benja.andreagiammarchi.now.sh/#minnowboard-max) so,
 in case of doubts, it's worth trying that iso out before starting a whole new process.
 
 

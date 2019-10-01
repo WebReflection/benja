@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta property="og:title" name="twitter:title" itemprop="name" content="B.E.N.J.A.">
     <meta property="og:description" name="twitter:description" itemprop="description" content="An HW Accelerated IoT oriented Web Kiosk for Makers">
-    <meta property="og:image" name="twitter:image:src" itemprop="image" content="https://benja.io/img/benja-card.png">
+    <meta property="og:image" name="twitter:image:src" itemprop="image" content="https://benja.andreagiammarchi.now.sh/img/benja-card.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@benja_io">
     <meta name="twitter:creator" content="@WebReflection">
-    <meta property="og:url" content="https://benja.io/">
+    <meta property="og:url" content="https://benja.andreagiammarchi.now.sh/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Benja OS">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" rel="stylesheet" type="text/css">
@@ -43,7 +43,7 @@ Please note that every supported board might have slightly different setup,
 hardware acceleration capabilities, or setup.</p>
 <h3 id="how-to-create-the-b-e-n-j-a-environment">How to create the B.E.N.J.A. environment</h3>
 <p>The easiest way to have a B.E.N.J.A. environment is to buy a preinstalled Micro SD card, accordingly with the hacker board you’d like to use.
-The list of boards and relative ISO images or preinstalled SD cards is available via the <a href="https://benja.io/">benja.io home page</a>.</p>
+The list of boards and relative ISO images or preinstalled SD cards is available via the <a href="https://benja.andreagiammarchi.now.sh/">benja.io home page</a>.</p>
 <p>There are also other ways to obtain, test, and use a B.E.N.J.A. environment:</p>
 <ul>
 <li>using an <a href="#how-to-burn-an-already-prepared-iso-image">ISO image already prepared</a> for your target platform</li>
@@ -53,7 +53,7 @@ The list of boards and relative ISO images or preinstalled SD cards is available
 <p>You will need a Micro SD card, possibly Class 10, and with at least 8GB of space.
 This procedure works on <strong>Linux</strong> and <strong>MacOS</strong>, but you can use <strong>Windows</strong> too as long as you have a software that can burn iso files into an SD card.</p>
 <p><strong>Warning</strong> your SD card will lose its data permanently.</p>
-<p>Images are stored as <code>.zip</code> files so once you download one from the <a href="https://benja.io/">benja.io home page</a>,
+<p>Images are stored as <code>.zip</code> files so once you download one from the <a href="https://benja.andreagiammarchi.now.sh/">benja.io home page</a>,
 using the <strong>DOWNLOAD ISO</strong> link under the right target board,
 be sure you also extract its content somewhere on your Hard Drive.</p>
 <p>Both <strong>Linux</strong> and <strong>MacOS</strong> have a simple way to burn images on SD cards, it’s called <a href="https://en.wikipedia.org/wiki/Dd_(Unix">dd</a>).</p>
@@ -99,7 +99,7 @@ it might take up to 5 minutes to burn the entire image.</p>
 However, if you’d like to help this project, making it compatible with new boards,
 or you’d like to customize the installation in a convenient way for your needs,
 all you need to do is to write the following in console:</p>
-<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.io/os/install</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.andreagiammarchi.now.sh/os/install</span>
 <span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
 <span class="line"></span>
 <span class="line"><span class="hljs-comment"># to prepare, as example, odroid-c1 image</span></span>
@@ -111,11 +111,11 @@ all you need to do is to write the following in console:</p>
 <p>In case you’d like to install Benja OS on an i686 or x86_64 compatible hardware,
 you need to start such machine via a recently burned <a href="https://www.archlinux.org/download/">ArchLinux ISO</a>.</p>
 <p>Once you’ll login, feel free to use <code>lsblk</code> to read where is your SD card, and write the following on console:</p>
-<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.io/os/install</span>
+<pre><code class="lang-sh hljs sh"><span class="line">$ curl -LO benja.andreagiammarchi.now.sh/os/install</span>
 <span class="line">$ bash install <span class="hljs-comment"># to read how to use it</span></span>
 <span class="line"></span>
 <span class="line"><span class="hljs-comment"># erase the SD card and install Benja OS</span></span>
-<span class="line">$ bash install /dev/mmcblk0</span></code></pre><p>This is the very same procedure that has been used for the <a href="https://benja.io/#minnowboard-max">Minnowboard Max</a> so,
+<span class="line">$ bash install /dev/mmcblk0</span></code></pre><p>This is the very same procedure that has been used for the <a href="https://benja.andreagiammarchi.now.sh/#minnowboard-max">Minnowboard Max</a> so,
 in case of doubts, it’s worth trying that iso out before starting a whole new process.</p>
 <h3 id="how-to-develop">How to Develop</h3>
 <p>Creating applications is as easy as writing the following from the <code>BENJA-APP</code> disk folder:</p>

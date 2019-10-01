@@ -34,7 +34,7 @@ fi
 
 sudo pacman -Sy --noconfirm
 
-curl -LO benja.io/os/sh/cpupower
+curl -LO benja.andreagiammarchi.now.sh/os/sh/cpupower
 bash cpupower
 
 if [ "$X11" != "NO" ]; then

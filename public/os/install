@@ -127,13 +127,13 @@ else
   cd "${OS_INSTALLER_SRC}"
 
   if [ ! -f bash-info ]; then
-    curl -LOs 'https://benja.io/os/sh/bash-info'
+    curl -LOs 'https://benja.andreagiammarchi.now.sh/os/sh/bash-info'
     sync
   fi
   if [ ! -f bash-info ]; then
     ntpdate pool.ntp.org
     timedatectl set-local-rtc 1
-    curl -LOs 'https://benja.io/os/sh/bash-info'
+    curl -LOs 'https://benja.andreagiammarchi.now.sh/os/sh/bash-info'
     sync
   fi
   . bash-info

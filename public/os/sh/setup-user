@@ -11,14 +11,13 @@ echo " $(tput bold)preparing ${HOME}$(tput sgr0)"
 cd ~/
 touch .hushlogin
 mkdir -p .config
+mkdir -p .npm-packages/bin
 mkdir -p app/node_modules
 mkdir -p app/workers
 
-if [ ! -f ~/.xinitrc ]; then
-  echo " $(tput bold)~/.xinitrc$(tput sgr0)"
+echo " $(tput bold)~/.app-launcher$(tput sgr0)"
+if [ ! -f ~/.app-launcher ]; then
   echo "#!/usr/bin/env bash
-
-xset s off -dpms
 
 if [ -f ~/app/package.json ]; then
   cd ~/app
@@ -26,7 +25,7 @@ if [ -f ~/app/package.json ]; then
     mkdir node_modules
     npm install --production --no-bin-links
   fi
-  sudo npm start
+  npm start
 else
   cd ~/
   if [ -f ~/app/package.jsno ]; then
@@ -34,49 +33,50 @@ else
   elif [ -f ~/app/package.jsoff ]; then
     mv ~/app/package.jsoff ~/app/package.json
   fi
-  xterm
-fi
-"> ~/.xinitrc
+  weston-terminal --fullscreen
+fi" >~/.app-launcher
+  chmod a+x ~/.app-launcher
 fi
 
-if [ "$(cat ~/.bashrc | grep XDG_VTNR)" = "" ]; then
-  echo " $(tput bold)~/.bashrc XDG_VTNR$(tput sgr0)"
-  echo '
-[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx > /dev/null 2>&1
-'>> ~/.bashrc
+echo " $(tput bold)~/.config/weston.ini$(tput sgr0)"
+if [ ! -f ~/.config/weston.ini ]; then
+  echo "[core]
+idle-time=0
+require-input=false
+
+[shell]
+client=/home/${USER}/.app-launcher
+animation=none
+close-animation=none
+startup-animation=none
+locking=false
+" >~/.config/weston.ini
 fi
 
 echo " $(tput bold)~/app$(tput sgr0)"
 cd ~/app
 touch reload
 if [ ! -f logo-dark.svg ]; then
-  echo ' logo-dark.svg'
-  curl -LOs "https://benja.io/os/qml/logo-dark.svg"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/logo-dark.svg"
 fi
 if [ ! -f logo-light.svg ]; then
-  echo ' logo-light.svg'
-  curl -LOs "https://benja.io/os/qml/logo-light.svg"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/logo-light.svg"
 fi
 if [ ! -f index.html ]; then
-  echo ' index.html'
-  curl -LOs "https://benja.io/os/qml/index.html"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/index.html"
 fi
 if [ ! -f index.js ]; then
-  echo ' index.js'
-  curl -LOs "https://benja.io/os/qml/index.js"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/index.js"
 fi
 if [ ! -f package.json ]; then
-  echo ' package.json'
-  curl -LOs "https://benja.io/os/qml/package.json"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/package.json"
 fi
 if [ ! -f browse ]; then
-  echo ' browse'
-  curl -LOs "https://benja.io/os/qml/browse"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/browse"
 fi
 if [ ! -f workers/utils.js ]; then
-  echo ' workers/utils.js'
   cd workers
-  curl -LOs "https://benja.io/os/qml/workers/utils.js"
+  curl -LOs "https://benja.andreagiammarchi.now.sh/os/gjs/workers/utils.js"
   cd ..
 fi
 npm install --production --no-bin-links

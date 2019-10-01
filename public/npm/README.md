@@ -11,4 +11,4 @@ Install it locally via `npm install benja` and after that:
 require(process.cwd() + '/node_modules/benja').paths();
 ```
 
-Visit [Benja OS](https://benja.io/) site to know more.
+Visit [Benja OS](https://benja.andreagiammarchi.now.sh/) site to know more.
