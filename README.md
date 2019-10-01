@@ -9,8 +9,8 @@ I have suggested a [DIY alternative](https://medium.com/@WebReflection/a-minimal
 
 - - -
 
-[Website](https://benja.io/)
+[Website](https://benja.andreagiammarchi.now.sh/)
 
-[Documentation](https://benja.io/docs/)
+[Documentation](https://benja.andreagiammarchi.now.sh/docs/)
 
-[Project files](https://github.com/WebReflection/benja/tree/gh-pages)
+[Project files](https://github.com/WebReflection/benja/tree/gh-pages/public)
