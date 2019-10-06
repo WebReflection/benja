@@ -3,14 +3,6 @@ Bootable Electron Node JS Application
 
 ## Abandoned
 
-Due lack of support, this project is currently unsustainable.
+Due lack of support, this project is currently unsustainable, but its installer has been improved and **moved** over **[archibold.io/benja](https://archibold.io/benja/)**.
 
-I have suggested a [DIY alternative](https://medium.com/@WebReflection/a-minimalistic-64-bit-web-kiosk-for-rpi-3-98e460419b47)
-
-- - -
-
-[Website](https://benja.andreagiammarchi.now.sh/)
-
-[Documentation](https://benja.andreagiammarchi.now.sh/docs/)
-
-[Project files](https://github.com/WebReflection/benja/tree/gh-pages/public)
+Alternatively, I have suggested a [DIY alternative](https://medium.com/@WebReflection/a-minimalistic-64-bit-web-kiosk-for-rpi-3-98e460419b47) that doesn't boot into Electron.
